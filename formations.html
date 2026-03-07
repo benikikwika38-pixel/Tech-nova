@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formations - TechNova Academy</title>
 
 <style>
@@ -9,39 +11,57 @@
 body{
 font-family: Arial, sans-serif;
 background:#f4f6f9;
+margin:0;
+height:100vh;
+
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+width:90%;
+max-width:700px;
+background:white;
+padding:50px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,0.15);
 text-align:center;
-padding:40px;
 }
 
 h1{
-font-size:40px;
+font-size:50px;
 color:#2c3e50;
+margin-bottom:30px;
 }
 
 p{
-font-size:22px;
+font-size:26px;
 }
 
 select{
-font-size:20px;
-padding:12px;
-width:260px;
-border-radius:8px;
+width:100%;
+font-size:24px;
+padding:15px;
 margin-top:10px;
+border-radius:8px;
+border:1px solid #ccc;
 }
 
 input{
-font-size:20px;
-padding:12px;
-width:250px;
+width:100%;
+font-size:24px;
+padding:15px;
+margin-top:20px;
 border-radius:8px;
-margin-top:15px;
+border:1px solid #ccc;
 }
 
 button{
-font-size:20px;
-padding:12px 35px;
-margin-top:20px;
+width:100%;
+font-size:26px;
+padding:18px;
+margin-top:30px;
 background:#2980b9;
 color:white;
 border:none;
@@ -59,6 +79,8 @@ background:#1f618d;
 
 <body>
 
+<div class="container">
+
 <h1>TechNova Academy</h1>
 
 <p>Choisissez votre formation :</p>
@@ -75,15 +97,13 @@ background:#1f618d;
 
 </select>
 
-<br><br>
-
 <p>Entrez votre code :</p>
 
-<input type="text" id="code">
+<input type="text" id="code" placeholder="Code de formation">
 
-<br><br>
+<button onclick="verifier()">Accéder au cours</button>
 
-<button onclick="verifier()">Accéder</button>
+</div>
 
 <script>
 
@@ -109,7 +129,7 @@ window.location.href="word.html";
 }
 
 else{
-alert("Code incorrect");
+alert("Code incorrect pour cette formation");
 }
 
 }
