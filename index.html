@@ -1,54 +1,130 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechNova Academy – Communauté des Érudits</title>
-    <style>
-        body { 
-            font-family: 'Georgia', serif; 
-            background-color: #f7f7f7; 
-            color: #222; 
-            text-align: center; 
-            padding: 30px;
-        }
-        h1 { color: #2c3e50; font-size: 2.5em; }
-        h2 { color: #34495e; font-size: 1.8em; margin-top: 40px; }
-        p { font-size: 1.1em; line-height: 1.6em; margin: 20px auto; max-width: 700px; }
-        ul { list-style-type: none; padding: 0; }
-        li { font-size: 1.1em; margin: 10px 0; }
-        a { 
-            display: inline-block; 
-            padding: 15px 25px; 
-            margin-top: 20px; 
-            font-size: 1.2em; 
-            color: #fff; 
-            background-color: #2980b9; 
-            text-decoration: none; 
-            border-radius: 8px; 
-            transition: background 0.3s;
-        }
-        a:hover { background-color: #1f618d; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechNova Academy – Communauté des Érudits</title>
+<style>
+    /* Polices et style général */
+    body {
+        font-family: 'Georgia', serif;
+        background-color: #f4f4f9; /* Fond clair élégant */
+        color: #222;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* En-tête */
+    header {
+        background-color: #2c3e50;
+        color: #fff;
+        text-align: center;
+        padding: 50px 20px;
+    }
+    header h1 {
+        font-size: 2.8em;
+        margin: 0;
+    }
+    header p {
+        font-size: 1.2em;
+        margin-top: 10px;
+        font-style: italic;
+    }
+
+    /* Sections */
+    section {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #34495e;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #2980b9;
+        display: inline-block;
+        padding-bottom: 5px;
+    }
+
+    p {
+        font-size: 1.1em;
+        line-height: 1.6em;
+        margin-bottom: 20px;
+    }
+
+    ul {
+        list-style-type: square;
+        padding-left: 20px;
+    }
+    ul li {
+        font-size: 1.1em;
+        margin: 10px 0;
+    }
+
+    /* Bouton d’inscription */
+    .btn-inscription {
+        display: inline-block;
+        padding: 15px 35px;
+        font-size: 1.2em;
+        color: #fff;
+        background-color: #2980b9;
+        border: none;
+        border-radius: 10px;
+        text-decoration: none;
+        margin-top: 20px;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+    .btn-inscription:hover {
+        background-color: #1f618d;
+        transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+        text-align: center;
+        color: #555;
+        margin: 50px 0 20px 0;
+        font-size: 0.9em;
+    }
+</style>
 </head>
 <body>
 
-<h1>Bienvenue sur TechNova Academy</h1>
+<header>
+    <h1>TechNova Academy</h1>
+    <p>Communauté des érudits passionnés par l’informatique et les technologies</p>
+</header>
 
-<p>TechNova est une communauté d’érudits passionnés par l’informatique et la programmation. Notre mission est de former les esprits curieux et de transmettre le savoir numérique à toute personne désireuse d’apprendre.</p>
+<section>
+    <h2>À propos</h2>
+    <p>TechNova Academy a pour mission de former des esprits curieux et ambitieux aux bases et avancées de l’informatique. 
+    Chaque étudiant reçoit un accompagnement sérieux et rigoureux pour devenir un véritable érudit numérique.</p>
+</section>
 
-<h2>Formations disponibles</h2>
-<ul>
-    <li>Excel</li>
-    <li>Word</li>
-    <li>Bases de données</li>
-    <li>Initiation à l’informatique</li>
-</ul>
+<section>
+    <h2>Formations disponibles</h2>
+    <ul>
+        <li>Excel</li>
+        <li>Word</li>
+        <li>Bases de données</li>
+        <li>Initiation à l’informatique</li>
+    </ul>
+</section>
 
-<h2>Inscription</h2>
-<p>Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous :</p>
+<section>
+    <h2>Inscription</h2>
+    <p>Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous. 
+    Votre dossier sera examiné et validé par TechNova Academy.</p>
+    <a href=https://forms.gle/8b2CHCozdcM33EMt5 target="_blank" class="btn-inscription">S'inscrire maintenant</a>
+</section>
 
-<a href=https://forms.gle/8b2CHCozdcM33EMt5target="_blank">S'inscrire maintenant</a>
+<footer>
+    &copy; 2026 TechNova Academy – Tous droits réservés
+</footer>
 
 </body>
-  </html>
+    </html>
