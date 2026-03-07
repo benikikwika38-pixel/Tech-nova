@@ -37,7 +37,8 @@ function verifierCode() {
     const codeValide = "223345"; // ← CHANGE ce code pour ton étudiant
     if(codeEntre === codeValide){
         alert("Accès autorisé ! Bienvenue aux cours.");
-        window.location.href = "cours.html"; // ← Redirige vers ta page de cours
+        window.location.href = "formation.html"; // ← Redirige vers ta 
+        page de formation 
     } else {
         alert("Code invalide. Votre dossier n’a pas été accepté.");
     }
@@ -49,9 +50,7 @@ function verifierCode() {
 <h1>TechNova Academy</h1>
 <h2>Accès aux cours</h2>
 <p>Entrez votre code d’accès fourni après validation de votre dossier :</p>
-<a href="formation.html">
-  <button>Accéder aux formations</button>
-</a>
+
 <input type="text" id="code" placeholder="Code étudiant">
 <br><br>
 <button onclick="verifierCode()">Valider</button>
