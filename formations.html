@@ -36,7 +36,34 @@ alert("Formation ou code incorrect");
 </script>
 
 </head>
+<script>
+function verifier(){
 
+let formation = document.getElementById("formation").value;
+let code = document.getElementById("code").value.trim();
+
+if(formation === "initiation" && code === "INIT2026"){
+window.location.href="initiation.html";
+}
+
+else if(formation === "database" && code === "DB2026"){
+window.location.href="database.html";
+}
+
+else if(formation === "excel" && code === "EXCEL2026"){
+window.location.href="excel.html";
+}
+
+else if(formation === "word" && code === "WORD2026"){
+window.location.href="word.html";
+}
+
+else{
+alert("Code incorrect pour cette formation");
+}
+
+}
+</script>
 <body>
 
 <h1>TechNova Academy</h1>
@@ -54,7 +81,7 @@ alert("Formation ou code incorrect");
 <option value="word">Microsoft Word</option>
 
 </select>
-</a>
+<a>
 </a>
 
 <br><br>
