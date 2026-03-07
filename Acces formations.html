@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Accès aux formations</title>
+
+<script>
+
+function verifier(){
+
+let formation = document.getElementById("formation").value;
+let code = document.getElementById("code").value;
+
+if(formation === "initiation" && code === "INIT2026"){
+window.location.href="initiation.html";
+}
+
+else if(formation === "database" && code === "DB2026"){
+window.location.href="database.html";
+}
+
+else if(formation === "excel" && code === "EXCEL2026"){
+window.location.href="excel.html";
+}
+
+else if(formation === "word" && code === "WORD2026"){
+window.location.href="word.html";
+}
+
+else{
+alert("Formation ou code incorrect");
+}
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<h1>TechNova Academy</h1>
+
+<p>Choisissez votre formation :</p>
+
+<select id="formation">
+
+<option value="initiation">Initiation à l'informatique</option>
+
+<option value="database">Base de données</option>
+
+<option value="excel">Microsoft Excel</option>
+
+<option value="word">Microsoft Word</option>
+
+</select>
+
+<br><br>
+
+<p>Entrez votre code :</p>
+
+<input type="text" id="code">
+
+<br><br>
+
+<button onclick="verifier()">Accéder au cours</button>
+
+</body>
+  </html>
