@@ -2,41 +2,91 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Accès aux formations</title>
+<title>Formations - TechNova Academy</title>
 
-<script>
+<style>
 
-function verifier(){
-
-let formation = document.getElementById("formation").value;
-let code = document.getElementById("code").value;
-
-if(formation === "initiation" && code === "INIT2026"){
-window.location.href="initiation.html";
+body{
+font-family: Arial, sans-serif;
+background:#f4f6f9;
+text-align:center;
+padding:40px;
 }
 
-else if(formation === "database" && code === "DB2026"){
-window.location.href="database.html";
+h1{
+font-size:40px;
+color:#2c3e50;
 }
 
-else if(formation === "excel" && code === "EXCEL2026"){
-window.location.href="excel.html";
+p{
+font-size:22px;
 }
 
-else if(formation === "word" && code === "WORD2026"){
-window.location.href="word.html";
+select{
+font-size:20px;
+padding:12px;
+width:260px;
+border-radius:8px;
+margin-top:10px;
 }
 
-else{
-alert("Formation ou code incorrect");
+input{
+font-size:20px;
+padding:12px;
+width:250px;
+border-radius:8px;
+margin-top:15px;
 }
 
+button{
+font-size:20px;
+padding:12px 35px;
+margin-top:20px;
+background:#2980b9;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
 }
 
-</script>
+button:hover{
+background:#1f618d;
+}
+
+</style>
 
 </head>
+
+<body>
+
+<h1>TechNova Academy</h1>
+
+<p>Choisissez votre formation :</p>
+
+<select id="formation">
+
+<option value="initiation">Initiation à l'informatique</option>
+
+<option value="database">Base de données</option>
+
+<option value="excel">Microsoft Excel</option>
+
+<option value="word">Microsoft Word</option>
+
+</select>
+
+<br><br>
+
+<p>Entrez votre code :</p>
+
+<input type="text" id="code">
+
+<br><br>
+
+<button onclick="verifier()">Accéder</button>
+
 <script>
+
 function verifier(){
 
 let formation = document.getElementById("formation").value;
@@ -59,40 +109,12 @@ window.location.href="word.html";
 }
 
 else{
-alert("Code incorrect pour cette formation");
+alert("Code incorrect");
 }
 
 }
+
 </script>
-<body>
-
-<h1>TechNova Academy</h1>
-
-<p>Choisissez votre formation :</p>
-
-<select id="formation">
-
-<option value="initiation">Initiation à l'informatique</option>
-
-<option value="database">Base de données</option>
-
-<option value="excel">Microsoft Excel</option>
-
-<option value="word">Microsoft Word</option>
-
-</select>
-<a>
-</a>
-
-<br><br>
-
-<p>Entrez votre code :</p>
-
-<input type="text" id="code">
-
-<br><br>
-
-<button onclick="verifier()">Accéder au cours</button>
 
 </body>
-  </html>
+</html>
