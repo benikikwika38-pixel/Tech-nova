@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accès aux cours - TechNova Academy</title>
+<style>
+body { font-family: 'Georgia', serif; background-color: #f4f4f9; color: #222; text-align: center; padding-top: 50px; }
+input { padding: 10px; width: 200px; margin: 10px; border-radius: 5px; border: 1px solid #ccc; }
+button { padding: 10px 20px; background-color: #2980b9; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+button:hover { background-color: #1f618d; }
+</style>
+<script>
+function verifierCode() {
+    const codeEntré = document.getElementById("code").value.trim();
+    const codeValide = "ACCEPTE123"; // Code unique pour les acceptés
+    if(codeEntré === codeValide){
+        alert("Accès autorisé ! Bienvenue aux cours.");
+        window.location.href = "cours.html"; // Redirige vers la page des cours
+    } else {
+        alert("Code invalide. Votre dossier n’a pas été accepté ou le code est incorrect.");
+    }
+}
+</script>
+</head>
+<body>
+
+<h1>TechNova Academy</h1>
+<h2>Accès aux cours</h2>
+<p>Entrez votre code d’accès fourni après validation de votre dossier :</p>
+<input type="text" id="code" placeholder="Code étudiant">
+<br>
+<button onclick="verifierCode()">Valider</button>
+
+</body>
+  </html>
