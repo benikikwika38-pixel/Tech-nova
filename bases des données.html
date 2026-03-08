@@ -3,29 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Base de données - TechNova Academy</title>
+<title>Bases de données - Niveau Intermédiaire</title>
+
 <style>
-body{font-family:Arial;margin:0;background:#f4f6f9;padding:40px;}
-.container{max-width:1000px;margin:auto;background:white;padding:50px;border-radius:12px;box-shadow:0 0 15px rgba(0,0,0,0.1);}
-h1{text-align:center;font-size:50px;color:#2c3e50;}
-h2{font-size:30px;margin-top:40px;color:#2980b9;}
-.chapitre{padding:20px;border-bottom:1px solid #ddd;font-size:22px;}
-.chapitre strong{color:#2c3e50;}
-button{margin-top:30px;padding:18px 35px;font-size:22px;background:#2980b9;color:white;border:none;border-radius:8px;cursor:pointer;}
-button:hover{background:#1f618d;}
+
+body{
+font-family: Arial, sans-serif;
+background:#f4f6f9;
+margin:0;
+padding:0;
+}
+
+.container{
+width:100%;
+padding:60px;
+box-sizing:border-box;
+}
+
+h1{
+font-size:60px;
+text-align:center;
+color:#2c3e50;
+margin-bottom:10px;
+}
+
+.niveau{
+text-align:center;
+font-size:22px;
+background:#2980b9;
+color:white;
+display:inline-block;
+padding:10px 25px;
+border-radius:20px;
+margin:auto;
+display:block;
+width:200px;
+margin-bottom:40px;
+}
+
+h2{
+font-size:35px;
+color:#2980b9;
+margin-bottom:30px;
+text-align:center;
+}
+
+.plan{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:30px;
+width:100%;
+}
+
+.chapitre{
+background:white;
+padding:30px;
+border-radius:10px;
+font-size:22px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+.chapitre strong{
+color:#2c3e50;
+font-size:24px;
+}
+
+button{
+display:block;
+margin:60px auto;
+padding:18px 40px;
+font-size:22px;
+background:#2980b9;
+color:white;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1f618d;
+}
+
 </style>
+
 </head>
+
 <body>
+
 <div class="container">
-<h1>Base de données</h1>
-<h2>Plan du cours</h2>
-<div class="chapitre"><strong>Chapitre 1 :</strong> Introduction aux bases de données<p>Concepts de base et utilité.</p></div>
-<div class="chapitre"><strong>Chapitre 2 :</strong> Types de bases de données<p>Relationnelles et non-relationnelles.</p></div>
-<div class="chapitre"><strong>Chapitre 3 :</strong> Tables et enregistrements<p>Créer et organiser les données.</p></div>
-<div class="chapitre"><strong>Chapitre 4 :</strong> Clés et relations<p>Relations entre tables, clé primaire et étrangère.</p></div>
-<div class="chapitre"><strong>Chapitre 5 :</strong> Requêtes simples<p>Lire et filtrer les données.</p></div>
-<div class="chapitre"><strong>Chapitre 6 :</strong> Exercices pratiques<p>Manipuler des données réelles.</p></div>
-<a href="formations.html"><button>Retour aux formations</button></a>
+
+<h1>Bases de données</h1>
+
+<div class="niveau">
+Niveau : Intermédiaire
 </div>
+
+<h2>Plan de la formation</h2>
+
+<div class="plan">
+
+<div class="chapitre">
+<strong>Chapitre 1 :</strong>
+<p>Rappel des notions fondamentales : tables, champs, clés primaires et étrangères.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 2 :</strong>
+<p>Schéma relationnel et modélisation des bases de données.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 3 :</strong>
+<p>Normalisation des données (1NF, 2NF, 3NF).</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 4 :</strong>
+<p>SQL intermédiaire : SELECT avancé, WHERE, GROUP BY.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 5 :</strong>
+<p>Jointures SQL et sous-requêtes.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 6 :</strong>
+<p>Index et optimisation des performances.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 7 :</strong>
+<p>Transactions et intégrité des données.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 8 :</strong>
+<p>Création de vues et fonctions SQL.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 9 :</strong>
+<p>Triggers et automatisation dans les bases de données.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 10 :</strong>
+<p>Sécurité et gestion des droits d’accès.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 11 :</strong>
+<p>Importation, exportation et sauvegarde des bases.</p>
+</div>
+
+<div class="chapitre">
+<strong>Chapitre 12 :</strong>
+<p>Projet pratique et exercices intermédiaires.</p>
+</div>
+
+</div>
+
+<a href="formations.html">
+<button>Retour aux formations</button>
+</a>
+
+</div>
+
 </body>
-</html>
+  </html>
