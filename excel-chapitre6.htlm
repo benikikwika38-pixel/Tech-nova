@@ -6,15 +6,15 @@
 <title>Excel Débutant - Chapitre 6</title>
 <style>
 body { font-family: Arial; margin:0; background:#f4f6f9; }
-.container { width:100%; min-height:100vh; padding:40px; box-sizing:border-box; background:white; }
+.container { width:100%; min-height:100vh; padding:40px; background:white; box-sizing:border-box; }
 h1 { text-align:center; font-size:40px; color:#2c3e50; }
 .niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
 h2 { color:#2980b9; margin-top:40px; font-size:28px; }
 p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
 ul { padding-left:25px; }
-.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
 table { width:100%; border-collapse:collapse; margin-top:20px; }
 th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
 button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
 button:hover { background:#1f618d; }
 </style>
@@ -25,32 +25,35 @@ button:hover { background:#1f618d; }
 <h1>Formation Excel</h1>
 <div class="niveau">Niveau : Débutant</div>
 
-<h2>Chapitre 6 : Fonctions avancées</h2>
+<h2>Chapitre 6 : Graphiques et visualisation</h2>
 
-<p>Dans ce chapitre final, nous allons explorer des fonctions avancées qui permettent d'automatiser des tâches, d’analyser de grandes quantités de données et d’obtenir des résultats précis sans effort manuel. Les fonctions avancées sont essentielles pour devenir un utilisateur compétent d’Excel.</p>
+<p>Les graphiques sont un outil fondamental pour visualiser les données dans Excel. Ils permettent de représenter les informations sous forme visuelle, facilitant ainsi l’analyse et la prise de décision. Excel offre différents types de graphiques : colonnes, barres, lignes, secteurs, aires, histogrammes et graphiques combinés.</p>
 
-<p>La fonction <b>SI</b> permet d’appliquer une condition : si une cellule répond à un critère, Excel renvoie une valeur, sinon il en renvoie une autre. Cela est particulièrement utile pour les classements, les validations et les décisions automatiques.</p>
+<p>Pour créer un graphique, sélectionnez vos données, puis choisissez le type de graphique approprié dans l’onglet “Insertion”. Chaque graphique peut être personnalisé : couleurs, styles, titres, légendes, axes et étiquettes de données. Une bonne personnalisation rend les graphiques plus lisibles et professionnels.</p>
 
-<p>Les fonctions de recherche comme <b>RECHERCHEV</b> ou <b>RECHERCHEH</b> permettent de rechercher des valeurs dans un tableau et de renvoyer des résultats associés dans une autre colonne ou ligne. Ces fonctions sont couramment utilisées pour croiser des données entre différentes tables ou bases.</p>
+<p>Les graphiques dynamiques ou graphiques croisés permettent de visualiser rapidement les tendances et de comparer différents ensembles de données. Les filtres appliqués aux graphiques mettent en évidence certaines informations sans modifier les données source.</p>
 
-<p>Les fonctions de texte permettent de manipuler les données textuelles, comme <b>GAUCHE</b>, <b>DROITE</b>, <b>STXT</b> ou <b>CONCATENER</b>, pour extraire ou combiner des portions de texte selon vos besoins.</p>
+<p>Il est important de choisir le bon type de graphique selon le type de données. Par exemple, un graphique à secteurs pour représenter des proportions, un graphique en colonnes pour comparer des valeurs, ou un graphique linéaire pour suivre l’évolution dans le temps.</p>
 
-<p>Les fonctions statistiques comme <b>NBVAL</b>, <b>ECARTYPE</b> ou <b>MEDIANE</b> permettent d’obtenir des analyses détaillées sur vos données numériques. Enfin, l’utilisation de fonctions imbriquées rend possible la création de formules complexes pour des calculs avancés.</p>
+<p>Les outils d’Excel permettent également de créer des graphiques combinés, ajoutant plusieurs types de représentation dans un même graphique pour une analyse plus complexe. Vous pouvez aussi ajouter des courbes de tendance, des barres d’erreur et des annotations pour mieux interpréter les résultats.</p>
 
-<h2>Exemple pratique : fonctions conditionnelles</h2>
+<h2>Exemple pratique : graphique simple</h2>
 <table>
-<tr><th>Note</th><th>Résultat</th></tr>
-<tr><td>15</td><td>=SI(A2>=10;"Validé";"Non validé")</td></tr>
-<tr><td>8</td><td>=SI(A3>=10;"Validé";"Non validé")</td></tr>
+<tr><th>Mois</th><th>Ventes</th></tr>
+<tr><td>Janvier</td><td>1500</td></tr>
+<tr><td>Février</td><td>2000</td></tr>
+<tr><td>Mars</td><td>1800</td></tr>
+<tr><td>Avril</td><td>2200</td></tr>
+<tr><td>Mai</td><td>2100</td></tr>
 </table>
 
 <div class="video">
 <h2>Vidéo explicative (FR)</h2>
-<iframe src="https://www.youtube.com/embed/T6gm5MQ0URc" frameborder="0" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/2_JotsAEIzU" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <a href="formations.html"><button>Retour aux formations</button></a>
-</div>
 
+</div>
 </body>
 </html>
