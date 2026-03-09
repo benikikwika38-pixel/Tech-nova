@@ -1,1 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechNova Academy - Cours</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin:0;
+    padding:0;
+}
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:50px auto;
+    background:white;
+    padding:40px;
+    border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.1);
+}
+h1{
+    text-align:center;
+    font-size:50px;
+    color:#2c3e50;
+}
+.formation-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
+    margin-top:50px;
+}
+.formation{
+    background:#ecf0f1;
+    padding:25px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 0 10px rgba(0,0,0,0.05);
+}
+.formation button{
+    margin-top:20px;
+    padding:15px 30px;
+    font-size:18px;
+    background:#2980b9;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+.formation button:hover{
+    background:#1f618d;
+}
+</style>
+</head>
+<body>
 
+<div class="container">
+<h1>TechNova Academy - Formations</h1>
+
+<div class="formation-list">
+
+<div class="formation">
+<h2>Excel - Débutant</h2>
+<p>Apprenez les bases d’Excel pour le monde professionnel.</p>
+<a href="cours/excel-chapitre1.html"><button>Accéder</button></a>
+</div>
+
+<div class="formation">
+<h2>HTML - Débutant</h2>
+<p>Apprenez à créer vos premières pages web.</p>
+<a href="cours/html-chapitre1.html"><button>Accéder</button></a>
+</div>
+
+<div class="formation">
+<h2>Word - Débutant</h2>
+<p>Maîtrisez la mise en page et les documents professionnels.</p>
+<a href="cours/word-chapitre1.html"><button>Accéder</button></a>
+</div>
+
+<div class="formation">
+<h2>Bases de données - Intermédiaire</h2>
+<p>Apprenez à manipuler des bases relationnelles et SQL.</p>
+<a href="cours/bd-chapitre1.html"><button>Accéder</button></a>
+</div>
+
+</div>
+</div>
+
+</body>
+  </html>
