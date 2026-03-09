@@ -4,111 +4,56 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Excel Débutant - Chapitre 3</title>
-
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f6f9; }
-.container {
-  width:100%;
-  min-height:100vh;
-  padding:40px;
-  box-sizing:border-box;
-  background:white;
-}
+body { font-family: Arial; margin:0; background:#f4f6f9; }
+.container { width:100%; min-height:100vh; padding:40px; box-sizing:border-box; background:white; }
 h1 { text-align:center; font-size:40px; color:#2c3e50; }
-.niveau {
-  text-align:center;
-  background:#27ae60;
-  color:white;
-  padding:12px 25px;
-  border-radius:20px;
-  display:inline-block;
-  width:250px;
-  margin:auto;
-  margin-bottom:40px;
-  font-size:22px;
-}
+.niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
 h2 { color:#2980b9; margin-top:40px; font-size:28px; }
-p, ul {
-  font-size:18px;
-  line-height:1.8;
-  margin-top:12px;
-}
+p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
 ul { padding-left:25px; }
-table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-}
-th, td {
-  padding:10px;
-  border:1px solid #ccc;
-  text-align:center;
-}
-.video iframe {
-  width:100%;
-  max-width:900px;
-  height:500px;
-  border-radius:10px;
-}
-button {
-  display:block;
-  margin:40px auto 0 auto;
-  padding:15px 40px;
-  font-size:20px;
-  background:#2980b9;
-  color:white;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-}
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
+button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
 button:hover { background:#1f618d; }
 </style>
-
 </head>
 <body>
-
 <div class="container">
 <h1>Formation Excel</h1>
 <div class="niveau">Niveau : Débutant</div>
 
-<h2>Chapitre 3 : Mise en forme des données</h2>
+<h2>Chapitre 3 : Mise en forme des cellules</h2>
 
-<p>La mise en forme des données est une étape essentielle pour rendre votre tableau Excel visible, structuré et compréhensible en un coup d’œil. Une feuille bien présentée permet d’éviter les erreurs d’interprétation et de faciliter la lecture, surtout lorsque les données sont nombreuses ou complexes.</p>
+<p>La mise en forme des cellules est essentielle pour rendre vos données plus claires et plus professionnelles. Une présentation soignée facilite l’interprétation des informations, réduit les erreurs de lecture et rend les rapports plus convaincants. Dans Excel, la mise en forme permet de modifier les polices, les tailles de caractère, les couleurs de fond et les styles, ce qui aide à hiérarchiser visuellement les données.</p>
 
-<p>Dans Excel, vous pouvez changer la couleur de fond des cellules pour mettre en évidence des informations importantes. Vous pouvez aussi modifier le style de police (italique, gras), la taille ou la couleur du texte pour mieux distinguer les rubriques, les titres ou les totaux. L’alignement du texte (gauche, centre, droite) améliore également l’esthétique et la clarté de vos tableaux.</p>
+<p>Les outils d’alignement vous permettent de centrer, aligner à gauche ou à droite le contenu des cellules, améliorant ainsi la structure du tableau. L’utilisation de styles prédéfinis accélère la mise en forme et garantit une cohérence graphique dans tout le document.</p>
 
-<p>Les bordures permettent de délimiter les cellules et de structurer visuellement les sections du tableau. Vous pouvez définir des bordures simples ou épaisses sur certaines lignes ou colonnes pour créer des zones distinctes. Le format des nombres et des dates est aussi important : utiliser les bons formats empêche les erreurs de lecture (par exemple, afficher les dates correctement ou les valeurs monétaires avec symbole).</p>
+<p>La mise en forme conditionnelle est l’un des outils les plus puissants d’Excel. Elle applique automatiquement une mise en forme spécifique aux cellules répondant à des critères définis, comme colorer en rouge les valeurs négatives ou mettre en surbrillance celles supérieures à un certain seuil. Cela permet de visualiser rapidement les exceptions ou les tendances.</p>
 
-<p>La mise en forme conditionnelle est un outil très puissant. Il permet de définir des règles pour modifier automatiquement l’apparence des cellules selon le contenu. Par exemple, vous pouvez mettre en surbrillance les valeurs supérieures à un certain seuil ou repérer les doublons plus facilement.</p>
+<p>Il existe différents formats numériques comme monétaire, pourcentage, date ou heure, qui sont essentiels pour une lecture correcte des données. Choisir le bon format évite les confusions et garantit l’exactitude des analyses ultérieures. Les bordures et les styles de cellules permettent également de délimiter les zones importantes d’un tableau pour les rendre visuellement distinctes.</p>
 
-<p>Lorsque vous avez appliqué un style à une cellule ou à une plage, vous pouvez utiliser le pinceau de mise en forme pour appliquer le même style ailleurs dans le tableau. Cela évite de refaire les mêmes étapes une par une et rend votre travail plus efficace.</p>
+<p>L’outil “Pinceau de format” est très utile pour copier la mise en forme d’une cellule ou d’une plage vers une autre, sans avoir à refaire manuellement les mêmes réglages à plusieurs endroits. Cela améliore l’efficacité et la cohérence globale du tableau.</p>
 
-<p>Il est conseillé de toujours vérifier que le format utilisé correspond au type de données :  
-<ul>
-<li>Format « Texte » pour les mots ou phrases</li>
-<li>Format « Nombre » pour les chiffres</li>
-<li>Format « Monétaire » pour les valeurs financières</li>
-<li>Format « Date » pour les dates</li>
-</ul>
-</p>
+<p>Une bonne mise en forme constitue souvent la base d’un rapport professionnel qui peut être utilisé dans des présentations, des documents imprimés ou des rapports destinés à des clients ou des équipes.</p>
 
-<p>Une bonne mise en forme améliore aussi le tri et le filtrage. Par exemple, appliquer une couleur de fond aux en-têtes aide à repérer rapidement les colonnes lors du tri. De même, lorsque les valeurs sont bien alignées, les résultats du tri sont plus intuitifs.</p>
-
-<h2>Exemple : tableau mis en forme</h2>
+<h2>Exemple pratique : tableau mis en forme</h2>
 <table>
-<tr><th>Moins</th><th>Plus</th><th>Balance</th></tr>
-<tr><td>200</td><td>300</td><td>=B2-A2</td></tr>
-<tr><td>450</td><td>600</td><td>=B3-A3</td></tr>
-<tr><td>150</td><td>200</td><td>=B4-A4</td></tr>
+<tr><th>Nom</th><th>Poste</th><th>Salaire</th><th>Status</th></tr>
+<tr><td>Jean</td><td>Comptable</td><td>500</td><td>Actif</td></tr>
+<tr><td>Marie</td><td>Assistante</td><td>650</td><td>Actif</td></tr>
+<tr><td>Paul</td><td>Secrétaire</td><td>450</td><td>Inactif</td></tr>
+<tr><td>Sophie</td><td>Manager</td><td>800</td><td>Actif</td></tr>
+<tr><td>Luc</td><td>Analyste</td><td>700</td><td>Actif</td></tr>
 </table>
 
 <div class="video">
 <h2>Vidéo explicative (FR)</h2>
-<iframe src="https://www.youtube.com/embed/OeFmY7Vt9fo" title="Cours Excel Mise en forme en Français" frameborder="0" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/EkvhYtfTRHs" title="Tutoriel mise en forme conditionnelle Excel" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <a href="excel-chapitre4.html"><button>Chapitre suivant</button></a>
 </div>
-
 </body>
-             </html>
+                                                   </html>
