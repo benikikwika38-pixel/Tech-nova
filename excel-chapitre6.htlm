@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Débutant - Chapitre 6</title>
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f9; }
+.container { width:100%; min-height:100vh; padding:40px; box-sizing:border-box; background:white; }
+h1 { text-align:center; font-size:40px; color:#2c3e50; }
+.niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
+h2 { color:#2980b9; margin-top:40px; font-size:28px; }
+p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
+ul { padding-left:25px; }
+.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
+button:hover { background:#1f618d; }
+</style>
+</head>
+<body>
 
+<div class="container">
+<h1>Formation Excel</h1>
+<div class="niveau">Niveau : Débutant</div>
+
+<h2>Chapitre 6 : Fonctions avancées</h2>
+
+<p>Dans ce chapitre final, nous allons explorer des fonctions avancées qui permettent d'automatiser des tâches, d’analyser de grandes quantités de données et d’obtenir des résultats précis sans effort manuel. Les fonctions avancées sont essentielles pour devenir un utilisateur compétent d’Excel.</p>
+
+<p>La fonction <b>SI</b> permet d’appliquer une condition : si une cellule répond à un critère, Excel renvoie une valeur, sinon il en renvoie une autre. Cela est particulièrement utile pour les classements, les validations et les décisions automatiques.</p>
+
+<p>Les fonctions de recherche comme <b>RECHERCHEV</b> ou <b>RECHERCHEH</b> permettent de rechercher des valeurs dans un tableau et de renvoyer des résultats associés dans une autre colonne ou ligne. Ces fonctions sont couramment utilisées pour croiser des données entre différentes tables ou bases.</p>
+
+<p>Les fonctions de texte permettent de manipuler les données textuelles, comme <b>GAUCHE</b>, <b>DROITE</b>, <b>STXT</b> ou <b>CONCATENER</b>, pour extraire ou combiner des portions de texte selon vos besoins.</p>
+
+<p>Les fonctions statistiques comme <b>NBVAL</b>, <b>ECARTYPE</b> ou <b>MEDIANE</b> permettent d’obtenir des analyses détaillées sur vos données numériques. Enfin, l’utilisation de fonctions imbriquées rend possible la création de formules complexes pour des calculs avancés.</p>
+
+<h2>Exemple pratique : fonctions conditionnelles</h2>
+<table>
+<tr><th>Note</th><th>Résultat</th></tr>
+<tr><td>15</td><td>=SI(A2>=10;"Validé";"Non validé")</td></tr>
+<tr><td>8</td><td>=SI(A3>=10;"Validé";"Non validé")</td></tr>
+</table>
+
+<div class="video">
+<h2>Vidéo explicative (FR)</h2>
+<iframe src="https://www.youtube.com/embed/T6gm5MQ0URc" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<a href="formations.html"><button>Retour aux formations</button></a>
+</div>
+
+</body>
+</html>
