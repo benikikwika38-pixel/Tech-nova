@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel Débutant - Chapitre 4</title>
+<style>
+body { font-family: Arial; margin:0; background:#f4f6f9; }
+.container { width:100%; min-height:100vh; padding:40px; box-sizing:border-box; background:white; }
+h1 { text-align:center; font-size:40px; color:#2c3e50; }
+.niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
+h2 { color:#2980b9; margin-top:40px; font-size:28px; }
+p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
+ul { padding-left:25px; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
+button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
+button:hover { background:#1f618d; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Formation Excel</h1>
+<div class="niveau">Niveau : Débutant</div>
 
+<h2>Chapitre 4 : Formules Excel</h2>
+
+<p>Les formules sont au cœur d’Excel. Elles permettent d’automatiser les calculs et d’obtenir rapidement des résultats précis. Une formule commence toujours par le signe <b>=</b> et peut inclure des nombres, des références de cellules, des opérateurs mathématiques et des fonctions intégrées.</p>
+
+<p>Les fonctions de base comprennent <b>SOMME</b>, <b>MOYENNE</b>, <b>MAX</b>, <b>MIN</b> qui permettent de calculer facilement des résultats sur des plages de cellules. Les fonctions logiques, comme <b>SI</b>, permettent de prendre des décisions automatiquement selon des conditions définies. Les références relatives changent lorsque la formule est copiée, tandis que les références absolues restent fixes.</p>
+
+<p>Les formules peuvent être combinées pour créer des calculs complexes. Par exemple, <b>=SI(B2>500; "Bonus"; "Pas de bonus")</b> attribue un texte selon la valeur de B2. Les fonctions de recherche comme <b>RECHERCHEV</b> permettent d’extraire des informations d’un tableau de données.</p>
+
+<p>Il est essentiel de vérifier les erreurs courantes : cellules vides, références incorrectes, parenthèses manquantes. Excel offre aussi des fonctions statistiques (NB, NBVAL, ECARTYPE) pour analyser les données. L’ordre des opérations est respecté automatiquement (parenthèses, exposants, multiplication/division, addition/soustraction).</p>
+
+<p>Enfin, la maîtrise des formules permet de gagner un temps considérable et d’augmenter la précision des calculs, surtout lorsque les tableaux contiennent de nombreuses lignes et colonnes.</p>
+
+<h2>Exemple pratique : calculs simples</h2>
+<table>
+<tr><th>Produit</th><th>Prix Unitaire</th><th>Quantité</th><th>Total</th></tr>
+<tr><td>Stylo</td><td>1.5</td><td>10</td><td>=B2*C2</td></tr>
+<tr><td>Cahier</td><td>3</td><td>5</td><td>=B3*C3</td></tr>
+<tr><td>Crayon</td><td>0.8</td><td>20</td><td>=B4*C4</td></tr>
+</table>
+
+<div class="video">
+<h2>Vidéo explicative</h2>
+<iframe src="https://www.youtube.com/embed/XN7v9Z3RyRo" title="Cours Excel Chapitre 4" frameborder="0" allowfullscreen></iframe>
+</div>
+
+<a href="excel-chapitre5.html"><button>Chapitre suivant</button></a>
+</div>
+</body>
+                                                                                                                                                                                                                                                                                               </html>
