@@ -3,113 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Microsoft Excel - TechNova Academy</title>
+<title>Excel Débutant - Chapitre 6</title>
 <style>
-body{
-  font-family: Arial, sans-serif;
-  margin:0;
-  padding:0;
-  background:#f4f6f9;
-}
-.container{
-  width:100%;
-  padding:30px; /* réduit pour que le texte touche presque les bords */
-  box-sizing:border-box;
-  background:white;
-  margin:0; /* plus de marge */
-}
-h1{
-  text-align:center;
-  font-size:60px;
-  color:#2c3e50;
-  margin-bottom:20px;
-}
-h2{
-  font-size:40px;
-  color:#2980b9;
-  margin-top:40px;
-  margin-bottom:20px;
-  text-align:center;
-}
-.plan{
-  display:flex;
-  flex-direction:column; /* chaque chapitre prend toute la largeur */
-  gap:20px;
-}
-.chapitre{
-  background:white;
-  padding:25px;
-  border-radius:10px;
-  font-size:20px;
-  line-height:1.8;
-  /* box-shadow:0 0 10px rgba(0,0,0,0.05); */ /* optionnel, peut enlever */
-}
-.chapitre strong{
-  color:#2c3e50;
-  font-size:26px;
-  display:block;
-  margin-bottom:15px;
-}
-button{
-  margin-top:20px;
-  padding:15px 40px;
-  font-size:20px;
-  background:#2980b9;
-  color:white;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  display:block;
-}
-button:hover{
-  background:#1f618d;
-}
+body { font-family: Arial; margin:0; background:#f4f6f9; }
+.container { width:100%; min-height:100vh; padding:40px; background:white; box-sizing:border-box; }
+h1 { text-align:center; font-size:40px; color:#2c3e50; }
+.niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
+h2 { color:#2980b9; margin-top:40px; font-size:28px; }
+p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
+ul { padding-left:25px; }
+table { width:100%; border-collapse:collapse; margin-top:20px; }
+th, td { padding:10px; border:1px solid #ccc; text-align:center; }
+.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
+button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
+button:hover { background:#1f618d; }
 </style>
 </head>
 <body>
+
 <div class="container">
-<h1>Microsoft Excel</h1>
-<h2>Plan du cours</h2>
+<h1>Formation Excel</h1>
+<div class="niveau">Niveau : Débutant</div>
 
-<div class="plan">
-  <div class="chapitre">
-    <strong>Chapitre 1 :</strong>
-    <p>Interface, classeurs, feuilles et menus.</p>
-    <a href="excel-chapitre1.html"><button>Accéder</button></a>
-  </div>
-  
-  <div class="chapitre">
-    <strong>Chapitre 2 :</strong>
-    <p>Entrer, modifier et organiser les cellules.</p>
-    <a href="excel-chapitre2.html"><button>Accéder</button></a>
-  </div>
+<h2>Chapitre 6 : Graphiques et visualisation</h2>
 
-  <div class="chapitre">
-    <strong>Chapitre 3 :</strong>
-    <p>Additions, soustractions, moyennes et pourcentages.</p>
-    <a href="excel-chapitre3.html"><button>Accéder</button></a>
-  </div>
+<p>Les graphiques sont des outils visuels qui facilitent l’analyse des données numériques. Ils permettent de représenter des tendances, des comparaisons et des proportions de manière plus claire qu’un tableau de chiffres. Excel offre une variété de types de graphiques adaptés à différentes situations.</p>
 
-  <div class="chapitre">
-    <strong>Chapitre 4 :</strong>
-    <p>Couleurs, bordures, formats et styles.</p>
-    <a href="excel-chapitre4.html"><button>Accéder</button></a>
-  </div>
+<p>Avant de créer un graphique, il est important de bien structurer vos données : avoir une première colonne de catégories et une ou plusieurs colonnes de valeurs. Par exemple, une colonne pour les mois et une autre pour les montants de ventes.</p>
 
-  <div class="chapitre">
-    <strong>Chapitre 5 :</strong>
-    <p>Créer des graphiques simples pour visualiser les données.</p>
-    <a href="excel-chapitre5.html"><button>Accéder</button></a>
-  </div>
+<p>Les graphiques en colonnes sont utiles pour comparer des valeurs entre plusieurs catégories, tandis que les graphiques en lignes sont parfaits pour observer l’évolution dans le temps. Les graphiques circulaires sont utilisés pour montrer la répartition ou les proportions entre plusieurs parties d’un ensemble.</p>
 
-  <div class="chapitre">
-    <strong>Chapitre 6 :</strong>
-    <p>Préparer vos feuilles pour impression ou PDF.</p>
-    <a href="excel-chapitre6.html"><button>Accéder</button></a>
-  </div>
+<p>Excel permet de personnaliser les graphiques : modifier les couleurs, les styles, ajouter des légendes, un titre, des étiquettes de données et ajuster l’axe. Ces options rendent les graphiques plus compréhensibles pour vos lecteurs ou collaborateurs.</p>
+
+<p>Les graphiques dynamiques et graphiques croisés sont des outils avancés permettant d’explorer rapidement des jeux de données complexes, avec la possibilité de filtrer ou d’exclure certaines valeurs sans modifier les données sources.</p>
+
+<p>Créer des graphiques facilite la prise de décision, car les visuels permettent de repérer des tendances générales ou des anomalies en un coup d’œil. Une bonne visualisation est souvent indispensable dans les rapports professionnels ou les présentations.</p>
+
+<h2>Exemple pratique : ventes mensuelles</h2>
+<table>
+<tr><th>Mois</th><th>Ventes</th></tr>
+<tr><td>Janvier</td><td>1500</td></tr>
+<tr><td>Février</td><td>2000</td></tr>
+<tr><td>Mars</td><td>1800</td></tr>
+</table>
+
+<div class="video">
+<h2>Vidéo explicative (FR)</h2>
+<iframe src="https://www.youtube.com/embed/ZHJVbszfgKc" frameborder="0" allowfullscreen></iframe>
 </div>
 
 <a href="formations.html"><button>Retour aux formations</button></a>
 </div>
+
 </body>
   </html>
