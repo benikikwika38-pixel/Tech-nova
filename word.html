@@ -5,51 +5,58 @@
 <title>Formation Microsoft Word - TechNova</title>
 
 <style>
-
 body{
-font-family:Arial;
-margin:0;
-background:#f4f6f9;
+    font-family: Arial, sans-serif;
+    margin:0;
+    background:#f4f6f9;
 }
 
 .container{
-width:100%;
-padding:60px;
-box-sizing:border-box;
+    width:100%;
+    padding:60px;
+    box-sizing:border-box;
 }
 
 h1{
-text-align:center;
-font-size:60px;
-color:#2c3e50;
+    text-align:center;
+    font-size:70px; /* agrandi */
+    color:#2c3e50;
 }
 
 .plan{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
-gap:30px;
-margin-top:50px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(400px,1fr)); /* un peu plus large */
+    gap:40px;
+    margin-top:50px;
 }
 
 .chapitre{
-background:white;
-padding:30px;
-border-radius:10px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
-font-size:22px;
+    background:white;
+    padding:35px; /* plus de padding */
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,0.1);
+    font-size:26px; /* texte plus grand */
+}
+
+.chapitre strong{
+    font-size:28px; /* titre du bloc plus grand */
+    color:#2c3e50;
 }
 
 button{
-margin-top:20px;
-padding:15px 35px;
-font-size:20px;
-background:#2980b9;
-color:white;
-border:none;
-border-radius:8px;
-cursor:pointer;
+    margin-top:25px;
+    padding:20px 40px;
+    font-size:24px; /* bouton plus gros */
+    background:#2980b9;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
 }
 
+button:hover{
+    background:#1f618d;
+}
 </style>
 </head>
 
@@ -59,7 +66,7 @@ cursor:pointer;
 
 <h1>Formation Microsoft Word</h1>
 
-<div class="programme des cours">
+<div class="plan">
 
 <div class="chapitre">
 <strong>Chapitre 1 :</strong> Découverte de Word
@@ -102,4 +109,4 @@ cursor:pointer;
 </div>
 
 </body>
-  </html>
+</html>
