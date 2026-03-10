@@ -5,43 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Microsoft Excel - TechNova Academy</title>
 <style>
-body {
+body{
   font-family: Arial, sans-serif;
   margin:0;
-  padding:0;
   background:#f4f6f9;
+  padding:0;
 }
-
-.container {
+.container{
   width:100%;
-  max-width:1400px;
-  margin:auto;
-  padding:40px;
+  padding:50px;
   box-sizing:border-box;
 }
-
-h1 {
+h1{
   text-align:center;
   font-size:60px;
   color:#2c3e50;
   margin-bottom:20px;
 }
-
-h2 {
+h2{
   font-size:40px;
   color:#2980b9;
   margin-top:40px;
   margin-bottom:20px;
   text-align:center;
 }
-
-.plan {
-  display:grid;
-  grid-template-columns:1fr; /* Chaque chapitre prend toute la largeur */
+.plan{
+  display:flex;
+  flex-direction:column; /* chaque chapitre prend toute la largeur */
   gap:30px;
 }
-
-.chapitre {
+.chapitre{
   background:white;
   padding:30px;
   border-radius:12px;
@@ -49,29 +42,24 @@ h2 {
   font-size:20px;
   line-height:1.8;
 }
-
-.chapitre strong {
+.chapitre strong{
   color:#2c3e50;
   font-size:26px;
-}
-
-.chapitre p {
-  margin-top:15px;
-}
-
-button {
   display:block;
-  margin:20px auto 0 auto;
-  padding:18px 50px;
+  margin-bottom:15px;
+}
+button{
+  margin-top:20px;
+  padding:18px 45px;
   font-size:20px;
   background:#2980b9;
   color:white;
   border:none;
   border-radius:10px;
   cursor:pointer;
+  display:block;
 }
-
-button:hover {
+button:hover{
   background:#1f618d;
 }
 </style>
@@ -83,48 +71,45 @@ button:hover {
 <h2>Plan du cours</h2>
 
 <div class="plan">
-
-<div class="chapitre">
-<strong>Chapitre 1 : Découverte d’Excel</strong>
-<p>Dans ce chapitre, vous allez découvrir l’interface d’Excel, les menus, les rubans et la structure des classeurs et feuilles de calcul. Vous apprendrez à créer un classeur, insérer des données et naviguer entre plusieurs feuilles pour organiser vos informations.</p>
-<a href="excel-chapitre1.html"><button>Accéder</button></a>
+  <div class="chapitre">
+    <strong>Chapitre 1 :</strong>
+    <p>Interface, classeurs, feuilles et menus.</p>
+    <a href="excel-chapitre1.html"><button>Accéder</button></a>
+  </div>
+  
+  <div class="chapitre">
+    <strong>Chapitre 2 :</strong>
+    <p>Entrer, modifier et organiser les cellules.</p>
+    <a href="excel-chapitre2.html"><button>Accéder</button></a>
+  </div>
+  
+  <div class="chapitre">
+    <strong>Chapitre 3 :</strong>
+    <p>Additions, soustractions, moyennes et pourcentages.</p>
+    <a href="excel-chapitre3.html"><button>Accéder</button></a>
+  </div>
+  
+  <div class="chapitre">
+    <strong>Chapitre 4 :</strong>
+    <p>Couleurs, bordures, formats et styles.</p>
+    <a href="excel-chapitre4.html"><button>Accéder</button></a>
+  </div>
+  
+  <div class="chapitre">
+    <strong>Chapitre 5 :</strong>
+    <p>Créer des graphiques simples pour visualiser les données.</p>
+    <a href="excel-chapitre5.html"><button>Accéder</button></a>
+  </div>
+  
+  <div class="chapitre">
+    <strong>Chapitre 6 :</strong>
+    <p>Préparer vos feuilles pour impression ou PDF.</p>
+    <a href="excel-chapitre6.html"><button>Accéder</button></a>
+  </div>
 </div>
-
-<div class="chapitre">
-<strong>Chapitre 2 : Saisir et gérer les données</strong>
-<p>Apprenez à saisir, modifier et organiser vos cellules, gérer les lignes et colonnes, et utiliser les fonctions de copier/coller. Nous verrons aussi comment formater vos données pour les rendre lisibles et professionnelles.</p>
-<a href="excel-chapitre2.html"><button>Accéder</button></a>
-</div>
-
-<div class="chapitre">
-<strong>Chapitre 3 : Formules et fonctions simples</strong>
-<p>Ce chapitre couvre les opérations de base comme l’addition, la soustraction, la moyenne et le pourcentage. Vous apprendrez comment créer vos premières formules et utiliser les fonctions de calcul pour automatiser vos données.</p>
-<a href="excel-chapitre3.html"><button>Accéder</button></a>
-</div>
-
-<div class="chapitre">
-<strong>Chapitre 4 : Mise en forme des cellules</strong>
-<p>Vous allez apprendre à appliquer des couleurs, bordures, styles et formats aux cellules pour rendre vos tableaux clairs et professionnels. L’utilisation de la mise en forme conditionnelle sera expliquée avec des exemples pratiques.</p>
-<a href="excel-chapitre4.html"><button>Accéder</button></a>
-</div>
-
-<div class="chapitre">
-<strong>Chapitre 5 : Graphiques</strong>
-<p>Créez vos premiers graphiques pour visualiser vos données. Ce chapitre montre comment utiliser les graphiques en colonnes, barres, secteurs et lignes, et comment personnaliser les couleurs et légendes pour rendre vos présentations plus impactantes.</p>
-<a href="excel-chapitre5.html"><button>Accéder</button></a>
-</div>
-
-<div class="chapitre">
-<strong>Chapitre 6 : Impression et export</strong>
-<p>Préparez vos feuilles pour l’impression ou pour l’export en PDF. Découvrez les marges, orientation, entêtes et pieds de page, et comment optimiser vos tableaux pour un rendu propre sur papier ou sur document numérique.</p>
-<a href="excel-chapitre6.html"><button>Accéder</button></a>
-</div>
-
-</div> <!-- plan -->
 
 <a href="formations.html"><button>Retour aux formations</button></a>
-
-</div> <!-- container -->
+</div>
 
 </body>
-</html>
+      </html>
