@@ -5,97 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Excel Débutant - Chapitre 1</title>
 <style>
-/* Corps et fond */
-body {
+body{
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    min-height: 100vh;
-    background: #f4f6f9;
+    margin:0;
+    padding:0;
+    width:100%;
+    background:#f4f6f9;
 }
-
-/* Conteneur principal plein écran */
-.container {
-    width: 100%;
-    min-height: 100vh;
-    padding: 60px 80px;
-    box-sizing: border-box;
-    background: white;
+.container{
+    width:100%;
+    padding:30px;
+    box-sizing:border-box;
+    background:white;
+    margin:0;
 }
-
-/* Titres principaux */
-h1 {
-    text-align: center;
-    font-size: 60px;
-    color: #2c3e50;
-    margin-bottom: 20px;
+h1{
+    text-align:center;
+    font-size:60px;
+    color:#2c3e50;
+    margin-bottom:20px;
 }
-
-/* Niveau */
-.niveau {
-    text-align: center;
-    background: #27ae60;
-    color: white;
-    padding: 15px 30px;
-    border-radius: 20px;
-    display: inline-block;
-    width: 250px;
-    font-size: 22px;
-    margin-bottom: 40px;
+.niveau{
+    text-align:center;
+    background:#27ae60;
+    color:white;
+    padding:15px 30px;
+    border-radius:20px;
+    display:inline-block;
+    width:250px;
+    font-size:22px;
+    margin-bottom:40px;
 }
-
-/* Titres de sections */
-h2 {
-    color: #2980b9;
-    margin-top: 50px;
-    font-size: 32px;
+h2{
+    color:#2980b9;
+    margin-top:40px;
+    font-size:32px;
 }
-
-/* Paragraphes et listes */
-p, ul {
-    font-size: 22px;
-    line-height: 2;
-    margin-top: 15px;
+p, ul{
+    font-size:20px;
+    line-height:1.8;
+    margin-top:15px;
 }
-ul { padding-left: 25px; }
-
-/* Tableaux */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 25px;
+ul{padding-left:25px;}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:25px;
 }
-th, td {
-    padding: 15px;
-    text-align: center;
-    border: 1px solid #ccc;
+th, td{
+    padding:15px;
+    text-align:center;
+    border:1px solid #ccc;
 }
-
-/* Vidéo */
-.video {
-    margin-top: 40px;
-    text-align: center;
+.video{
+    margin-top:40px;
+    text-align:center;
 }
-.video iframe {
-    width: 100%;
-    max-width: 900px;
-    height: 500px;
+.video iframe{
+    width:100%;
+    max-width:900px;
+    height:500px;
+    border-radius:10px;
 }
-
-/* Bouton */
-button {
-    margin-top: 50px;
-    padding: 18px 45px;
-    font-size: 22px;
-    background: #2980b9;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
+button{
+    margin-top:30px;
+    padding:18px 45px;
+    font-size:20px;
+    background:#2980b9;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
 }
-button:hover {
-    background: #1f618d;
+button:hover{
+    background:#1f618d;
 }
 </style>
 </head>
@@ -104,20 +90,15 @@ button:hover {
 <h1>Formation Excel</h1>
 <div class="niveau">Niveau : Débutant</div>
 
-<h2>Chapitre 1 : Introduction à Excel</h2>
-<p>Microsoft Excel est un logiciel de tableur utilisé pour gérer, analyser et présenter des données. Très utilisé dans les entreprises et institutions, il permet de créer des tableaux, de réaliser des calculs automatiques, et de générer des rapports détaillés.</p>
-
-<h2>Objectifs de ce chapitre</h2>
-<ul>
-<li>Découvrir l’interface d’Excel et ses fonctionnalités de base</li>
-<li>Créer, ouvrir et enregistrer un classeur</li>
-<li>Identifier colonnes, lignes et cellules</li>
-<li>Manipuler les cellules (saisie, copie, suppression)</li>
-<li>Créer des tableaux simples pour organiser des informations</li>
-</ul>
-
-<h2>L’interface d’Excel</h2>
-<p>Un classeur contient plusieurs feuilles de calcul. Chaque feuille est composée de colonnes (lettres), de lignes (chiffres) et de cellules (intersections). Chaque cellule peut contenir du texte, un nombre ou une formule.</p>
+<h2>Chapitre 1 : Découverte d’Excel</h2>
+<p>Excel est un logiciel de tableur qui permet de gérer, analyser et présenter des données de manière efficace. Il est utilisé dans les entreprises, écoles et institutions pour organiser l’information, calculer automatiquement et générer des rapports clairs.</p>
+<p>Dans ce chapitre, nous allons découvrir l’interface d’Excel, les rubans, onglets et menus, ainsi que la structure des classeurs et feuilles de calcul.</p>
+<p>Vous apprendrez à créer un nouveau classeur, à sauvegarder vos fichiers, et à naviguer entre plusieurs feuilles pour organiser vos projets.</p>
+<p>Chaque feuille contient des colonnes (lettres), des lignes (chiffres), et des cellules (points d’intersection). Les cellules peuvent contenir du texte, des nombres ou des formules simples pour calculer automatiquement.</p>
+<p>L’onglet "Accueil" offre les fonctionnalités essentielles comme le formatage du texte, le copier-coller, le tri et le filtre de base. Bien comprendre ces outils est fondamental pour travailler efficacement.</p>
+<p>Nous verrons comment insérer, supprimer et renommer des feuilles, ainsi que gérer plusieurs classeurs simultanément.</p>
+<p>Les options de mise en page vous permettent de personnaliser votre interface et vos rapports pour un meilleur confort visuel.</p>
+<p>Enfin, nous aborderons les bonnes pratiques pour sauvegarder régulièrement votre travail et éviter les erreurs courantes.</p>
 
 <h2>Exemple pratique : tableau simple</h2>
 <table>
@@ -127,31 +108,12 @@ button:hover {
 <tr><td>Paul</td><td>Secrétaire</td><td>450</td></tr>
 </table>
 
-<h2>Fonctions de base</h2>
-<p>Excel permet d’automatiser des calculs grâce aux formules :</p>
-<ul>
-<li>=SOMME(B2:B4) → additionne les valeurs de B2 à B4</li>
-<li>=MOYENNE(B2:B4) → calcule la moyenne des valeurs</li>
-<li>=MAX(B2:B4) → affiche la valeur maximale</li>
-<li>=MIN(B2:B4) → affiche la valeur minimale</li>
-</ul>
-
-<h2>Conseils pour bien débuter</h2>
-<ul>
-<li>Explorer les onglets “Accueil”, “Insertion”, “Mise en page”</li>
-<li>Sauvegarder régulièrement votre travail</li>
-<li>Utiliser les raccourcis clavier pour gagner du temps</li>
-<li>Tester les formules sur de petits tableaux avant de manipuler de gros classeurs</li>
-</ul>
-
 <div class="video">
-<h2>Vidéo explicative</h2>
+<h2>Vidéo explicative (FR)</h2>
 <iframe src="https://www.youtube.com/embed/heH30BAfYF8" title="Cours Excel débutant" frameborder="0" allowfullscreen></iframe>
 </div>
 
-<div style="text-align:center;">
 <a href="excel-chapitre2.html"><button>Chapitre suivant</button></a>
-</div>
 
 </div>
 </body>
