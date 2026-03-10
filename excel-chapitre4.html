@@ -3,54 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Excel Débutant - Chapitre 4</title>
+<title>Word Débutant - Chapitre 4</title>
+
 <style>
-body { font-family: Arial; margin:0; background:#f4f6f9; }
-.container { width:100%; min-height:100vh; padding:40px; box-sizing:border-box; background:white; }
-h1 { text-align:center; font-size:40px; color:#2c3e50; }
-.niveau { text-align:center; background:#27ae60; color:white; padding:12px 25px; border-radius:20px; display:inline-block; width:250px; margin:auto; margin-bottom:40px; font-size:22px; }
-h2 { color:#2980b9; margin-top:40px; font-size:28px; }
-p, ul { font-size:18px; line-height:1.8; margin-top:10px; }
-ul { padding-left:25px; }
-table { width:100%; border-collapse:collapse; margin-top:20px; }
-th, td { padding:10px; border:1px solid #ccc; text-align:center; }
-.video iframe { width:100%; max-width:900px; height:500px; border-radius:10px; }
-button { display:block; margin:40px auto 0 auto; padding:15px 40px; font-size:20px; background:#2980b9; color:white; border:none; border-radius:10px; cursor:pointer; }
-button:hover { background:#1f618d; }
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    width:100%;
+    background:#f4f6f9;
+}
+.container{
+    width:100%;
+    padding:30px;
+    box-sizing:border-box;
+    background:white;
+    margin:0;
+}
+h1{
+    text-align:center;
+    font-size:60px;
+    color:#2c3e50;
+    margin-bottom:20px;
+}
+.niveau{
+    text-align:center;
+    background:#27ae60;
+    color:white;
+    padding:15px 30px;
+    border-radius:20px;
+    display:inline-block;
+    width:250px;
+    font-size:22px;
+    margin-bottom:40px;
+}
+h2{
+    color:#2980b9;
+    margin-top:40px;
+    font-size:32px;
+}
+p, ul{
+    font-size:20px;
+    line-height:1.8;
+    margin-top:15px;
+}
+ul{padding-left:25px;}
+button{
+    margin-top:30px;
+    padding:18px 45px;
+    font-size:20px;
+    background:#2980b9;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+}
+button:hover{
+    background:#1f618d;
+}
+.video{
+    margin-top:40px;
+    text-align:center;
+}
+.video iframe{
+    width:100%;
+    max-width:900px;
+    height:500px;
+    border-radius:10px;
+}
 </style>
 </head>
 <body>
-
 <div class="container">
-<h1>Formation Excel</h1>
+
+<h1>Formation Word</h1>
 <div class="niveau">Niveau : Débutant</div>
 
-<h2>Chapitre 4 : Fonctions et formules avancées</h2>
+<h2>Chapitre 4 : Insertion d’images et tableaux</h2>
 
-<p>Les fonctions avancées sont indispensables pour analyser des données complexes et automatiser des calculs. Contrairement aux calculs simples, les fonctions avancées permettent de traiter des conditions, de chercher des valeurs spécifiques et de combiner plusieurs opérations dans une seule formule. Cela rend vos tableaux plus intelligents et efficaces.</p>
+<p>Word permet d’enrichir vos documents en insérant des images, formes, icônes et tableaux. Cela rend vos documents plus professionnels et visuellement attrayants.</p>
 
-<p>Une fonction très utilisée est la fonction <b>SI</b>, qui permet d’appliquer une logique conditionnelle dans Excel. Par exemple, vous pouvez afficher “Validé” ou “Non validé” selon qu’une valeur dépasse un certain seuil. Ce type de logique est très utile pour automatiser les analyses et éviter les vérifications manuelles.</p>
+<p>Pour insérer une image, utilisez l’onglet <strong>Insertion > Images</strong> et sélectionnez un fichier depuis votre ordinateur. Vous pouvez redimensionner, déplacer et appliquer des effets à l’image.</p>
 
-<p>La fonction <b>RECHERCHEV</b> permet de rechercher une valeur dans une colonne et de renvoyer un résultat associé dans une autre colonne. Elle est essentielle pour manipuler de grandes bases de données ou des listes liées entre elles. Comprendre les références de colonne et la structure des tableaux est important pour utiliser cette fonction correctement.</p>
+<p>Les tableaux sont utiles pour organiser les données sous forme de lignes et colonnes. Vous pouvez créer un tableau via <strong>Insertion > Tableau</strong>, puis saisir vos informations dans chaque cellule.</p>
 
-<p>D’autres fonctions comme <b>CONCATENER</b> (ou <b>&</b>) permettent de joindre du texte, tandis que <b>TEXTE</b> et <b>GAUCHE/DROITE</b> permettent de manipuler les chaînes de caractères. Ces fonctions sont souvent utilisées pour nettoyer ou formater des données importées d’autres systèmes.</p>
+<ul>
+<li>Insérer des images et ajuster leur taille</li>
+<li>Ajouter des formes et icônes</li>
+<li>Créer et formater des tableaux</li>
+<li>Fusionner ou fractionner des cellules</li>
+<li>Appliquer des styles de tableau prédéfinis</li>
+</ul>
 
-<p>Les fonctions statistiques comme <b>NBVAL</b> et <b>ECARTYPE</b> aident à analyser les données brutes, tandis que les fonctions mathématiques plus complexes permettent des calculs avancés dans des modèles financiers ou scientifiques. La maîtrise des fonctions avancées augmente grandement la capacité d’analyse dans Excel.</p>
-
-<h2>Exemple pratique : fonctions combinées</h2>
-<table>
-<tr><th>Valeur A</th><th>Valeur B</th><th>Résultat SI</th></tr>
-<tr><td>15</td><td>10</td><td>=SI(A2>B2;"A plus grand";"B plus grand")</td></tr>
-<tr><td>8</td><td>12</td><td>=SI(A3>B3;"A plus grand";"B plus grand")</td></tr>
-</table>
-
-<div class="video">
 <h2>Vidéo explicative (FR)</h2>
-<iframe src="https://www.youtube.com/embed/T6gm5MQ0URc" frameborder="0" allowfullscreen></iframe>
+<div class="video">
+<iframe src="https://www.youtube.com/embed/ROy0Y6Tt0aE" title="Cours Word insérer images et tableaux" frameborder="0" allowfullscreen></iframe>
 </div>
 
-<a href="excel-chapitre5.html"><button>Chapitre suivant</button></a>
-</div>
+<a href="word-chapitre5.html"><button>Chapitre suivant</button></a>
 
+</div>
 </body>
 </html>
