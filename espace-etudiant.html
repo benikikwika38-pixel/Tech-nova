@@ -14,16 +14,16 @@ body {
 h1 {color:#6a0dad; font-size:32px;}
 h3 {font-size:20px; margin-top:20px;}
 input, select {
-    padding: 14px;         /* plus de padding */
+    padding: 14px;
     margin: 10px;
-    width: 320px;          /* plus large */
+    width: 320px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    font-size: 18px;       /* texte plus grand */
+    font-size: 18px;
 }
 button {
-    padding: 14px 35px;    /* bouton plus grand */
-    font-size: 20px;       /* texte bouton plus visible */
+    padding: 14px 35px;
+    font-size: 20px;
     border-radius: 6px;
     background: #6a0dad;
     color: white;
@@ -55,7 +55,7 @@ button:hover {background: #4b078c;}
 </style>
 <script>
 // Mot de passe général
-const motPasseGeneral="223345";
+const motPasseGeneral="TECHBE12";
 
 // Charger étudiants depuis localStorage
 let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
@@ -105,16 +105,17 @@ function nouveau(){
 
     // Vérifier si l'étudiant existe déjà
     let etudiantExistant = etudiants.find(e => e.nom === nom && JSON.stringify(e.formations) === JSON.stringify(formations));
+
     if(etudiantExistant){
-        alert("Vous avez déjà un espace étudiant !\nMatricule : "+etudiantExistant.matricule+"\nMot de passe : "+etudiantExistant.motDePasse);
+        alert("Cet espace étudiant existe déjà !\nMatricule : "+etudiantExistant.matricule+"\nMot de passe : "+etudiantExistant.motDePasse);
         afficher(etudiantExistant);
         return;
     }
 
-    // Créer un nouvel étudiant
-    let matricule=genererMatricule();
-    let mdp=genererPassword();
-    let etudiant={nom:nom, formations:formations, matricule:matricule, motDePasse:mdp};
+    // Sinon créer un nouvel étudiant
+    let matricule = genererMatricule();
+    let mdp = genererPassword();
+    let etudiant = {nom:nom, formations:formations, matricule:matricule, motDePasse:mdp};
     etudiants.push(etudiant);
     sauvegarder();
     afficher(etudiant);
@@ -165,6 +166,7 @@ function afficherEtudiants(){
 
 <!-- Menu principal -->
 <div id="menu" style="display:none">
+
 <h3>Connexion étudiant existant</h3>
 <input type="text" id="matriculeLogin" placeholder="Matricule">
 <br>
@@ -198,15 +200,16 @@ function afficherEtudiants(){
 <h4>Liste des étudiants</h4>
 <ul id="listeEtudiants"></ul>
 </div>
+
 </div>
 
-<!-- Espace étudiant -->
-<div id="espace" class="box">
+<!-- Espace étudiant affiché -->
+<div class="box" id="espace">
 <p><strong>Nom :</strong> <span id="n"></span></p>
 <p><strong>Formations :</strong> <span id="f"></span></p>
 <p><strong>Matricule :</strong> <span id="m"></span></p>
 <p><strong>Date d'inscription :</strong> <span id="d"></span></p>
-<p><strong>Année académique :</strong> <span id="a"></span></p>
+<p><strong>Année :</strong> <span id="a"></span></p>
 <p class="signature">Signé par le fondateur Béni Kikwika</p>
 </div>
 
