@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Accès Espace Étudiants - TechNova</title>
+<title>Espace Étudiant - TechNova</title>
 <style>
 body {
     font-family: 'Georgia', serif;
@@ -52,41 +52,97 @@ button:hover {
 }
 </style>
 <script>
-// Mot de passe général pour accéder au formulaire
-const motDePasseGeneral = "223345";
+// Mot de passe général
+const mdpGeneral = "TECHBE12";
 
-function verifierMotDePasseGeneral(){
-    const mdpEntre = document.getElementById("motDePasseGeneral").value.trim();
-    if(mdpEntre === motDePasseGeneral){
-        // afficher le formulaire pour remplir les infos
-        document.getElementById("formulaireEtudiant").style.display = "block";
-        document.getElementById("motDePasseSection").style.display = "none";
+// Base de données des anciens étudiants
+let etudiants = [
+    { nom: "Muzele Buluku Sarah", formations: ["Bases de données","Excel"], matricule: "TN-2026-A5F3", motDePasse: "T3ch#8Bz" },
+    { nom: "Jean Dupont", formations: ["Word","Excel"], matricule: "TN-2026-Q7G1", motDePasse: "X9vL$2Kp" },
+    { nom: "Marie Luma", formations: ["Programmation"], matricule: "TN-2026-M2B8", motDePasse: "P4sW!6Hq" }
+];
+
+// Fonction pour générer un matricule aléatoire
+function genererMatricule(){
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let code = "";
+    for(let i=0; i<4; i++) code += chars.charAt(Math.floor(Math.random()*chars.length));
+    return `TN-2026-${code}`;
+}
+
+// Fonction pour générer un mot de passe aléatoire
+function genererMotDePasse(){
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
+    let mdp = "";
+    for(let i=0; i<8; i++) mdp += chars.charAt(Math.floor(Math.random()*chars.length));
+    return mdp;
+}
+
+// Vérifier mot de passe général
+function verifierGeneral(){
+    const codeGeneral = document.getElementById("mdpGeneral").value.trim();
+    if(codeGeneral === mdpGeneral){
+        document.getElementById("sectionGeneral").style.display = "none";
+        document.getElementById("sectionChoix").style.display = "block";
     } else {
-        alert("Mot de passe incorrect ! Vous ne pouvez pas accéder à l'espace étudiant.");
+        alert("Mot de passe général incorrect !");
     }
 }
 
-function genererEspace(){
-    let nom = document.getElementById("nom").value.trim();
-    let formationsSelect = document.getElementById("formations");
-    let formations = Array.from(formationsSelect.selectedOptions).map(o => o.value);
-    
-    if(!nom || formations.length === 0){
-        alert("Veuillez remplir votre nom et choisir au moins une formation.");
+// Afficher formulaire pour anciens ou nouveaux
+function choisirType(type){
+    document.getElementById("sectionChoix").style.display = "none";
+    if(type === "ancien"){
+        document.getElementById("sectionAncien").style.display = "block";
+    } else {
+        document.getElementById("sectionNouveau").style.display = "block";
+    }
+}
+
+// Accéder espace ancien étudiant
+function accederAncien(){
+    const mdp = document.getElementById("motDePasseAncien").value.trim();
+    const etudiant = etudiants.find(e => e.motDePasse === mdp);
+    if(etudiant){
+        afficherEspace(etudiant);
+        document.getElementById("sectionAncien").style.display = "none";
+    } else {
+        alert("Mot de passe incorrect !");
+    }
+}
+
+// Ajouter et afficher nouveau étudiant
+function ajouterNouveau(){
+    const nom = document.getElementById("nomNouveau").value.trim();
+    const formationsSelect = document.getElementById("formationsNouveau");
+    const formations = Array.from(formationsSelect.selectedOptions).map(o => o.value);
+
+    if(!nom || formations.length===0){
+        alert("Remplissez nom et choisissez au moins une formation !");
         return;
     }
 
-    let matricule = "TN-2026-" + Math.floor(Math.random()*900+100); // matricule aléatoire
-    let dateInscription = new Date().toLocaleDateString("fr-FR");
-    let motDePasseEtudiant = "TECHBE12"; // mot de passe pour l'étudiant
+    const matricule = genererMatricule();
+    const motDePasse = genererMotDePasse();
 
-    document.getElementById("affNom").innerText = nom;
-    document.getElementById("affMatricule").innerText = matricule;
-    document.getElementById("affDate").innerText = dateInscription;
-    document.getElementById("affFormations").innerText = formations.join(", ");
-    document.getElementById("affMotDePasseEtudiant").innerText = motDePasseEtudiant;
-    document.getElementById("affAcces").innerText = "Activé ✅";
+    const nouveau = { nom, formations, matricule, motDePasse };
+    etudiants.push(nouveau);
+
+    afficherEspace(nouveau);
+    document.getElementById("sectionNouveau").style.display = "none";
+
+    alert(`Votre mot de passe unique : ${motDePasse} \nMatricule : ${matricule} \nConservez-les bien !`);
+}
+
+// Afficher l'espace violet
+function afficherEspace(etudiant){
     document.getElementById("espaceEtudiant").style.display = "block";
+    document.getElementById("affNom").innerText = etudiant.nom;
+    document.getElementById("affFormations").innerText = etudiant.formations.join(", ");
+    document.getElementById("affMatricule").innerText = etudiant.matricule;
+    document.getElementById("affDate").innerText = new Date().toLocaleDateString("fr-FR");
+    document.getElementById("affMotDePasseEtudiant").innerText = etudiant.motDePasse;
+    document.getElementById("affAcces").innerText = "Activé ✅";
 }
 </script>
 </head>
@@ -95,29 +151,44 @@ function genererEspace(){
 <h1>TechNova Academy</h1>
 <h2>Espace Étudiants</h2>
 
-<!-- Section mot de passe avant accès au formulaire -->
-<div id="motDePasseSection">
-<p>Entrez le mot de passe pour accéder au formulaire :</p>
-<input type="password" id="motDePasseGeneral" placeholder="Mot de passe">
+<!-- Mot de passe général -->
+<div id="sectionGeneral">
+<p>Entrez le mot de passe général :</p>
+<input type="password" id="mdpGeneral" placeholder="Mot de passe général">
 <br><br>
-<button onclick="verifierMotDePasseGeneral()">Valider</button>
+<button onclick="verifierGeneral()">Valider</button>
 </div>
 
-<!-- Formulaire étudiant (apparaît seulement après mot de passe correct) -->
-<div id="formulaireEtudiant" style="display:none;">
+<!-- Choix ancien ou nouveau -->
+<div id="sectionChoix" style="display:none;">
+<p>Êtes-vous un ancien ou un nouveau étudiant ?</p>
+<button onclick="choisirType('ancien')">Ancien étudiant</button>
+<button onclick="choisirType('nouveau')">Nouveau étudiant</button>
+</div>
+
+<!-- Formulaire ancien -->
+<div id="sectionAncien" style="display:none;">
+<p>Entrez votre mot de passe unique :</p>
+<input type="password" id="motDePasseAncien" placeholder="Mot de passe étudiant">
+<br><br>
+<button onclick="accederAncien()">Accéder</button>
+</div>
+
+<!-- Formulaire nouveau -->
+<div id="sectionNouveau" style="display:none;">
 <p>Remplissez vos informations :</p>
-<input type="text" id="nom" placeholder="Nom complet"><br>
-<select id="formations" multiple>
+<input type="text" id="nomNouveau" placeholder="Nom complet"><br>
+<select id="formationsNouveau" multiple>
 <option value="Initiation à l’informatique">Initiation à l’informatique (Gratuit)</option>
 <option value="Word">Word (Gratuit)</option>
 <option value="Excel">Excel (5$)</option>
 <option value="Bases de données">Bases de données (5$)</option>
 <option value="Programmation">Programmation (10$)</option>
 </select><br>
-<button onclick="genererEspace()">Voir mon espace</button>
+<button onclick="ajouterNouveau()">Valider et créer mon espace</button>
 </div>
 
-<!-- Espace étudiant généré -->
+<!-- Espace étudiant -->
 <div id="espaceEtudiant" class="info-box">
 <p><strong>Nom complet :</strong> <span id="affNom">---</span></p>
 <p><strong>Matricule :</strong> <span id="affMatricule">---</span></p>
