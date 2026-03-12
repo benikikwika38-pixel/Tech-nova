@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fil d'actualité - TechNova Network</title>
+<style>
+body{
+    font-family:Arial, sans-serif;
+    margin:0;
+    background:#f4f6f9;
+}
+header{
+    background:#2980b9;
+    color:white;
+    padding:20px;
+    text-align:center;
+    font-size:28px;
+}
+.container{
+    display:flex;
+    justify-content:space-between;
+    max-width:1200px;
+    margin:20px auto;
+}
+.left, .right{
+    width:25%;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    height:fit-content;
+}
+.center{
+    width:48%;
+}
+.post{
+    background:white;
+    padding:15px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 0 5px rgba(0,0,0,0.05);
+}
+.post h3{
+    margin:0 0 10px 0;
+    color:#2980b9;
+}
+.post p{
+    margin:5px 0;
+    font-size:16px;
+}
+.likes, .comments{
+    font-size:14px;
+    color:#555;
+    margin-top:5px;
+}
+button{
+    background:#2980b9;
+    color:white;
+    border:none;
+    border-radius:5px;
+    padding:8px 15px;
+    cursor:pointer;
+    margin-top:10px;
+}
+button:hover{
+    background:#1f618d;
+}
+</style>
+</head>
+<body>
+
+<header>
+TechNova Network - Apprendre et partager
+</header>
+
+<div class="container">
+
+<!-- Colonne de gauche : Menu et profil -->
+<div class="left">
+<h2>Profil</h2>
+<p><strong>Jean Dupont</strong></p>
+<p>Compétences : Word, Excel</p>
+<p>Formations : Word, Excel</p>
+<p>Certificats : Word</p>
+<button>Modifier profil</button>
+<hr>
+<h2>Top étudiants</h2>
+<ol>
+<li>Jean - 900 points</li>
+<li>Marie - 850 points</li>
+<li>Paul - 800 points</li>
+</ol>
+</div>
+
+<!-- Colonne centrale : Publications -->
+<div class="center">
+<h2>Fil d'actualité</h2>
+
+<div class="post">
+<h3>Jean Dupont</h3>
+<p>Aujourd’hui j’ai appris les formules Excel sur TechNova.</p>
+<div class="likes">❤️ 12 likes</div>
+<div class="comments">💬 3 commentaires</div>
+<button>Like</button>
+<button>Commenter</button>
+</div>
+
+<div class="post">
+<h3>Marie</h3>
+<p>J’ai terminé le chapitre sur Word et créé un CV.</p>
+<div class="likes">❤️ 15 likes</div>
+<div class="comments">💬 5 commentaires</div>
+<button>Like</button>
+<button>Commenter</button>
+</div>
+
+</div>
+
+<!-- Colonne de droite : Formations -->
+<div class="right">
+<h2>Formations TechNova</h2>
+<ul>
+<li>Initiation à l’informatique (Gratuit)</li>
+<li>Word (Gratuit)</li>
+<li>Excel</li>
+<li>Bases de données (5$)</li>
+<li>Programmation (10$)</li>
+</ul>
+</div>
+
+</div>
+
+</body>
+</html>
