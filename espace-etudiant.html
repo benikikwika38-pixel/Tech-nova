@@ -2,77 +2,110 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Espace Étudiant - TechNova</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accès Espace Étudiants - TechNova</title>
 <style>
-body{
-    font-family:Arial, sans-serif;
-    margin:0;
-    padding:0;
-    background: linear-gradient(135deg, #6a0dad, #8e44ad);
-    color:white;
-    text-align:center;
-    min-height:100vh;
+body {
+    font-family: 'Georgia', serif;
+    background-color: #f4f4f9;
+    color: #222;
+    text-align: center;
+    padding-top: 50px;
 }
-.container{
-    background:rgba(255,255,255,0.05);
-    max-width:700px;
-    margin:50px auto;
-    padding:40px;
-    border-radius:15px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.3);
+input, select {
+    padding: 10px;
+    width: 220px;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
-h2{
-    color:#f1c40f;
-    margin-bottom:30px;
+button {
+    padding: 10px 25px;
+    background-color: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
-input, select{
-    padding:12px; 
-    font-size:16px; 
-    margin:10px 0; 
-    width:90%; 
-    border-radius:5px; 
-    border:none;
+button:hover {
+    background-color: #1f618d;
 }
-button{
-    padding:12px 25px; 
-    font-size:16px; 
-    background:#9b59b6; 
-    color:white; 
-    border:none; 
-    border-radius:8px; 
-    cursor:pointer;
-    transition:0.3s;
-}
-button:hover{background:#b370d0;}
 .info-box{
-    background: rgba(0,0,0,0.2);
-    padding:15px;
-    border-radius:10px;
-    margin:15px 0;
-    text-align:left;
+    background: #6a0dad;
+    color: white;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    display: none;
+    text-align: left;
 }
 .status{
     font-weight:bold;
-}
-.toggle-btn{
-    background:#f1c40f;
-    color:#6a0dad;
-    margin-left:10px;
+    color: #f1c40f;
 }
 .signature{
-    margin-top:20px; 
-    font-style:italic; 
-    color:#f1c40f; 
-    text-align:center;
+    margin-top:15px;
+    font-style:italic;
+    color:#f1c40f;
 }
 </style>
+<script>
+// Mot de passe général pour accéder au formulaire
+const motDePasseGeneral = "223345";
+
+function verifierMotDePasseGeneral(){
+    const mdpEntre = document.getElementById("motDePasseGeneral").value.trim();
+    if(mdpEntre === motDePasseGeneral){
+        // afficher le formulaire pour remplir les infos
+        document.getElementById("formulaireEtudiant").style.display = "block";
+        document.getElementById("motDePasseSection").style.display = "none";
+    } else {
+        alert("Mot de passe incorrect ! Vous ne pouvez pas accéder à l'espace étudiant.");
+    }
+}
+
+function genererEspace(){
+    let nom = document.getElementById("nom").value.trim();
+    let formationsSelect = document.getElementById("formations");
+    let formations = Array.from(formationsSelect.selectedOptions).map(o => o.value);
+    
+    if(!nom || formations.length === 0){
+        alert("Veuillez remplir votre nom et choisir au moins une formation.");
+        return;
+    }
+
+    let matricule = "TN-2026-" + Math.floor(Math.random()*900+100); // matricule aléatoire
+    let dateInscription = new Date().toLocaleDateString("fr-FR");
+    let motDePasseEtudiant = "TECHBE12"; // mot de passe pour l'étudiant
+
+    document.getElementById("affNom").innerText = nom;
+    document.getElementById("affMatricule").innerText = matricule;
+    document.getElementById("affDate").innerText = dateInscription;
+    document.getElementById("affFormations").innerText = formations.join(", ");
+    document.getElementById("affMotDePasseEtudiant").innerText = motDePasseEtudiant;
+    document.getElementById("affAcces").innerText = "Activé ✅";
+    document.getElementById("espaceEtudiant").style.display = "block";
+}
+</script>
 </head>
 <body>
 
-<div class="container">
-<h2>Espace Étudiant TechNova</h2>
+<h1>TechNova Academy</h1>
+<h2>Espace Étudiants</h2>
 
-<!-- Formulaire rapide -->
+<!-- Section mot de passe avant accès au formulaire -->
+<div id="motDePasseSection">
+<p>Entrez le mot de passe pour accéder au formulaire :</p>
+<input type="password" id="motDePasseGeneral" placeholder="Mot de passe">
+<br><br>
+<button onclick="verifierMotDePasseGeneral()">Valider</button>
+</div>
+
+<!-- Formulaire étudiant (apparaît seulement après mot de passe correct) -->
+<div id="formulaireEtudiant" style="display:none;">
+<p>Remplissez vos informations :</p>
 <input type="text" id="nom" placeholder="Nom complet"><br>
 <select id="formations" multiple>
 <option value="Initiation à l’informatique">Initiation à l’informatique (Gratuit)</option>
@@ -82,126 +115,18 @@ button:hover{background:#b370d0;}
 <option value="Programmation">Programmation (10$)</option>
 </select><br>
 <button onclick="genererEspace()">Voir mon espace</button>
-
-<hr>
-
-<!-- Espace étudiant généré -->
-<div class="info-box">
-<p><strong>Nom complet :</strong> <span id="affNom">---</span></p>
-<p><strong>Formations choisies :</strong> <span id="affFormations">---</span></p>
-<p><strong>Matricule :</strong> <span id="affMatricule">---</span></p>
-<p><strong>Date d'inscription :</strong> <span id="affDate">---</span></p>
-<p><strong>Année académique :</strong> <span id="affAnnee">---</span></p>
-<p><strong>Mot de passe :</strong> <span id="affMotDePasse">---</span>
-<button class="toggle-btn" onclick="toggleMDP()">👁️</button></p>
-
-<input type="password" id="motDePasseSaisi" placeholder="Entrez votre mot de passe" style="display:none;">
-<button id="verifierMDP" onclick="verifierMDP()" style="display:none;">Valider mot de passe</button>
-
-<p><strong>Accès aux cours :</strong> <span id="affAcces" class="status">---</span></p>
-
-<p class="signature">
-Ce certificat est validé par le fondateur : <strong>Béni Kikwika</strong> – TechNova Network
-</p>
 </div>
 
-<script>
-// compteur pour matricule
-let compteur = localStorage.getItem("compteur") ? parseInt(localStorage.getItem("compteur")) : 1;
-let motDePasseCache = "";
-const anneeAcademique = "2026-2027"; // année académique fixe
-
-function genererEspace(){
-    let nom = document.getElementById("nom").value.trim();
-    let formationsSelect = document.getElementById("formations");
-    let formations = Array.from(formationsSelect.selectedOptions).map(o => o.value);
-
-    if(!nom || formations.length === 0){
-        alert("Veuillez remplir votre nom et choisir au moins une formation");
-        return;
-    }
-
-    let etudiants = JSON.parse(localStorage.getItem("etudiants") || "[]");
-    let etudiant = etudiants.find(e => e.nom === nom);
-
-    let matricule = "";
-    let motDePasseGenere = "";
-    let dateInscription = "";
-
-    if(etudiant){
-        matricule = etudiant.matricule;
-        motDePasseGenere = etudiant.motDePasse;
-        // si la date d'inscription est vide, on la crée maintenant
-        if(!etudiant.dateInscription){
-            dateInscription = new Date().toLocaleDateString("fr-FR");
-            etudiant.dateInscription = dateInscription;
-            localStorage.setItem("etudiants", JSON.stringify(etudiants));
-        } else {
-            dateInscription = etudiant.dateInscription;
-        }
-    } else {
-        matricule = "TN-2026-" + compteur.toString().padStart(3,'0');
-        compteur++;
-        localStorage.setItem("compteur", compteur);
-        motDePasseGenere = "TN" + Math.floor(1000 + Math.random()*9000);
-        dateInscription = new Date().toLocaleDateString("fr-FR");
-
-        etudiants.push({
-            nom: nom,
-            matricule: matricule,
-            motDePasse: motDePasseGenere,
-            formations: formations,
-            dateInscription: dateInscription
-        });
-        localStorage.setItem("etudiants", JSON.stringify(etudiants));
-    }
-
-    motDePasseCache = motDePasseGenere;
-
-    // affichage
-    document.getElementById("affNom").innerText = nom;
-    document.getElementById("affFormations").innerText = formations.join(", ");
-    document.getElementById("affMatricule").innerText = matricule;
-    document.getElementById("affDate").innerText = dateInscription;
-    document.getElementById("affAnnee").innerText = anneeAcademique;
-    document.getElementById("affMotDePasse").innerText = motDePasseGenere;
-
-    document.getElementById("motDePasseSaisi").style.display = "block";
-    document.getElementById("verifierMDP").style.display = "block";
-
-    document.getElementById("affAcces").innerText = "Bloqué 🔒";
-    document.getElementById("affAcces").style.color = "red";
-
-    alert("Votre mot de passe privé est : " + motDePasseGenere);
-}
-
-function verifierMDP(){
-    let mdpSaisi = document.getElementById("motDePasseSaisi").value.trim();
-    let nom = document.getElementById("nom").value.trim();
-    let etudiants = JSON.parse(localStorage.getItem("etudiants") || "[]");
-    let etudiant = etudiants.find(e => e.nom === nom);
-
-    if(etudiant && mdpSaisi === etudiant.motDePasse){
-        document.getElementById("affAcces").innerText = "Activé ✅";
-        document.getElementById("affAcces").style.color = "green";
-        alert("Accès aux cours activé !");
-    } else {
-        document.getElementById("affAcces").innerText = "Bloqué 🔒";
-        document.getElementById("affAcces").style.color = "red";
-        alert("Mot de passe incorrect !");
-    }
-}
-
-// Montrer/masquer mot de passe
-function toggleMDP(){
-    let mdpSpan = document.getElementById("affMotDePasse");
-    if(mdpSpan.innerText.includes("•")){
-        mdpSpan.innerText = motDePasseCache;
-    } else {
-        mdpSpan.innerText = "••••••••";
-    }
-}
-</script>
+<!-- Espace étudiant généré -->
+<div id="espaceEtudiant" class="info-box">
+<p><strong>Nom complet :</strong> <span id="affNom">---</span></p>
+<p><strong>Matricule :</strong> <span id="affMatricule">---</span></p>
+<p><strong>Date d'inscription :</strong> <span id="affDate">---</span></p>
+<p><strong>Formations choisies :</strong> <span id="affFormations">---</span></p>
+<p><strong>Mot de passe étudiant :</strong> <span id="affMotDePasseEtudiant">---</span></p>
+<p><strong>Accès aux cours :</strong> <span id="affAcces" class="status">---</span></p>
+<p class="signature">Validé par le fondateur : Béni Kikwika – TechNova Network</p>
+</div>
 
 </body>
-                                                                                 </html>
+</html>
