@@ -62,7 +62,7 @@ let etudiants = [
     { nom: "Marie Luma", formations: ["Programmation"], matricule: "TN-2026-M2B8", motDePasse: "P4sW!6Hq" }
 ];
 
-// Fonction pour générer un matricule aléatoire
+// Générer matricule aléatoire
 function genererMatricule(){
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
@@ -70,7 +70,7 @@ function genererMatricule(){
     return `TN-2026-${code}`;
 }
 
-// Fonction pour générer un mot de passe aléatoire
+// Générer mot de passe aléatoire
 function genererMotDePasse(){
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$";
     let mdp = "";
@@ -89,7 +89,7 @@ function verifierGeneral(){
     }
 }
 
-// Afficher formulaire pour anciens ou nouveaux
+// Choisir ancien ou nouveau
 function choisirType(type){
     document.getElementById("sectionChoix").style.display = "none";
     if(type === "ancien"){
@@ -107,7 +107,7 @@ function accederAncien(){
         afficherEspace(etudiant);
         document.getElementById("sectionAncien").style.display = "none";
     } else {
-        alert("Mot de passe incorrect !");
+        alert("Mot de passe incorrect ! Vérifiez bien majuscules/minuscules et espaces.");
     }
 }
 
@@ -166,7 +166,7 @@ function afficherEspace(etudiant){
 <button onclick="choisirType('nouveau')">Nouveau étudiant</button>
 </div>
 
-<!-- Formulaire ancien -->
+<!-- Ancien étudiant -->
 <div id="sectionAncien" style="display:none;">
 <p>Entrez votre mot de passe unique :</p>
 <input type="password" id="motDePasseAncien" placeholder="Mot de passe étudiant">
@@ -174,18 +174,20 @@ function afficherEspace(etudiant){
 <button onclick="accederAncien()">Accéder</button>
 </div>
 
-<!-- Formulaire nouveau -->
+<!-- Nouveau étudiant -->
 <div id="sectionNouveau" style="display:none;">
 <p>Remplissez vos informations :</p>
-<input type="text" id="nomNouveau" placeholder="Nom complet"><br>
+<input type="text" id="nomNouveau" placeholder="Nom complet">
+<br>
 <select id="formationsNouveau" multiple>
 <option value="Initiation à l’informatique">Initiation à l’informatique (Gratuit)</option>
 <option value="Word">Word (Gratuit)</option>
 <option value="Excel">Excel (5$)</option>
 <option value="Bases de données">Bases de données (5$)</option>
 <option value="Programmation">Programmation (10$)</option>
-</select><br>
-<button onclick="ajouterNouveau()">Valider et créer mon espace</button>
+</select>
+<br><br>
+<button onclick="ajouterNouveau()">Valider et créer espace</button>
 </div>
 
 <!-- Espace étudiant -->
@@ -200,4 +202,4 @@ function afficherEspace(etudiant){
 </div>
 
 </body>
-</html>
+    </html>
