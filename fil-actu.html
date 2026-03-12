@@ -66,17 +66,28 @@ button{
 button:hover{
     background:#1f618d;
 }
+h2{
+    color:#2c3e50;
+    margin-bottom:15px;
+}
+ul{
+    padding-left:20px;
+}
+ul li{
+    margin-bottom:10px;
+    font-size:16px;
+}
 </style>
 </head>
 <body>
 
 <header>
-TechNova Network - Apprendre et partager
+TechNova Network - Apprendre, partager et évoluer
 </header>
 
 <div class="container">
 
-<!-- Colonne de gauche : Menu et profil -->
+<!-- Colonne de gauche : Profil et classement -->
 <div class="left">
 <h2>Profil</h2>
 <p><strong>Jean Dupont</strong></p>
@@ -93,26 +104,35 @@ TechNova Network - Apprendre et partager
 </ol>
 </div>
 
-<!-- Colonne centrale : Publications -->
+<!-- Colonne centrale : Fil d'actualité -->
 <div class="center">
 <h2>Fil d'actualité</h2>
 
 <div class="post">
 <h3>Jean Dupont</h3>
 <p>Aujourd’hui j’ai appris les formules Excel sur TechNova.</p>
-<div class="likes">❤️ 12 likes</div>
-<div class="comments">💬 3 commentaires</div>
-<button>Like</button>
-<button>Commenter</button>
+<div class="likes" id="likes1">❤️ 12 likes</div>
+<div class="comments" id="comments1">💬 3 commentaires</div>
+<button onclick="addLike('likes1')">Like</button>
+<button onclick="addComment('comments1')">Commenter</button>
 </div>
 
 <div class="post">
 <h3>Marie</h3>
 <p>J’ai terminé le chapitre sur Word et créé un CV.</p>
-<div class="likes">❤️ 15 likes</div>
-<div class="comments">💬 5 commentaires</div>
-<button>Like</button>
-<button>Commenter</button>
+<div class="likes" id="likes2">❤️ 15 likes</div>
+<div class="comments" id="comments2">💬 5 commentaires</div>
+<button onclick="addLike('likes2')">Like</button>
+<button onclick="addComment('comments2')">Commenter</button>
+</div>
+
+<div class="post">
+<h3>Paul</h3>
+<p>J’ai appris à créer une base de données simple pour gérer les étudiants.</p>
+<div class="likes" id="likes3">❤️ 8 likes</div>
+<div class="comments" id="comments3">💬 2 commentaires</div>
+<button onclick="addLike('likes3')">Like</button>
+<button onclick="addComment('comments3')">Commenter</button>
 </div>
 
 </div>
@@ -131,5 +151,24 @@ TechNova Network - Apprendre et partager
 
 </div>
 
+<script>
+// Ajouter un like
+function addLike(id){
+    const el = document.getElementById(id);
+    let number = parseInt(el.innerText.match(/\d+/)[0]);
+    number++;
+    el.innerText = `❤️ ${number} likes`;
+}
+
+// Ajouter un commentaire
+function addComment(id){
+    const el = document.getElementById(id);
+    let number = parseInt(el.innerText.match(/\d+/)[0]);
+    number++;
+    el.innerText = `💬 ${number} commentaires`;
+}
+</script>
+
 </body>
 </html>
+
