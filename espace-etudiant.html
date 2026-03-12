@@ -4,87 +4,30 @@
 <meta charset="UTF-8">
 <title>TechNova - Espace Étudiant</title>
 <style>
-body{
-    font-family:Arial, sans-serif;
-    background:#f4f4f9;
-    text-align:center;
-    padding:40px;
-    color:#222;
-}
-
-h1{
-    color:#6a0dad;
-}
-
-input, select{
-    padding:10px; 
-    margin:10px;
-    width:230px;
-    border-radius:5px;
-    border:1px solid #ccc;
-}
-
-button{
-    padding:10px 25px;
-    background:#6a0dad;
-    color:white;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-}
-
-button:hover{
-    background:#4b078c;
-}
-
-.box{
-    background:#9b59b6;
-    color:white;
-    max-width:600px;
-    margin:auto;
-    margin-top:30px;
-    padding:25px;
-    border-radius:10px;
-    display:none;
-    text-align:left;
-    line-height:1.6;
-}
-
-.signature{
-    margin-top:15px;
-    font-style:italic;
-    color:#ffd700;
-}
-
-#adminZone{
-    margin-top:20px;
-    text-align:left;
-    color:#222;
-}
-
-#adminPanel{
-    display:none;
-    margin-top:30px;
-}
-
-#listeEtudiants li{
-    margin:5px 0;
-}
+body{font-family:Arial, sans-serif; background:#f4f4f9; text-align:center; padding:40px; color:#222;}
+h1{color:#6a0dad;}
+input, select{padding:10px; margin:10px; width:230px; border-radius:5px; border:1px solid #ccc;}
+button{padding:10px 25px; background:#6a0dad; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px;}
+button:hover{background:#4b078c;}
+.box{background:#9b59b6; color:white; max-width:600px; margin:auto; margin-top:30px; padding:25px; border-radius:10px; display:none; text-align:left; line-height:1.6;}
+.signature{margin-top:15px; font-style:italic; color:#ffd700;}
+#adminZone{margin-top:20px; text-align:left; color:#222;}
+#adminPanel{display:none; margin-top:30px;}
+#listeEtudiants li{margin:5px 0;}
 </style>
 
 <script>
 const motPasseGeneral="223345";
 
-/* Charger étudiants depuis localStorage */
+// Charger étudiants depuis localStorage
 let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
 
-/* Sauvegarder étudiants */
+// Sauvegarder étudiants
 function sauvegarder(){
     localStorage.setItem("technova_etudiants", JSON.stringify(etudiants));
 }
 
-/* Entrée mot de passe général */
+// Entrée mot de passe général
 function entrer(){
     let code=document.getElementById("passGeneral").value.trim();
     if(code===motPasseGeneral){
@@ -95,13 +38,13 @@ function entrer(){
     }
 }
 
-/* Générer matricule */
+// Générer matricule
 function genererMatricule(){
     let numero=(etudiants.length+1).toString().padStart(3,"0");
     return "TN-2026-"+numero;
 }
 
-/* Générer mot de passe */
+// Générer mot de passe aléatoire
 function genererPassword(){
     let caracteres="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let pass="";
@@ -111,7 +54,7 @@ function genererPassword(){
     return pass;
 }
 
-/* Connexion ancien étudiant */
+// Connexion ancien étudiant
 function ancien(){
     let matricule=document.getElementById("matriculeLogin").value.trim();
     let mdp=document.getElementById("passAncien").value.trim();
@@ -125,7 +68,7 @@ function ancien(){
     }
 }
 
-/* Nouveau étudiant */
+// Nouveau étudiant
 function nouveau(){
     let nom=document.getElementById("nom").value.trim();
     let formations=[...document.getElementById("formations").selectedOptions].map(o=>o.value);
@@ -135,6 +78,16 @@ function nouveau(){
         return;
     }
 
+    // Vérifier si l'étudiant existe déjà
+    let etudiantExistant = etudiants.find(e => e.nom === nom && JSON.stringify(e.formations) === JSON.stringify(formations));
+
+    if(etudiantExistant){
+        alert("Vous avez déjà un espace étudiant !\nVotre matricule : "+etudiantExistant.matricule+"\nVotre mot de passe : "+etudiantExistant.motDePasse);
+        afficher(etudiantExistant);
+        return;
+    }
+
+    // Créer un nouvel étudiant
     let matricule=genererMatricule();
     let mdp=genererPassword();
 
@@ -145,10 +98,10 @@ function nouveau(){
 
     afficher(etudiant);
 
-    alert("Votre matricule : "+matricule+"\nVotre mot de passe : "+mdp);
+    alert("Votre espace a été créé !\nVotre matricule : "+matricule+"\nVotre mot de passe : "+mdp);
 }
 
-/* Afficher espace étudiant */
+// Afficher espace étudiant
 function afficher(e){
     document.getElementById("espace").style.display="block";
     document.getElementById("n").innerText=e.nom;
@@ -158,7 +111,7 @@ function afficher(e){
     document.getElementById("a").innerText="2026-2027";
 }
 
-/* ADMIN */
+// ADMIN
 function ouvrirAdmin(){
     document.getElementById("adminPanel").style.display="block";
 }
@@ -184,6 +137,7 @@ function afficherEtudiants(){
 }
 </script>
 </head>
+
 <body>
 
 <h1>TechNova Academy</h1>
@@ -223,7 +177,18 @@ function afficherEtudiants(){
 
 <hr>
 
-<button onclick="ouvrirAdmin()">Admin</button>
+<!-- Admin -->
+<h3>Admin</h3>
+<input type="password" id="adminPass" placeholder="Mot de passe admin">
+<br>
+<button onclick="verifierAdmin()">Ouvrir Admin</button>
+
+<div id="adminPanel">
+    <div id="adminZone" style="display:none;">
+        <h3>Liste des étudiants</h3>
+        <ul id="listeEtudiants"></ul>
+    </div>
+</div>
 
 </div>
 
@@ -236,20 +201,10 @@ function afficherEtudiants(){
 <p><b>Date d'inscription :</b> <span id="d"></span></p>
 <p><b>Année académique :</b> <span id="a"></span></p>
 <p><b>Accès aux cours :</b> Activé ✅</p>
-<p class="signature">Signé par le fondateur <br>Béni Kikwika</p>
-</div>
-
-<!-- Panel admin -->
-<div id="adminPanel">
-<h3>Connexion Admin</h3>
-<input type="password" id="adminPass" placeholder="Mot de passe admin">
-<br><br>
-<button onclick="verifierAdmin()">Entrer</button>
-<div id="adminZone" style="display:none">
-<h3>Liste des étudiants TechNova</h3>
-<ul id="listeEtudiants"></ul>
-</div>
+<p class="signature">
+Signé par le fondateur <br> Béni Kikwika
+</p>
 </div>
 
 </body>
-  </html>
+                            </html>
