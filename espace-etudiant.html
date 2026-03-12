@@ -15,7 +15,6 @@ button:hover{background:#4b078c;}
 #adminPanel{display:none; margin-top:30px;}
 #listeEtudiants li{margin:5px 0;}
 </style>
-
 <script>
 const motPasseGeneral="223345";
 
@@ -82,6 +81,7 @@ function nouveau(){
     let etudiantExistant = etudiants.find(e => e.nom === nom && JSON.stringify(e.formations) === JSON.stringify(formations));
 
     if(etudiantExistant){
+        // Étudiant déjà existant
         alert("Vous avez déjà un espace étudiant !\nVotre matricule : "+etudiantExistant.matricule+"\nVotre mot de passe : "+etudiantExistant.motDePasse);
         afficher(etudiantExistant);
         return;
@@ -94,7 +94,7 @@ function nouveau(){
     let etudiant={nom:nom, formations:formations, matricule:matricule, motDePasse:mdp};
 
     etudiants.push(etudiant);
-    sauvegarder(); // sauvegarde immédiate
+    sauvegarder();
 
     afficher(etudiant);
 
@@ -137,7 +137,6 @@ function afficherEtudiants(){
 }
 </script>
 </head>
-
 <body>
 
 <h1>TechNova Academy</h1>
@@ -189,7 +188,6 @@ function afficherEtudiants(){
         <ul id="listeEtudiants"></ul>
     </div>
 </div>
-
 </div>
 
 <!-- Espace étudiant -->
@@ -201,10 +199,8 @@ function afficherEtudiants(){
 <p><b>Date d'inscription :</b> <span id="d"></span></p>
 <p><b>Année académique :</b> <span id="a"></span></p>
 <p><b>Accès aux cours :</b> Activé ✅</p>
-<p class="signature">
-Signé par le fondateur <br> Béni Kikwika
-</p>
+<p class="signature">Signé par le fondateur<br>Béni Kikwika</p>
 </div>
 
 </body>
-                            </html>
+</html>
