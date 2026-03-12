@@ -59,6 +59,12 @@ button:hover{background:#b370d0;}
     color:#6a0dad;
     margin-left:10px;
 }
+.signature{
+    margin-top:20px; 
+    font-style:italic; 
+    color:#f1c40f; 
+    text-align:center;
+}
 </style>
 </head>
 <body>
@@ -84,6 +90,8 @@ button:hover{background:#b370d0;}
 <p><strong>Nom complet :</strong> <span id="affNom">---</span></p>
 <p><strong>Formations choisies :</strong> <span id="affFormations">---</span></p>
 <p><strong>Matricule :</strong> <span id="affMatricule">---</span></p>
+<p><strong>Date d'inscription :</strong> <span id="affDate">---</span></p>
+<p><strong>Année académique :</strong> <span id="affAnnee">---</span></p>
 <p><strong>Mot de passe :</strong> <span id="affMotDePasse">---</span>
 <button class="toggle-btn" onclick="toggleMDP()">👁️</button></p>
 
@@ -91,12 +99,17 @@ button:hover{background:#b370d0;}
 <button id="verifierMDP" onclick="verifierMDP()" style="display:none;">Valider mot de passe</button>
 
 <p><strong>Accès aux cours :</strong> <span id="affAcces" class="status">---</span></p>
+
+<p class="signature">
+Ce certificat est validé par le fondateur : <strong>Béni Kikwika</strong> – TechNova Network
+</p>
 </div>
 
 <script>
 // compteur pour matricule
 let compteur = localStorage.getItem("compteur") ? parseInt(localStorage.getItem("compteur")) : 1;
 let motDePasseCache = "";
+const anneeAcademique = "2026-2027"; // année académique fixe
 
 // Générer espace
 function genererEspace(){
@@ -114,20 +127,25 @@ function genererEspace(){
 
     let matricule = "";
     let motDePasseGenere = "";
+    let dateInscription = "";
 
     if(etudiant){
         matricule = etudiant.matricule;
         motDePasseGenere = etudiant.motDePasse;
+        dateInscription = etudiant.dateInscription;
     } else {
         matricule = "TN-2026-" + compteur.toString().padStart(3,'0');
         compteur++;
         localStorage.setItem("compteur", compteur);
         motDePasseGenere = "TN" + Math.floor(1000 + Math.random()*9000);
+        dateInscription = new Date().toLocaleDateString("fr-FR");
+
         etudiants.push({
             nom: nom,
             matricule: matricule,
             motDePasse: motDePasseGenere,
-            formations: formations
+            formations: formations,
+            dateInscription: dateInscription
         });
         localStorage.setItem("etudiants", JSON.stringify(etudiants));
     }
@@ -138,6 +156,8 @@ function genererEspace(){
     document.getElementById("affNom").innerText = nom;
     document.getElementById("affFormations").innerText = formations.join(", ");
     document.getElementById("affMatricule").innerText = matricule;
+    document.getElementById("affDate").innerText = dateInscription;
+    document.getElementById("affAnnee").innerText = anneeAcademique;
     document.getElementById("affMotDePasse").innerText = motDePasseGenere;
 
     document.getElementById("motDePasseSaisi").style.display = "block";
@@ -152,7 +172,11 @@ function genererEspace(){
 // Vérification mot de passe
 function verifierMDP(){
     let mdpSaisi = document.getElementById("motDePasseSaisi").value.trim();
-    if(mdpSaisi === motDePasseCache){
+    let nom = document.getElementById("nom").value.trim();
+    let etudiants = JSON.parse(localStorage.getItem("etudiants") || "[]");
+    let etudiant = etudiants.find(e => e.nom === nom);
+
+    if(etudiant && mdpSaisi === etudiant.motDePasse){
         document.getElementById("affAcces").innerText = "Activé ✅";
         document.getElementById("affAcces").style.color = "green";
         alert("Accès aux cours activé !");
@@ -175,4 +199,4 @@ function toggleMDP(){
 </script>
 
 </body>
-</html>                                                                      </html>
+    </html>
