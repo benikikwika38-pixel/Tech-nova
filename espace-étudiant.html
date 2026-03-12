@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Espace Étudiant - TechNova</title>
+<style>
+body{font-family:Arial; background:#f4f6f9; text-align:center; padding:50px;}
+.container{background:white; padding:40px; max-width:600px; margin:auto; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1);}
+input, select{padding:12px; font-size:18px; margin:10px 0; width:300px;}
+button{padding:12px 30px; font-size:18px; background:#2980b9; color:white; border:none; border-radius:8px; cursor:pointer;}
+h2{color:#2980b9;}
+.info{font-size:20px;margin-top:15px;}
+.status{font-weight:bold;}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>Espace Étudiant TechNova</h2>
+
+<!-- Formulaire rapide -->
+<input type="text" id="nom" placeholder="Nom complet" required><br>
+<select id="formations" multiple>
+<option value="Initiation à l’informatique">Initiation à l’informatique (Gratuit)</option>
+<option value="Word">Word (Gratuit)</option>
+<option value="Excel">Excel (5$)</option>
+<option value="Bases de données">Bases de données (5$)</option>
+<option value="Programmation">Programmation (10$)</option>
+</select><br>
+<button onclick="genererEspace()">Voir mon espace</button>
+
+<hr>
+
+<!-- Espace étudiant généré automatiquement -->
+<p class="info"><strong>Nom complet :</strong> <span id="affNom">---</span></p>
+<p class="info"><strong>Matricule :</strong> <span id="affMatricule">---</span></p>
+<p class="info"><strong>Date d'inscription :</strong> <span id="affDate">---</span></p>
+<p class="info"><strong>Formations choisies :</strong> <span id="affFormations">---</span></p>
+<p class="info"><strong>Paiements :</strong> <span id="affPaiements">---</span></p>
+<p class="info"><strong>Accès aux cours :</strong> <span id="affAcces" class="status">---</span></p>
+
+</div>
+
+<script>
+let compteur = 1; // pour générer matricule unique
+
+function genererEspace(){
+    let nom = document.getElementById("nom").value;
+    let formationsSelect = document.getElementById("formations");
+    let formations = Array.from(formationsSelect.selectedOptions).map(o => o.value);
+
+    if(!nom || formations.length === 0){
+        alert("Veuillez remplir votre nom et choisir au moins une formation");
+        return;
+    }
+
+    // Générer matricule automatique
+    let matricule = "TN-2026-" + compteur.toString().padStart(3,'0');
+    compteur++;
+
+    // Détecter paiements (cours payants)
+    let paiements = formations.filter(f => !f.toLowerCase().includes("gratuit"));
+
+    // Accès cours activé automatiquement
+    let accesCours = true;
+
+    // Date actuelle
+    let dateInscription = new Date().toLocaleDateString("fr-FR");
+
+    // Afficher dans l'espace
+    document.getElementById("affNom").innerText = nom;
+    document.getElementById("affMatricule").innerText = matricule;
+    document.getElementById("affDate").innerText = dateInscription;
+    document.getElementById("affFormations").innerText = formations.join(", ");
+    document.getElementById("affPaiements").innerText = paiements.length ? paiements.join(", ") : "Aucun paiement";
+    document.getElementById("affAcces").innerText = accesCours ? "Activé ✅" : "Bloqué 🔒";
+    document.getElementById("affAcces").style.color = accesCours ? "green" : "red";
+}
+</script>
+
+</body>
+</html>
