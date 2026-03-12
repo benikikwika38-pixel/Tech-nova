@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Vérification Certificat - TechNova</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+text-align:center;
+padding:50px;
+}
+
+h1{
+font-size:50px;
+color:#2c3e50;
+}
+
+input{
+padding:15px;
+font-size:20px;
+width:300px;
+margin-top:20px;
+}
+
+button{
+padding:15px 30px;
+font-size:20px;
+background:#2980b9;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.result{
+margin-top:40px;
+font-size:24px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>Vérification de certificat</h1>
+
+<p>Entrez le numéro du certificat</p>
+
+<input type="text" id="certificat" placeholder="Ex: TN-2026-001">
+
+<br><br>
+
+<button onclick="verifier()">Vérifier</button>
+
+<div class="result" id="resultat"></div>
+
+<script>
+
+function verifier(){
+
+let numero = document.getElementById("certificat").value;
+let resultat = document.getElementById("resultat");
+
+if(numero === "TN-2026-001"){
+
+resultat.innerHTML = `
+<b>Certificat valide ✅</b><br><br>
+Nom : Muzele Buluku Sarah<br>
+Formation : Bases de données<br>
+Date : 15 Mars 2026<br>
+Délivré par : TechNova
+`;
+
+}
+
+else{
+
+resultat.innerHTML = "❌ Certificat introuvable";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
