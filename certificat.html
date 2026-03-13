@@ -19,10 +19,10 @@ body {
 .certificat {
     width: 850px;
     background: #fff;
-    border: 10px solid gold;
-    border-radius: 20px;
-    padding: 50px 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 12px solid gold;
+    border-radius: 10px;
+    padding: 60px 50px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
     position: relative;
     text-align: center;
 }
@@ -32,26 +32,67 @@ body {
     top: 20px;
     right: 20px;
 }
-h1 { font-size: 3em; color: #b8860b; margin-bottom: 10px; }
-h2 { font-size: 2em; margin-bottom: 30px; color: #333; }
-p { font-size: 1.3em; margin: 20px 0; line-height: 1.6em; }
-input[type="text"] { font-size: 1.1em; padding: 10px; width: 300px; margin: 10px 0 20px 0; border-radius: 6px; border: 1px solid #aaa; text-align: center; }
-button { padding: 12px 25px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; background: #2980b9; color: white; margin-top: 20px; transition: 0.3s; }
-button:hover { background: #1f618d; }
-.signature { margin-top: 60px; font-weight: bold; font-size: 1.1em; color: #2c3e50; text-align: right; }
+h1 { 
+    font-size: 3em; 
+    color: #b8860b; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+    letter-spacing: 2px;
+}
+h2 { 
+    font-size: 2em; 
+    color: #2c3e50; 
+    margin-bottom: 25px; 
+}
+p { 
+    font-size: 1.3em; 
+    margin: 20px 0; 
+    line-height: 1.6em; 
+}
+input[type="text"] { 
+    font-size: 1.1em; 
+    padding: 10px; 
+    width: 300px; 
+    margin: 10px 0 20px 0; 
+    border-radius: 6px; 
+    border: 1px solid #aaa; 
+    text-align: center; 
+}
+button { 
+    padding: 12px 25px; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    background: #2980b9; 
+    color: white; 
+    margin-top: 20px; 
+    transition: 0.3s; 
+}
+button:hover { 
+    background: #1f618d; 
+}
+.signature { 
+    margin-top: 60px; 
+    font-weight: bold; 
+    font-size: 1.1em; 
+    color: #2c3e50; 
+    text-align: right; 
+    font-style: italic; 
+}
 </style>
 </head>
 <body>
 <div class="certificat" id="certificat">
     <img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
-    <h1>Certificat de Réussite</h1>
+    <h1>CERTIFICAT DE RÉUSSITE</h1>
     <h2>TechNova Academy</h2>
 
     <p>Ce certificat est décerné à :</p>
     <input type="text" id="nomEtudiant" placeholder="Nom de l'étudiant">
 
     <p>Pour avoir complété avec succès la formation :</p>
-    <p id="formationText"></p>
+    <p id="formationText" style="font-weight:bold;"></p>
 
     <input type="text" id="matriculeInput" placeholder="Entrez votre matricule pour vérification">
 
@@ -82,16 +123,16 @@ async function verifierEtudiant() {
 
     const { jsPDF } = window.jspdf;
 
-    // Taille A4 paysage en points (595 x 842 px approx)
+    // Taille PDF paysage A4 en points
     const pdfWidth = 842;
     const pdfHeight = 595;
 
-    // Calcul du ratio pour garder la proportion du certificat
+    // Calcul ratio pour garder les proportions
     const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
     const imgWidth = canvas.width * ratio;
     const imgHeight = canvas.height * ratio;
 
-    // Centrer l'image sur la page A4 paysage
+    // Centrer le certificat dans le PDF
     const x = (pdfWidth - imgWidth) / 2;
     const y = (pdfHeight - imgHeight) / 2;
 
