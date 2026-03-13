@@ -6,51 +6,64 @@
 <title>Admin TechNova</title>
 <style>
 body{
-    font-family:Arial, sans-serif;
+    font-family: Arial, sans-serif;
     background:#f4f4f9;
+    padding:20px;
     text-align:center;
-    padding:30px;
 }
 h1{
     color:#2c3e50;
+    margin-bottom:10px;
 }
 #compteur{
-    font-size:1.1em;
+    font-size:1.2em;
     margin-bottom:15px;
 }
+.table-container{
+    width:100%;
+    overflow-x:auto; /* scroll horizontal sur mobile */
+}
 table{
-    width:95%;
-    margin:auto;
-    border-collapse:collapse;
+    width:100%;
+    min-width:700px; /* pour garder la lisibilité */
+    border-collapse: collapse;
     background:white;
     box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    font-size:1em;
 }
 th,td{
-    padding:12px;
+    padding:14px 10px;
     border:1px solid #ddd;
+    text-align:center;
+    vertical-align: middle;
 }
 th{
     background:#2c3e50;
     color:white;
 }
+tr:nth-child(even){
+    background:#f9f9f9;
+}
 button{
-    padding:6px 12px;
-    margin:3px;
+    padding:7px 14px;
+    margin:2px;
     border:none;
-    border-radius:6px;
+    border-radius:5px;
     background:#2980b9;
     color:white;
     cursor:pointer;
+    font-size:0.95em;
 }
 button:hover{
     background:#1f618d;
 }
-input[type="text"], input[type="number"], input[type="password"]{
-    width:90%;
+input[type="text"], input[type="password"]{
+    width:95%;
     padding:6px;
-    margin:3px 0;
     border-radius:4px;
     border:1px solid #ccc;
+    font-size:0.95em;
+    box-sizing: border-box;
 }
 </style>
 </head>
@@ -59,6 +72,7 @@ input[type="text"], input[type="number"], input[type="password"]{
 <h1>Administration TechNova</h1>
 <p id="compteur">Nombre d’étudiants inscrits : 0</p>
 
+<div class="table-container">
 <table id="tableEtudiants">
 <tr>
 <th>Nom</th>
@@ -68,6 +82,7 @@ input[type="text"], input[type="number"], input[type="password"]{
 <th>Actions</th>
 </tr>
 </table>
+</div>
 
 <script>
 // Récupérer les étudiants depuis localStorage
@@ -80,7 +95,7 @@ function saveEtudiants(etudiants){
     localStorage.setItem("technova_etudiants", JSON.stringify(etudiants));
 }
 
-// Afficher les étudiants dans le tableau
+// Afficher les étudiants
 function afficherEtudiants(){
     let etudiants = getEtudiants();
     let table = document.getElementById("tableEtudiants");
