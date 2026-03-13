@@ -4,186 +4,227 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TechNova Academy – Communauté des Érudits</title>
+
 <style>
-/* === Style général === */
-body {
-    font-family: 'Georgia', serif;
-    background-color: #f4f4f9;
-    color: #222;
-    margin: 0;
-    padding: 0;
-}
-header {
-    background-color: #2c3e50;
-    color: #fff;
-    text-align: center;
-    padding: 50px 20px;
-    position: relative;
-}
-header h1 {
-    font-size: 2.8em;
-    margin: 0;
-    cursor: pointer;
-    user-select: none;
-}
-header p {
-    font-size: 1.2em;
-    margin-top: 10px;
-    font-style: italic;
+
+/* Style général */
+body{
+font-family:'Georgia',serif;
+background-color:#f4f4f9;
+color:#222;
+margin:0;
+padding:0;
 }
 
-/* === Menu trois barres collé au coin === */
-.menu-btn {
-    position: fixed;      /* fixe en haut à droite */
-    top: 10px;
-    right: 10px;
-    font-size: 30px;
-    cursor: pointer;
-    color: white;
-    z-index: 1000;
-    user-select: none;
-}
-nav {
-    display: none; /* caché par défaut */
-    background:#6a0dad;
-    position: fixed;
-    top: 50px;       /* juste en dessous du coin supérieur */
-    right: 10px;
-    width:200px;
-    text-align:left;
-    border-radius:0 0 10px 10px;
-    overflow:hidden;
-    z-index: 999;
-}
-nav a {
-    display:block;
-    color:white;
-    padding:12px 15px;
-    text-decoration:none;
-    border-top:1px solid #fff3;
-}
-nav a:hover {
-    background:#4b078c;
+/* Header */
+header{
+background:#2c3e50;
+color:white;
+text-align:center;
+padding:50px 20px;
+position:relative;
 }
 
-/* === Sections === */
-section {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+/* Bouton menu */
+.menu{
+position:absolute;
+top:20px;
+right:25px;
+font-size:28px;
+cursor:pointer;
 }
-h2 {
-    color: #34495e;
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #2980b9;
-    display: inline-block;
-    padding-bottom: 5px;
+
+/* Menu caché */
+nav{
+display:none;
+background:#2c3e50;
+position:absolute;
+top:80px;
+right:20px;
+border-radius:8px;
+overflow:hidden;
 }
-p {
-    font-size: 1.1em;
-    line-height: 1.6em;
-    margin-bottom: 20px;
+
+nav a{
+display:block;
+color:white;
+padding:12px 20px;
+text-decoration:none;
+border-bottom:1px solid rgba(255,255,255,0.2);
 }
-ul {
-    list-style-type: square;
-    padding-left: 20px;
+
+nav a:hover{
+background:#34495e;
 }
-ul li {
-    font-size: 1.1em;
-    margin: 10px 0;
+
+/* Sections */
+section{
+max-width:900px;
+margin:40px auto;
+padding:20px;
+background:white;
+border-radius:10px;
+box-shadow:0 6px 15px rgba(0,0,0,0.1);
 }
-.btn-inscription {
-    display: inline-block;
-    padding: 15px 35px;
-    font-size: 1.2em;
-    color: #fff;
-    background-color: #2980b9;
-    border: none;
-    border-radius: 10px;
-    text-decoration: none;
-    margin-top: 20px;
-    transition: background-color 0.3s, transform 0.2s;
+
+h2{
+color:#34495e;
+border-bottom:2px solid #2980b9;
+display:inline-block;
+padding-bottom:5px;
 }
-.btn-inscription:hover {
-    background-color: #1f618d;
-    transform: scale(1.05);
+
+ul{
+padding-left:20px;
 }
-footer {
-    text-align: center;
-    color: #555;
-    margin: 50px 0 20px 0;
-    font-size: 0.9em;
+
+ul li{
+margin:10px 0;
+font-size:1.1em;
 }
+
+/* Boutons */
+button{
+padding:12px 25px;
+font-size:16px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#2980b9;
+color:white;
+}
+
+button:hover{
+background:#1f618d;
+}
+
+/* Footer */
+footer{
+text-align:center;
+color:#555;
+margin:50px 0 20px 0;
+font-size:0.9em;
+}
+
 </style>
 
 <script>
-/* === Menu toggle === */
-function toggleMenu(){
-    const nav = document.getElementById("navMenu");
-    if(nav.style.display === "block") nav.style.display = "none";
-    else nav.style.display = "block";
+
+/* Menu 3 barres */
+
+function ouvrirMenu(){
+
+let menu = document.getElementById("menu");
+
+if(menu.style.display === "block"){
+menu.style.display="none";
+}else{
+menu.style.display="block";
 }
 
-/* === Secret Admin : maintien 5 secondes sur le titre === */
-let timer;
-function startAdminTimer() {
-    timer = setTimeout(() => {
-        let pass = prompt("Mot de passe Admin");
-        if(pass === "TECHNOVA2026"){
-            fetch("admin.html").then(res=>{
-                if(res.ok) window.location.href="admin.html";
-                else alert("admin.html introuvable !");
-            }).catch(()=>alert("Impossible de charger admin.html"));
-        } else {
-            alert("Accès refusé");
-        }
-    },5000);
 }
-function cancelAdminTimer() { clearTimeout(timer); }
+
+/* ADMIN SECRET */
+
+let compteur=0;
+
+function secretAdmin(){
+
+compteur++;
+
+if(compteur==5){
+
+let pass=prompt("Mot de passe Admin");
+
+if(pass==="TECHNOVA2026"){
+
+window.location="admin.html";
+
+}else{
+
+alert("Accès refusé");
+
+}
+
+}
+
+}
+
 </script>
+
 </head>
 
 <body>
 
 <header>
-    <h1 onmousedown="startAdminTimer()" onmouseup="cancelAdminTimer()" ontouchstart="startAdminTimer()" ontouchend="cancelAdminTimer()">
-        TechNova Academy
-    </h1>
 
-    <!-- Menu trois barres collé au coin -->
-    <span class="menu-btn" onclick="toggleMenu()">☰</span>
-    <nav id="navMenu">
-        <a href="#espace">Espace Étudiants</a>
-        <a href="#acceder">Accéder aux cours</a>
-        <a href="#certificat">Certificat</a>
-    </nav>
+<div class="menu" onclick="ouvrirMenu()">☰</div>
 
-    <p>Communauté des érudits passionnés par l’informatique et les technologies</p>
+<h1 onclick="secretAdmin()">TechNova Academy</h1>
+
+<p>Communauté des érudits passionnés par l’informatique et les technologies</p>
+
+<nav id="menu">
+
+<a href="espace-etudiant.html">Espace étudiants</a>
+
+<a href="#">Certificat</a>
+
+<a href="acces-cours.html">Cours</a>
+
+</nav>
+
 </header>
 
-<section id="espace">
-    <h2>Espace Étudiants</h2>
-    <!-- Ton code espace étudiant ici -->
+<section>
+
+<h2>À propos</h2>
+
+<p>
+TechNova Academy a pour mission de former des esprits curieux et ambitieux aux bases et avancées de l’informatique.
+Chaque participant reçoit un accompagnement sérieux et rigoureux pour devenir un véritable érudit numérique.
+</p>
+
 </section>
 
-<section id="acceder">
-    <h2>Accéder aux cours</h2>
-    <a href="acces-cours.html" class="btn-inscription">Accéder aux cours</a>
+<section>
+
+<h2>Formations disponibles</h2>
+
+<ul>
+<li>Excel</li>
+<li>Word</li>
+<li>Bases de données</li>
+<li>Initiation à l’informatique</li>
+</ul>
+
 </section>
 
-<section id="certificat">
-    <h2>Certificat</h2>
-    <p>Section pour générer ou voir les certificats</p>
+<section>
+
+<h2>Inscription</h2>
+
+<p>
+Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous.
+Votre dossier sera examiné et validé par TechNova Academy.
+</p>
+
+<br>
+<br><br>
+<a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
+<button>S'inscrire maintenant</button>
+</a>
+
+<br><br>
+
 </section>
 
 <footer>
-    &copy; 2026 TechNova Academy – Tous droits réservés<br>
-    Créé par Béni Kikwika
+
+© 2026 TechNova Academy – Tous droits réservés  
+Créé par Béni Kikwika
+
 </footer>
 
 </body>
-        </html>
+    </html>
