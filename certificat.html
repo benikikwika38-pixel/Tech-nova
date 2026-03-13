@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- QR CODE -->
+<!-- QR Code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
@@ -21,6 +21,7 @@ body {
     min-height: 100vh;
     margin: 0;
 }
+
 .certificat {
     width: 850px;
     background: #fff;
@@ -31,6 +32,7 @@ body {
     position: relative;
     text-align: center;
 }
+
 .certificat .logo {
     width: 120px;
     position: absolute;
@@ -55,38 +57,36 @@ h1 { font-size: 3em; color: #b8860b; margin-bottom: 10px; }
 h2 { font-size: 2em; margin-bottom: 30px; color: #333; }
 p { font-size: 1.3em; margin: 20px 0; line-height: 1.6em; }
 
-input[type="text"] { 
-font-size: 1.1em; 
-padding: 10px; 
-width: 300px; 
-margin: 10px 0 20px 0; 
-border-radius: 6px; 
-border: 1px solid #aaa; 
-text-align: center; 
+input[type="text"] {
+font-size: 1.1em;
+padding: 10px;
+width: 300px;
+margin: 10px 0 20px 0;
+border-radius: 6px;
+border: 1px solid #aaa;
+text-align: center;
 }
 
-button { 
-padding: 12px 25px; 
-font-size: 16px; 
-border: none; 
-border-radius: 10px; 
-cursor: pointer; 
-background: #2980b9; 
-color: white; 
-margin-top: 20px; 
-transition: 0.3s; 
+button {
+padding: 12px 25px;
+font-size: 16px;
+border: none;
+border-radius: 10px;
+cursor: pointer;
+background: #2980b9;
+color: white;
+margin-top: 20px;
+transition: 0.3s;
 }
 
-button:hover { 
-background: #1f618d; 
-}
+button:hover { background: #1f618d; }
 
-.signature { 
-margin-top: 60px; 
-font-weight: bold; 
-font-size: 1.1em; 
-color: #2c3e50; 
-text-align: right; 
+.signature {
+margin-top: 60px;
+font-weight: bold;
+font-size: 1.1em;
+color: #2c3e50;
+text-align: right;
 }
 </style>
 </head>
@@ -114,16 +114,14 @@ text-align: right;
 
 <div id="qrcode" class="qrcode"></div>
 
-<p id="anneeAcademique"><strong>Année académique : 2025-2026</strong></p>
-    
 <div class="signature">Signé par Béni Kikwika (Fondateur)</div>
 
 </div>
 
 <script>
 
-function genererNumero(){
-return "TN-"+Date.now();
+function genererNumeroCertificat(){
+return "TN-" + Date.now();
 }
 
 async function verifierEtudiant() {
@@ -141,12 +139,12 @@ return;
 
 document.getElementById("formationText").innerText = etu.formation;
 
-const numero = genererNumero();
+/* Générer numéro certificat */
+const numero = genererNumeroCertificat();
+document.getElementById("numeroCertificat").innerText = "Certificat N° : " + numero;
 
-document.getElementById("numeroCertificat").innerText =
-"Certificat N° : "+numero;
-
-document.getElementById("qrcode").innerHTML="";
+/* Générer QR Code */
+document.getElementById("qrcode").innerHTML = "";
 
 new QRCode(document.getElementById("qrcode"),{
 text:"Certificat TechNova\nNom:"+nom+"\nMatricule:"+matricule+"\nNumero:"+numero,
@@ -156,12 +154,14 @@ height:90
 
 const certificatEl = document.getElementById("certificat");
 
+/* Capture certificat */
 const canvas = await html2canvas(certificatEl, { scale: 3 });
 
 const imgData = canvas.toDataURL("image/png");
 
 const { jsPDF } = window.jspdf;
 
+/* PDF horizontal */
 const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
 
 const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -178,8 +178,8 @@ const y = (pdfHeight - imgHeight) / 2;
 pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
 
 pdf.save(`Certificat_${etu.nom}.pdf`);
-
 }
+
 </script>
 
 </body>
