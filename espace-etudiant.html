@@ -43,6 +43,14 @@ button:hover {background: #4b078c;}
     text-align:left;
     line-height:1.6;
     font-size:18px;
+    position: relative;
+}
+.box img.logo {
+    position: absolute;
+    top:10px;
+    right:10px;
+    width:50px;
+    height:50px;
 }
 .signature {
     margin-top:15px;
@@ -50,17 +58,15 @@ button:hover {background: #4b078c;}
     color:#ffd700;
     font-size:16px;
 }
-#adminPanel {display:none; margin-top:30px; text-align:left; font-size:16px;}
-#listeEtudiants li {margin:5px 0;}
 </style>
 <script>
 // Mot de passe général
-const motPasseGeneral="TECHBE12";
+const motPasseGeneral="223345";
 
-// Charger étudiants depuis localStorage
+// Charger les étudiants depuis localStorage
 let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
 
-// Sauvegarder étudiants
+// Sauvegarder les étudiants
 function sauvegarder(){
     localStorage.setItem("technova_etudiants", JSON.stringify(etudiants));
 }
@@ -92,9 +98,18 @@ function genererPassword(){
 function ancien(){
     let matricule=document.getElementById("matriculeLogin").value.trim();
     let mdp=document.getElementById("passAncien").value.trim();
-    let etudiant=etudiants.find(e=>e.matricule===matricule && e.motDePasse===mdp);
-    if(etudiant){ afficher(etudiant); }
-    else { alert("Matricule ou mot de passe incorrect"); }
+
+    // Recherche insensible à la casse et aux espaces
+    let etudiant = etudiants.find(e => 
+        e.matricule.trim() === matricule &&
+        e.motDePasse.trim().toLowerCase() === mdp.toLowerCase()
+    );
+
+    if(etudiant){ 
+        afficher(etudiant); 
+    } else { 
+        alert("Matricule ou mot de passe incorrect"); 
+    }
 }
 
 // Nouveau étudiant
@@ -104,7 +119,8 @@ function nouveau(){
     if(nom=="" || formations.length==0){ alert("Remplissez les informations"); return; }
 
     // Vérifier si l'étudiant existe déjà
-    let etudiantExistant = etudiants.find(e => e.nom === nom && JSON.stringify(e.formations) === JSON.stringify(formations));
+    let etudiantExistant = etudiants.find(e => e.nom.toLowerCase() === nom.toLowerCase() &&
+        JSON.stringify(e.formations) === JSON.stringify(formations));
 
     if(etudiantExistant){
         alert("Cet espace étudiant existe déjà !\nMatricule : "+etudiantExistant.matricule+"\nMot de passe : "+etudiantExistant.motDePasse);
@@ -130,25 +146,6 @@ function afficher(e){
     document.getElementById("m").innerText=e.matricule;
     document.getElementById("d").innerText=new Date().toLocaleDateString();
     document.getElementById("a").innerText="2026-2027";
-}
-
-// Admin
-function verifierAdmin(){
-    let pass=document.getElementById("adminPass").value.trim();
-    if(pass==="TECHNOVA2026"){
-        document.getElementById("adminPanel").style.display="block";
-        afficherEtudiants();
-    } else { alert("Mot de passe admin incorrect"); }
-}
-
-function afficherEtudiants(){
-    let liste = document.getElementById("listeEtudiants");
-    liste.innerHTML = "";
-    etudiants.forEach(e=>{
-        let li=document.createElement("li");
-        li.innerText=`Nom: ${e.nom} | Matricule: ${e.matricule} | Formations: ${e.formations.join(", ")} | Mot de passe: ${e.motDePasse}`;
-        liste.appendChild(li);
-    });
 }
 </script>
 </head>
@@ -185,33 +182,21 @@ function afficherEtudiants(){
 <option>Excel</option>
 <option>Bases de données</option>
 <option>Programmation</option>
-</select>
-<br>
-<button onclick="nouveau()">Créer espace</button>
-
-<hr>
-
-<h3>Admin</h3>
-<input type="password" id="adminPass" placeholder="Mot de passe admin">
-<br>
-<button onclick="verifierAdmin()">Ouvrir Admin</button>
-
-<div id="adminPanel">
-<h4>Liste des étudiants</h4>
-<ul id="listeEtudiants"></ul>
-</div>
+</select><br>
+<button onclick="nouveau()">Créer mon espace</button>
 
 </div>
 
 <!-- Espace étudiant affiché -->
 <div class="box" id="espace">
-<p><strong>Nom :</strong> <span id="n"></span></p>
-<p><strong>Formations :</strong> <span id="f"></span></p>
-<p><strong>Matricule :</strong> <span id="m"></span></p>
-<p><strong>Date d'inscription :</strong> <span id="d"></span></p>
-<p><strong>Année :</strong> <span id="a"></span></p>
-<p class="signature">Signé par le fondateur Béni Kikwika</p>
+<img class="logo" src="https://i.imgur.com/5QfBHzM.png" alt="TechNova Logo">
+<p><strong>Nom complet :</strong> <span id="n">---</span></p>
+<p><strong>Formations choisies :</strong> <span id="f">---</span></p>
+<p><strong>Matricule :</strong> <span id="m">---</span></p>
+<p><strong>Date d'inscription :</strong> <span id="d">---</span></p>
+<p><strong>Année académique :</strong> <span id="a">---</span></p>
+<p class="signature">Signé par Beni Kikwika</p>
 </div>
 
 </body>
-</html>
+    </html>
