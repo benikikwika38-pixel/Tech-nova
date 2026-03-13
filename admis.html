@@ -3,76 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin TechNova – Gestion des étudiants</title>
-
+<title>Admin TechNova</title>
 <style>
 body{
-font-family:Arial,sans-serif;
-background:#f4f4f9;
-padding:30px;
-color:#222;
+    font-family:Arial, sans-serif;
+    background:#f4f4f9;
+    text-align:center;
+    padding:30px;
 }
-
 h1{
-text-align:center;
-color:#2c3e50;
+    color:#2c3e50;
 }
-
-h2{
-color:#34495e;
-text-align:center;
-margin-top:20px;
+#compteur{
+    font-size:1.1em;
+    margin-bottom:15px;
 }
-
 table{
-width:95%;
-margin:20px auto;
-border-collapse:collapse;
-background:white;
-box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    width:95%;
+    margin:auto;
+    border-collapse:collapse;
+    background:white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
-
-th, td{
-padding:12px;
-border:1px solid #ccc;
-text-align:center;
+th,td{
+    padding:12px;
+    border:1px solid #ddd;
 }
-
 th{
-background:#6a0dad;
-color:white;
+    background:#2c3e50;
+    color:white;
 }
-
 button{
-padding:6px 12px;
-margin:2px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-color:white;
+    padding:6px 12px;
+    margin:3px;
+    border:none;
+    border-radius:6px;
+    background:#2980b9;
+    color:white;
+    cursor:pointer;
 }
-
-.btn-edit{background:#2980b9;}
-.btn-edit:hover{background:#1f618d;}
-
-.btn-delete{background:#c0392b;}
-.btn-delete:hover{background:#96281b;}
-
-#total{
-text-align:center;
-margin-top:15px;
-font-weight:bold;
-font-size:1.1em;
-color:#2c3e50;
+button:hover{
+    background:#1f618d;
+}
+input[type="text"], input[type="number"], input[type="password"]{
+    width:90%;
+    padding:6px;
+    margin:3px 0;
+    border-radius:4px;
+    border:1px solid #ccc;
 }
 </style>
 </head>
-
 <body>
 
-<h1>Admin TechNova – Gestion des étudiants</h1>
-
-<h2>Total étudiants : <span id="total">0</span></h2>
+<h1>Administration TechNova</h1>
+<p id="compteur">Nombre d’étudiants inscrits : 0</p>
 
 <table id="tableEtudiants">
 <tr>
@@ -85,76 +70,70 @@ color:#2c3e50;
 </table>
 
 <script>
-
-// Récupère les étudiants depuis localStorage
-function chargerEtudiants(){
-let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
-let table = document.getElementById("tableEtudiants");
-
-table.innerHTML = `
-<tr>
-<th>Nom</th>
-<th>Formation</th>
-<th>Matricule</th>
-<th>Mot de passe</th>
-<th>Actions</th>
-</tr>
-`;
-
-etudiants.forEach((e,index)=>{
-table.innerHTML += `
-<tr>
-<td><input type="text" value="${e.nom}" id="nom-${index}"></td>
-<td><input type="text" value="${e.formation}" id="formation-${index}"></td>
-<td>${e.matricule}</td>
-<td><input type="text" value="${e.password}" id="pass-${index}"></td>
-<td>
-<button class="btn-edit" onclick="modifier(${index})">Modifier</button>
-<button class="btn-delete" onclick="supprimer(${index})">Supprimer</button>
-</td>
-</tr>
-`;
-});
-
-// Affiche le total étudiants
-document.getElementById("total").innerText = etudiants.length;
+// Récupérer les étudiants depuis localStorage
+function getEtudiants(){
+    return JSON.parse(localStorage.getItem("technova_etudiants")) || [];
 }
 
-// Supprimer un étudiant
-function supprimer(index){
-let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
-if(confirm(`Supprimer l'étudiant ${etudiants[index].nom} ?`)){
-etudiants.splice(index,1);
-localStorage.setItem("technova_etudiants",JSON.stringify(etudiants));
-chargerEtudiants();
+// Sauvegarder étudiants dans localStorage
+function saveEtudiants(etudiants){
+    localStorage.setItem("technova_etudiants", JSON.stringify(etudiants));
 }
+
+// Afficher les étudiants dans le tableau
+function afficherEtudiants(){
+    let etudiants = getEtudiants();
+    let table = document.getElementById("tableEtudiants");
+    table.innerHTML = `
+    <tr>
+    <th>Nom</th>
+    <th>Formation</th>
+    <th>Matricule</th>
+    <th>Mot de passe</th>
+    <th>Actions</th>
+    </tr>
+    `;
+    document.getElementById("compteur").innerText = `Nombre d’étudiants inscrits : ${etudiants.length}`;
+    etudiants.forEach((e, index) => {
+        table.innerHTML += `
+        <tr>
+        <td><input type="text" value="${e.nom}" id="nom${index}"></td>
+        <td><input type="text" value="${e.formation}" id="formation${index}"></td>
+        <td>${e.matricule}</td>
+        <td><input type="password" value="${e.password}" id="password${index}"></td>
+        <td>
+            <button onclick="modifierEtudiant(${index})">Modifier</button>
+            <button onclick="supprimerEtudiant(${index})">Supprimer</button>
+        </td>
+        </tr>
+        `;
+    });
 }
 
 // Modifier un étudiant
-function modifier(index){
-let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
-let nom = document.getElementById(`nom-${index}`).value.trim();
-let formation = document.getElementById(`formation-${index}`).value.trim();
-let pass = document.getElementById(`pass-${index}`).value.trim();
-
-if(nom === "" || formation === "" || pass === ""){
-alert("Tous les champs doivent être remplis !");
-return;
+function modifierEtudiant(index){
+    let etudiants = getEtudiants();
+    etudiants[index].nom = document.getElementById(`nom${index}`).value.trim();
+    etudiants[index].formation = document.getElementById(`formation${index}`).value.trim();
+    etudiants[index].password = document.getElementById(`password${index}`).value.trim();
+    saveEtudiants(etudiants);
+    alert("Informations modifiées !");
+    afficherEtudiants();
 }
 
-etudiants[index].nom = nom;
-etudiants[index].formation = formation;
-etudiants[index].password = pass;
-
-localStorage.setItem("technova_etudiants",JSON.stringify(etudiants));
-alert("Étudiant modifié avec succès !");
-chargerEtudiants();
+// Supprimer un étudiant
+function supprimerEtudiant(index){
+    if(confirm("Voulez-vous vraiment supprimer cet étudiant ?")){
+        let etudiants = getEtudiants();
+        etudiants.splice(index,1);
+        saveEtudiants(etudiants);
+        afficherEtudiants();
+    }
 }
 
-// Charger à l'ouverture
-window.onload = chargerEtudiants;
-
+// Charger la table au démarrage
+window.onload = afficherEtudiants;
 </script>
 
 </body>
-  </html>
+</html>
