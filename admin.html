@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin TechNova</title>
+<title>Admin TechNova – Érudit</title>
 <style>
 body{
-    font-family: Arial, sans-serif;
-    background:#f4f4f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:#f0f2f5;
+    margin:0;
     padding:20px;
     text-align:center;
 }
@@ -16,54 +17,66 @@ h1{
     margin-bottom:10px;
 }
 #compteur{
-    font-size:1.2em;
-    margin-bottom:15px;
+    font-size:1.3em;
+    margin-bottom:20px;
+    font-weight:bold;
+    color:#34495e;
 }
 .table-container{
     width:100%;
-    overflow-x:auto; /* scroll horizontal sur mobile */
+    overflow-x:auto;
+    margin-bottom:30px;
 }
 table{
     width:100%;
-    min-width:700px; /* pour garder la lisibilité */
+    min-width:800px;
     border-collapse: collapse;
     background:white;
-    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    box-shadow:0 6px 15px rgba(0,0,0,0.1);
     font-size:1em;
 }
 th,td{
-    padding:14px 10px;
-    border:1px solid #ddd;
+    padding:16px 12px;
+    border:1px solid #ccc;
     text-align:center;
     vertical-align: middle;
 }
 th{
-    background:#2c3e50;
+    background:#2980b9;
     color:white;
+    font-size:1.05em;
 }
 tr:nth-child(even){
     background:#f9f9f9;
 }
+input[type="text"], input[type="password"]{
+    width:95%;
+    padding:8px;
+    font-size:1em;
+    border-radius:5px;
+    border:1px solid #aaa;
+    box-sizing: border-box;
+    text-align:center;
+}
 button{
-    padding:7px 14px;
+    padding:8px 14px;
     margin:2px;
     border:none;
     border-radius:5px;
-    background:#2980b9;
+    background:#27ae60;
     color:white;
     cursor:pointer;
     font-size:0.95em;
+    transition:0.2s;
 }
 button:hover{
-    background:#1f618d;
+    background:#1e8449;
 }
-input[type="text"], input[type="password"]{
-    width:95%;
-    padding:6px;
-    border-radius:4px;
-    border:1px solid #ccc;
-    font-size:0.95em;
-    box-sizing: border-box;
+button.delete{
+    background:#c0392b;
+}
+button.delete:hover{
+    background:#922b21;
 }
 </style>
 </head>
@@ -109,16 +122,22 @@ function afficherEtudiants(){
     </tr>
     `;
     document.getElementById("compteur").innerText = `Nombre d’étudiants inscrits : ${etudiants.length}`;
-    etudiants.forEach((e, index) => {
+    
+    etudiants.forEach((e,index)=>{
+        let nom = e.nom || "—";
+        let formation = e.formation || "—";
+        let matricule = e.matricule || "—";
+        let password = e.password || "—";
+        
         table.innerHTML += `
         <tr>
-        <td><input type="text" value="${e.nom}" id="nom${index}"></td>
-        <td><input type="text" value="${e.formation}" id="formation${index}"></td>
-        <td>${e.matricule}</td>
-        <td><input type="password" value="${e.password}" id="password${index}"></td>
+        <td><input type="text" value="${nom}" id="nom${index}"></td>
+        <td><input type="text" value="${formation}" id="formation${index}"></td>
+        <td>${matricule}</td>
+        <td><input type="password" value="${password}" id="password${index}"></td>
         <td>
             <button onclick="modifierEtudiant(${index})">Modifier</button>
-            <button onclick="supprimerEtudiant(${index})">Supprimer</button>
+            <button class="delete" onclick="supprimerEtudiant(${index})">Supprimer</button>
         </td>
         </tr>
         `;
@@ -128,9 +147,9 @@ function afficherEtudiants(){
 // Modifier un étudiant
 function modifierEtudiant(index){
     let etudiants = getEtudiants();
-    etudiants[index].nom = document.getElementById(`nom${index}`).value.trim();
-    etudiants[index].formation = document.getElementById(`formation${index}`).value.trim();
-    etudiants[index].password = document.getElementById(`password${index}`).value.trim();
+    etudiants[index].nom = document.getElementById(`nom${index}`).value.trim() || "—";
+    etudiants[index].formation = document.getElementById(`formation${index}`).value.trim() || "—";
+    etudiants[index].password = document.getElementById(`password${index}`).value.trim() || "—";
     saveEtudiants(etudiants);
     alert("Informations modifiées !");
     afficherEtudiants();
@@ -146,7 +165,7 @@ function supprimerEtudiant(index){
     }
 }
 
-// Charger la table au démarrage
+// Charger au démarrage
 window.onload = afficherEtudiants;
 </script>
 
