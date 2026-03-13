@@ -15,7 +15,6 @@ body {
     min-height: 100vh;
     margin: 0;
 }
-
 .certificat {
     width: 850px;
     background: #fff;
@@ -26,70 +25,25 @@ body {
     position: relative;
     text-align: center;
 }
-
 .certificat .logo {
     width: 120px;
     position: absolute;
     top: 20px;
     right: 20px;
 }
-
-h1 {
-    font-size: 3em;
-    color: #b8860b;
-    margin-bottom: 10px;
-}
-
-h2 {
-    font-size: 2em;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-p {
-    font-size: 1.3em;
-    margin: 20px 0;
-    line-height: 1.6em;
-}
-
-input[type="text"] {
-    font-size: 1.1em;
-    padding: 10px;
-    width: 300px;
-    margin: 10px 0 20px 0;
-    border-radius: 6px;
-    border: 1px solid #aaa;
-    text-align: center;
-}
-
-button {
-    padding: 12px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    background: #2980b9;
-    color: white;
-    margin-top: 20px;
-    transition: 0.3s;
-}
-button:hover {
-    background: #1f618d;
-}
-
-.signature {
-    margin-top: 60px;
-    font-weight: bold;
-    font-size: 1.1em;
-    color: #2c3e50;
-    text-align: right;
-}
+h1 { font-size: 3em; color: #b8860b; margin-bottom: 10px; }
+h2 { font-size: 2em; margin-bottom: 30px; color: #333; }
+p { font-size: 1.3em; margin: 20px 0; line-height: 1.6em; }
+input[type="text"] { font-size: 1.1em; padding: 10px; width: 300px; margin: 10px 0 20px 0; border-radius: 6px; border: 1px solid #aaa; text-align: center; }
+button { padding: 12px 25px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; background: #2980b9; color: white; margin-top: 20px; transition: 0.3s; }
+button:hover { background: #1f618d; }
+.signature { margin-top: 60px; font-weight: bold; font-size: 1.1em; color: #2c3e50; text-align: right; }
 </style>
 </head>
 <body>
 
 <div class="certificat">
-    <img src="logo-technova.png" alt="Logo TechNova" class="logo">
+    <img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
     <h1>Certificat de Réussite</h1>
     <h2>TechNova Academy</h2>
 
@@ -103,13 +57,11 @@ button:hover {
 
     <button onclick="verifierEtudiant()">Vérifier et Télécharger PDF</button>
 
-    <div class="signature">
-        Signé par Béni Kikwika (Fondateur)
-    </div>
+    <div class="signature">Signé par Béni Kikwika (Fondateur)</div>
 </div>
 
 <script>
-function verifierEtudiant() {
+async function verifierEtudiant() {
     const nom = document.getElementById("nomEtudiant").value.trim();
     const matricule = document.getElementById("matriculeInput").value.trim();
     const etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
@@ -137,12 +89,14 @@ function verifierEtudiant() {
     doc.setFontSize(18);
     doc.text("Signé par Béni Kikwika (Fondateur)", 540, 380);
 
+    // Charger le logo correctement avant PDF
+    const logo = document.getElementById("logo");
     const img = new Image();
-    img.src = "logo-technova.png";
+    img.src = logo.src;
     img.onload = function() {
         doc.addImage(img, "PNG", 420, 20, 120, 120);
         doc.save(`Certificat_${etu.nom}.pdf`);
-    }
+    };
 }
 </script>
 
