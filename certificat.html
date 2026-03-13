@@ -21,59 +21,72 @@ body {
     min-height: 100vh;
     margin: 0;
 }
-
 .certificat {
-    width: 900px;
-    height: 500px;
+    width: 850px;
     background: #fff;
-    border: 12px solid gold;
-    border-radius: 10px;
+    border: 10px solid gold;
+    border-radius: 20px;
     padding: 50px 40px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     position: relative;
     text-align: center;
 }
-
-.logo {
+.certificat .logo {
     width: 120px;
     position: absolute;
     top: 20px;
     right: 20px;
 }
 
-.qrcode{
-    position:absolute;
-    bottom:40px;
-    left:40px;
-}
-
-.numero{
+.numeroCertificat{
     position:absolute;
     top:20px;
-    left:30px;
+    left:20px;
     font-weight:bold;
 }
 
-h1{
-    font-size:3em;
-    color:#b8860b;
-    margin-bottom:5px;
-}
-
-h2{
-    font-size:2em;
-    color:#2c3e50;
-}
-
-p{
-    font-size:1.3em;
-}
-
-.signature{
+.qrcode{
     position:absolute;
-    bottom:40px;
-    right:40px;
-    font-weight:bold;
+    bottom:20px;
+    left:20px;
+}
+
+h1 { font-size: 3em; color: #b8860b; margin-bottom: 10px; }
+h2 { font-size: 2em; margin-bottom: 30px; color: #333; }
+p { font-size: 1.3em; margin: 20px 0; line-height: 1.6em; }
+
+input[type="text"] { 
+font-size: 1.1em; 
+padding: 10px; 
+width: 300px; 
+margin: 10px 0 20px 0; 
+border-radius: 6px; 
+border: 1px solid #aaa; 
+text-align: center; 
+}
+
+button { 
+padding: 12px 25px; 
+font-size: 16px; 
+border: none; 
+border-radius: 10px; 
+cursor: pointer; 
+background: #2980b9; 
+color: white; 
+margin-top: 20px; 
+transition: 0.3s; 
+}
+
+button:hover { 
+background: #1f618d; 
+}
+
+.signature { 
+margin-top: 60px; 
+font-weight: bold; 
+font-size: 1.1em; 
+color: #2c3e50; 
+text-align: right; 
 }
 </style>
 </head>
@@ -82,11 +95,11 @@ p{
 
 <div class="certificat" id="certificat">
 
-<div class="numero" id="numeroCertificat"></div>
+<div id="numeroCertificat" class="numeroCertificat"></div>
 
-<img src="logo-technova.png" class="logo">
+<img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
 
-<h1>CERTIFICAT DE RÉUSSITE</h1>
+<h1>Certificat de Réussite</h1>
 <h2>TechNova Academy</h2>
 
 <p>Ce certificat est décerné à :</p>
@@ -95,79 +108,79 @@ p{
 <p>Pour avoir complété avec succès la formation :</p>
 <p id="formationText"></p>
 
-<input type="text" id="matriculeInput" placeholder="Entrez votre matricule">
-
-<br><br>
+<input type="text" id="matriculeInput" placeholder="Entrez votre matricule pour vérification">
 
 <button onclick="verifierEtudiant()">Vérifier et Télécharger PDF</button>
 
 <div id="qrcode" class="qrcode"></div>
 
-<div class="signature">
-Signé par Béni Kikwika (Fondateur)
-</div>
+<p id="anneeAcademique"><strong>Année académique : 2025-2026</strong></p>
+    
+<div class="signature">Signé par Béni Kikwika (Fondateur)</div>
 
 </div>
 
 <script>
 
-function genererNumeroCertificat(){
-    const numero = "TN-" + Date.now();
-    return numero;
+function genererNumero(){
+return "TN-"+Date.now();
 }
 
-async function verifierEtudiant(){
+async function verifierEtudiant() {
 
 const nom = document.getElementById("nomEtudiant").value.trim();
 const matricule = document.getElementById("matriculeInput").value.trim();
 
 const etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
-
 const etu = etudiants.find(e => e.nom === nom && e.matricule === matricule);
 
 if(!etu){
-alert("Aucun étudiant trouvé !");
+alert("Aucun étudiant trouvé avec ce nom et ce matricule !");
 return;
 }
 
 document.getElementById("formationText").innerText = etu.formation;
 
-const numero = genererNumeroCertificat();
+const numero = genererNumero();
 
-document.getElementById("numeroCertificat").innerText = "Certificat N° : " + numero;
+document.getElementById("numeroCertificat").innerText =
+"Certificat N° : "+numero;
 
-document.getElementById("qrcode").innerHTML = "";
+document.getElementById("qrcode").innerHTML="";
 
 new QRCode(document.getElementById("qrcode"),{
-text: "Certificat TechNova\nNom:"+nom+"\nMatricule:"+matricule+"\nNumero:"+numero,
-width:100,
-height:100
+text:"Certificat TechNova\nNom:"+nom+"\nMatricule:"+matricule+"\nNumero:"+numero,
+width:90,
+height:90
 });
 
 const certificatEl = document.getElementById("certificat");
 
-const canvas = await html2canvas(certificatEl,{scale:3});
+const canvas = await html2canvas(certificatEl, { scale: 3 });
 
 const imgData = canvas.toDataURL("image/png");
 
 const { jsPDF } = window.jspdf;
 
-const pdf = new jsPDF({
-orientation:"landscape",
-unit:"mm",
-format:"a4"
-});
+const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
 
-const pageWidth = pdf.internal.pageSize.getWidth();
-const pageHeight = pdf.internal.pageSize.getHeight();
+const pdfWidth = pdf.internal.pageSize.getWidth();
+const pdfHeight = pdf.internal.pageSize.getHeight();
 
-pdf.addImage(imgData,"PNG",0,0,pageWidth,pageHeight);
+const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
 
-pdf.save("Certificat_"+nom+".pdf");
+const imgWidth = canvas.width * ratio;
+const imgHeight = canvas.height * ratio;
+
+const x = (pdfWidth - imgWidth) / 2;
+const y = (pdfHeight - imgHeight) / 2;
+
+pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+
+pdf.save(`Certificat_${etu.nom}.pdf`);
 
 }
-
 </script>
 
 </body>
-</html>
+    </html>
