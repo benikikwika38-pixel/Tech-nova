@@ -49,15 +49,19 @@ th{
 tr:nth-child(even){
     background:#f9f9f9;
 }
+
+/* === CORRECTION INPUTS FORMATION ET MOT DE PASSE === */
 input[type="text"], input[type="password"]{
-    width:95%;
-    padding:8px;
-    font-size:1em;
-    border-radius:5px;
-    border:1px solid #aaa;
-    box-sizing: border-box;
-    text-align:center;
+    width: 100%;       /* occupe toute la cellule */
+    min-width: 150px;  /* largeur minimale pour le texte */
+    padding: 10px;     /* plus de hauteur */
+    font-size: 1em;    /* texte visible */
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    box-sizing: border-box;  /* padding inclus dans largeur */
+    text-align: center;
 }
+
 button{
     padding:8px 14px;
     margin:2px;
