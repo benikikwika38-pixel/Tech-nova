@@ -76,25 +76,26 @@ async function verifierEtudiant() {
 
     const certificatEl = document.getElementById("certificat");
 
-    // html2canvas avec échelle plus grande pour un rendu net
+    // html2canvas avec scale pour haute qualité
     const canvas = await html2canvas(certificatEl, { scale: 3 });
-
     const imgData = canvas.toDataURL("image/png");
 
     const { jsPDF } = window.jspdf;
 
-    // Créer un PDF A4 paysage (format standard)
-    const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
+    // Taille A4 paysage en points (595 x 842 px approx)
+    const pdfWidth = 842;
+    const pdfHeight = 595;
 
-    // Calcul pour centrer l'image et garder les proportions
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
+    // Calcul du ratio pour garder la proportion du certificat
     const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
     const imgWidth = canvas.width * ratio;
     const imgHeight = canvas.height * ratio;
+
+    // Centrer l'image sur la page A4 paysage
     const x = (pdfWidth - imgWidth) / 2;
     const y = (pdfHeight - imgHeight) / 2;
 
+    const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: [pdfWidth, pdfHeight]});
     pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
     pdf.save(`Certificat_${etu.nom}.pdf`);
 }
