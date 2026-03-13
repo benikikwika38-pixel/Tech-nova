@@ -17,14 +17,18 @@ body {
     margin: 0;
 }
 .certificat {
-    width: 850px;
+    width: 900px; /* largeur augmentée pour plus de rectangle */
+    height: 500px; /* hauteur réduite pour rendre rectangulaire */
     background: #fff;
     border: 12px solid gold;
     border-radius: 10px;
-    padding: 60px 50px;
+    padding: 50px 40px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.25);
     position: relative;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .certificat .logo {
     width: 120px;
@@ -42,12 +46,12 @@ h1 {
 h2 { 
     font-size: 2em; 
     color: #2c3e50; 
-    margin-bottom: 25px; 
+    margin-bottom: 20px; 
 }
 p { 
     font-size: 1.3em; 
-    margin: 20px 0; 
-    line-height: 1.6em; 
+    margin: 15px 0; 
+    line-height: 1.5em; 
 }
 input[type="text"] { 
     font-size: 1.1em; 
@@ -73,7 +77,7 @@ button:hover {
     background: #1f618d; 
 }
 .signature { 
-    margin-top: 60px; 
+    margin-top: 30px; 
     font-weight: bold; 
     font-size: 1.1em; 
     color: #2c3e50; 
@@ -123,16 +127,14 @@ async function verifierEtudiant() {
 
     const { jsPDF } = window.jspdf;
 
-    // Taille PDF paysage A4 en points
-    const pdfWidth = 842;
-    const pdfHeight = 595;
+    // PDF format paysage rectangulaire (proportion proche du div)
+    const pdfWidth = 900;
+    const pdfHeight = 500;
 
-    // Calcul ratio pour garder les proportions
     const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
     const imgWidth = canvas.width * ratio;
     const imgHeight = canvas.height * ratio;
 
-    // Centrer le certificat dans le PDF
     const x = (pdfWidth - imgWidth) / 2;
     const y = (pdfHeight - imgHeight) / 2;
 
