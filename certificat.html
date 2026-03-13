@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Certificat TechNova – Université</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 body {
@@ -42,7 +43,7 @@ button:hover { background: #1f618d; }
 </head>
 <body>
 
-<div class="certificat">
+<div class="certificat" id="certificat">
     <img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
     <h1>Certificat de Réussite</h1>
     <h2>TechNova Academy</h2>
@@ -74,29 +75,15 @@ async function verifierEtudiant() {
 
     document.getElementById("formationText").innerText = etu.formation;
 
-    // Génération PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({orientation: "landscape", unit: "pt", format: [595, 420]});
-    doc.setFont("times", "normal");
-    doc.setFontSize(30);
-    doc.setTextColor(184, 134, 11);
-    doc.text("Certificat de Réussite", 297, 80, {align: "center"});
-    doc.setFontSize(22);
-    doc.setTextColor(0,0,0);
-    doc.text(`Décerné à : ${etu.nom}`, 297, 150, {align: "center"});
-    doc.text(`Formation : ${etu.formation}`, 297, 190, {align: "center"});
-    doc.text(`Matricule : ${etu.matricule}`, 297, 230, {align: "center"});
-    doc.setFontSize(18);
-    doc.text("Signé par Béni Kikwika (Fondateur)", 540, 380);
+    // Génération PDF via html2canvas pour conserver le design exact
+    const certificatEl = document.getElementById("certificat");
+    const canvas = await html2canvas(certificatEl, {scale:2});
+    const imgData = canvas.toDataURL("image/png");
 
-    // Charger le logo correctement avant PDF
-    const logo = document.getElementById("logo");
-    const img = new Image();
-    img.src = logo.src;
-    img.onload = function() {
-        doc.addImage(img, "PNG", 420, 20, 120, 120);
-        doc.save(`Certificat_${etu.nom}.pdf`);
-    };
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({orientation: "landscape", unit: "px", format: [canvas.width, canvas.height]});
+    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+    pdf.save(`Certificat_${etu.nom}.pdf`);
 }
 </script>
 
