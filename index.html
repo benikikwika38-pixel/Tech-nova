@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TechNova Academy – Communauté des Érudits</title>
 <style>
-    /* Polices et style général */
     body {
         font-family: 'Georgia', serif;
         background-color: #f4f4f9;
@@ -13,8 +12,6 @@
         margin: 0;
         padding: 0;
     }
-
-    /* En-tête */
     header {
         background-color: #2c3e50;
         color: #fff;
@@ -25,15 +22,14 @@
     header h1 {
         font-size: 2.8em;
         margin: 0;
-        cursor: pointer; /* Indique que le titre est cliquable */
+        cursor: pointer;
+        user-select: none;
     }
     header p {
         font-size: 1.2em;
         margin-top: 10px;
         font-style: italic;
     }
-
-    /* Sections */
     section {
         max-width: 900px;
         margin: 40px auto;
@@ -42,7 +38,6 @@
         border-radius: 10px;
         box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     }
-
     h2 {
         color: #34495e;
         font-size: 1.8em;
@@ -51,13 +46,11 @@
         display: inline-block;
         padding-bottom: 5px;
     }
-
     p {
         font-size: 1.1em;
         line-height: 1.6em;
         margin-bottom: 20px;
     }
-
     ul {
         list-style-type: square;
         padding-left: 20px;
@@ -66,8 +59,6 @@
         font-size: 1.1em;
         margin: 10px 0;
     }
-
-    /* Bouton d’inscription */
     .btn-inscription {
         display: inline-block;
         padding: 15px 35px;
@@ -84,8 +75,6 @@
         background-color: #1f618d;
         transform: scale(1.05);
     }
-
-    /* Footer */
     footer {
         text-align: center;
         color: #555;
@@ -94,25 +83,38 @@
     }
 </style>
 <script>
-    /* SECRET ADMIN : clique 5 fois sur le titre pour accéder à l'admin */
-    let compteurAdmin = 0;
-    function secretAdmin() {
-        compteurAdmin++;
-        if (compteurAdmin === 5) {
+    // SECRET ADMIN : maintien long sur le titre (5 secondes)
+    let timer;
+    function startAdminTimer() {
+        timer = setTimeout(() => {
             let pass = prompt("Mot de passe Admin");
             if(pass === "TECHNOVA2026"){
-                window.location.href = "admin.html";
+                // Vérifier si admin.html existe
+                fetch("admin.html").then(response => {
+                    if(response.ok){
+                        window.location.href = "admin.html";
+                    } else {
+                        alert("Fichier admin.html introuvable ! Vérifie qu'il est bien dans le même dossier que index.html");
+                    }
+                }).catch(() => {
+                    alert("Impossible de charger admin.html");
+                });
             } else {
                 alert("Accès refusé");
             }
-        }
+        }, 5000); // 5 secondes
+    }
+    function cancelAdminTimer() {
+        clearTimeout(timer);
     }
 </script>
 </head>
 <body>
 
 <header>
-    <h1 onclick="secretAdmin()">TechNova Academy</h1>
+    <h1 onmousedown="startAdminTimer()" onmouseup="cancelAdminTimer()" ontouchstart="startAdminTimer()" ontouchend="cancelAdminTimer()">
+        TechNova Academy
+    </h1>
     <p>Communauté des érudits passionnés par l’informatique et les technologies</p>
 </header>
 
@@ -136,7 +138,6 @@
     <h2>Inscription</h2>
     <p>Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous. 
     Votre dossier sera examiné et validé par TechNova Academy.</p>
-    <a
     <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank" class="btn-inscription">S'inscrire maintenant</a>
     
 </section>
@@ -147,4 +148,4 @@
 </footer>
 
 </body>
-</html>
+    </html>
