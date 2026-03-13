@@ -3,113 +3,160 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Certificat TechNova</title>
-
+<title>Certificat TechNova – Érudit</title>
 <style>
-
 body{
-font-family:Georgia, serif;
-background:#f4f4f9;
-text-align:center;
-padding:40px;
+    font-family: 'Georgia', serif;
+    background:#f0f4f8;
+    text-align:center;
+    padding:50px 20px;
 }
-
 h1{
-color:#2c3e50;
+    color:#2c3e50;
+    margin-bottom:20px;
 }
-
+/* Input et bouton */
 input{
-padding:10px;
-width:250px;
-font-size:16px;
-border-radius:6px;
-border:1px solid #ccc;
+    padding:12px;
+    width:300px;
+    font-size:16px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    text-align:center;
 }
-
 button{
-padding:10px 20px;
-font-size:16px;
-border:none;
-border-radius:6px;
-background:#2980b9;
-color:white;
-cursor:pointer;
-margin-top:10px;
+    padding:12px 25px;
+    font-size:16px;
+    border:none;
+    border-radius:6px;
+    background:#2980b9;
+    color:white;
+    cursor:pointer;
+    margin:15px;
+    transition:0.3s;
 }
-
 button:hover{
-background:#1f618d;
+    background:#1f618d;
 }
-
 /* Certificat */
-
 #certificat{
-margin-top:40px;
-padding:40px;
-border:5px solid #2c3e50;
-background:white;
-display:none;
+    display:none;
+    margin-top:40px;
+    padding:50px 40px;
+    background:white;
+    border:12px solid gold;
+    border-radius:20px;
+    max-width:900px;
+    margin-left:auto;
+    margin-right:auto;
+    box-shadow:0 12px 30px rgba(0,0,0,0.25);
+    position:relative;
 }
-
-#certificat h2{
-font-size:28px;
+#certificat img.logo{
+    width:120px;
+    position:absolute;
+    top:-60px;
+    left:calc(50% - 60px);
 }
-
+.titre{
+    font-size:38px;
+    font-weight:bold;
+    margin-bottom:15px;
+    color:#2c3e50;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+}
+.nom{
+    font-size:42px;
+    font-weight:bold;
+    margin:25px 0;
+    color:#000;
+}
+.formation{
+    font-size:26px;
+    margin:20px 0;
+    font-style:italic;
+    color:#34495e;
+}
+.signature{
+    margin-top:50px;
+    font-style:italic;
+    color:#2c3e50;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 50px;
+}
+.signature div{
+    text-align:center;
+}
+.signature .nom-proprio{
+    font-weight:bold;
+    font-size:16px;
+}
+.signature img{
+    width:120px;
+    margin-top:10px;
+}
 </style>
-
 </head>
-
 <body>
 
-<h1>Générer votre certificat</h1>
-
-<input type="text" id="nom" placeholder="Entrez votre nom">
-
-<br><br>
-
-<button onclick="genererCertificat()">Voir mon certificat</button>
+<h1>Accéder à votre certificat</h1>
+<p>Entrez votre matricule pour afficher votre certificat</p>
+<input type="text" id="matricule" placeholder="Matricule étudiant">
+<br>
+<button onclick="verifier()">Voir mon certificat</button>
 
 <div id="certificat">
-
-<h2>Certificat de réussite</h2>
-
+<img src="logo-technova.png" class="logo" alt="Logo TechNova">
+<div class="titre">CERTIFICAT DE RÉUSSITE</div>
 <p>Ce certificat est décerné à</p>
-
-<h1 id="nomCertificat"></h1>
-
+<div class="nom" id="nom"></div>
 <p>Pour avoir complété avec succès la formation</p>
+<div class="formation" id="formation"></div>
+<p>À TechNova Academy</p>
+<p>Année académique 2026</p>
 
-<p><b>TechNova Academy</b></p>
-
-<p>Année : 2026</p>
+<div class="signature">
+    <div>
+        <p>Signature officielle</p>
+        <img src="signature.png" alt="Signature TechNova">
+        <div class="nom-proprio">Béni Kikwika<br>Propriétaire TechNova</div>
+    </div>
+</div>
 
 <br>
-
-<p>Signature : TechNova Academy</p>
-
+<button onclick="telechargerPDF()">🖨 Télécharger PDF</button>
 </div>
 
 <script>
+// Vérifier le matricule dans l'admin
+function verifier(){
+    let matricule = document.getElementById("matricule").value.trim();
+    let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
+    let trouve = false;
 
-function genererCertificat(){
+    etudiants.forEach(e=>{
+        if(e.matricule === matricule){
+            document.getElementById("nom").innerText = e.nom;
+            document.getElementById("formation").innerText = e.formation;
+            document.getElementById("certificat").style.display = "block";
+            trouve = true;
+        }
+    });
 
-let nom=document.getElementById("nom").value;
-
-if(nom===""){
-
-alert("Entrez votre nom");
-
-return;
-
+    if(!trouve){
+        alert("Matricule incorrect ou étudiant non trouvé");
+        document.getElementById("certificat").style.display = "none";
+    }
 }
 
-document.getElementById("nomCertificat").innerText=nom;
-
-document.getElementById("certificat").style.display="block";
-
+// Télécharger PDF
+function telechargerPDF(){
+    window.print();
 }
-
 </script>
 
 </body>
-  </html>
+</html>
