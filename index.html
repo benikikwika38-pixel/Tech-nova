@@ -5,108 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TechNova Academy – Communauté des Érudits</title>
 <style>
-    body {
-        font-family: 'Georgia', serif;
-        background-color: #f4f4f9;
-        color: #222;
-        margin: 0;
-        padding: 0;
-    }
-    header {
-        background-color: #2c3e50;
-        color: #fff;
-        text-align: center;
-        padding: 50px 20px;
-        position: relative;
-    }
-    header h1 {
-        font-size: 2.8em;
-        margin: 0;
-        cursor: pointer;
-        user-select: none;
-    }
-    header p {
-        font-size: 1.2em;
-        margin-top: 10px;
-        font-style: italic;
-    }
-    section {
-        max-width: 900px;
-        margin: 40px auto;
-        padding: 0 20px;
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    }
-    h2 {
-        color: #34495e;
-        font-size: 1.8em;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #2980b9;
-        display: inline-block;
-        padding-bottom: 5px;
-    }
-    p {
-        font-size: 1.1em;
-        line-height: 1.6em;
-        margin-bottom: 20px;
-    }
-    ul {
-        list-style-type: square;
-        padding-left: 20px;
-    }
-    ul li {
-        font-size: 1.1em;
-        margin: 10px 0;
-    }
-    .btn-inscription {
-        display: inline-block;
-        padding: 15px 35px;
-        font-size: 1.2em;
-        color: #fff;
-        background-color: #2980b9;
-        border: none;
-        border-radius: 10px;
-        text-decoration: none;
-        margin-top: 20px;
-        transition: background-color 0.3s, transform 0.2s;
-    }
-    .btn-inscription:hover {
-        background-color: #1f618d;
-        transform: scale(1.05);
-    }
-    footer {
-        text-align: center;
-        color: #555;
-        margin: 50px 0 20px 0;
-        font-size: 0.9em;
-    }
+body {
+    font-family: 'Georgia', serif;
+    background-color: #f4f4f9;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background-color: #2c3e50;
+    color: #fff;
+    text-align: center;
+    padding: 50px 20px;
+    position: relative;
+}
+header h1 {
+    font-size: 2.8em;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+header p {
+    font-size: 1.2em;
+    margin-top: 10px;
+    font-style: italic;
+}
+section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+h2 {
+    color: #34495e;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #2980b9;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+p {
+    font-size: 1.1em;
+    line-height: 1.6em;
+    margin-bottom: 20px;
+}
+ul {
+    list-style-type: square;
+    padding-left: 20px;
+}
+ul li {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+.btn-inscription {
+    display: inline-block;
+    padding: 15px 35px;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: #2980b9;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    margin-top: 20px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.btn-inscription:hover {
+    background-color: #1f618d;
+    transform: scale(1.05);
+}
+footer {
+    text-align: center;
+    color: #555;
+    margin: 50px 0 20px 0;
+    font-size: 0.9em;
+}
 </style>
 <script>
-    // SECRET ADMIN : maintien long sur le titre (5 secondes)
-    let timer;
-    function startAdminTimer() {
-        timer = setTimeout(() => {
-            let pass = prompt("Mot de passe Admin");
-            if(pass === "TECHNOVA2026"){
-                // Vérifier si admin.html existe
-                fetch("admin.html").then(response => {
-                    if(response.ok){
-                        window.location.href = "admin.html";
-                    } else {
-                        alert("Fichier admin.html introuvable ! Vérifie qu'il est bien dans le même dossier que index.html");
-                    }
-                }).catch(() => {
-                    alert("Impossible de charger admin.html");
-                });
-            } else {
-                alert("Accès refusé");
-            }
-        }, 5000); // 5 secondes
-    }
-    function cancelAdminTimer() {
-        clearTimeout(timer);
-    }
+let timer;
+function startAdminTimer() {
+    timer = setTimeout(() => {
+        let pass = prompt("Mot de passe Admin");
+        if(pass === "TECHNOVA2026"){
+            window.location.href = "admin.html"; // Redirection directe
+        } else {
+            alert("Accès refusé");
+        }
+    }, 5000); // 5 secondes de maintien
+}
+function cancelAdminTimer() {
+    clearTimeout(timer);
+}
 </script>
 </head>
 <body>
@@ -139,7 +129,6 @@
     <p>Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous. 
     Votre dossier sera examiné et validé par TechNova Academy.</p>
     <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank" class="btn-inscription">S'inscrire maintenant</a>
-    
 </section>
 
 <footer>
@@ -148,4 +137,4 @@
 </footer>
 
 </body>
-    </html>
+</html>
