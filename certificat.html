@@ -2,56 +2,114 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Certificats - TechNova</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificat TechNova</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family:Georgia, serif;
+background:#f4f4f9;
 text-align:center;
-background:#f4f6f9;
-padding:50px;
+padding:40px;
 }
 
 h1{
-font-size:50px;
 color:#2c3e50;
 }
 
-p{
-font-size:22px;
-margin-top:20px;
+input{
+padding:10px;
+width:250px;
+font-size:16px;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
 button{
-padding:15px 30px;
-font-size:20px;
+padding:10px 20px;
+font-size:16px;
+border:none;
+border-radius:6px;
 background:#2980b9;
 color:white;
-border:none;
-border-radius:8px;
 cursor:pointer;
+margin-top:10px;
 }
+
+button:hover{
+background:#1f618d;
+}
+
+/* Certificat */
+
+#certificat{
+margin-top:40px;
+padding:40px;
+border:5px solid #2c3e50;
+background:white;
+display:none;
+}
+
+#certificat h2{
+font-size:28px;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h1>Certificats TechNova</h1>
+<h1>Générer votre certificat</h1>
 
-<p>
-TechNova délivre des certificats aux étudiants ayant terminé avec succès leurs formations.
-</p>
+<input type="text" id="nom" placeholder="Entrez votre nom">
 
-<p>
-Chaque certificat possède un numéro unique et peut être vérifié en ligne.
-</p>
+<br><br>
+
+<button onclick="genererCertificat()">Voir mon certificat</button>
+
+<div id="certificat">
+
+<h2>Certificat de réussite</h2>
+
+<p>Ce certificat est décerné à</p>
+
+<h1 id="nomCertificat"></h1>
+
+<p>Pour avoir complété avec succès la formation</p>
+
+<p><b>TechNova Academy</b></p>
+
+<p>Année : 2026</p>
 
 <br>
 
-<a href="verifier-certificat.html">
-<button>Vérifier un certificat</button>
-</a>
+<p>Signature : TechNova Academy</p>
+
+</div>
+
+<script>
+
+function genererCertificat(){
+
+let nom=document.getElementById("nom").value;
+
+if(nom===""){
+
+alert("Entrez votre nom");
+
+return;
+
+}
+
+document.getElementById("nomCertificat").innerText=nom;
+
+document.getElementById("certificat").style.display="block";
+
+}
+
+</script>
 
 </body>
-</html>
+  </html>
