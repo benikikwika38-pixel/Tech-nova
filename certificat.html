@@ -42,7 +42,6 @@ button:hover { background: #1f618d; }
 </style>
 </head>
 <body>
-
 <div class="certificat" id="certificat">
     <img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
     <h1>Certificat de Réussite</h1>
@@ -75,17 +74,30 @@ async function verifierEtudiant() {
 
     document.getElementById("formationText").innerText = etu.formation;
 
-    // Génération PDF via html2canvas pour conserver le design exact
     const certificatEl = document.getElementById("certificat");
-    const canvas = await html2canvas(certificatEl, {scale:2});
+
+    // html2canvas avec échelle plus grande pour un rendu net
+    const canvas = await html2canvas(certificatEl, { scale: 3 });
+
     const imgData = canvas.toDataURL("image/png");
 
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({orientation: "landscape", unit: "px", format: [canvas.width, canvas.height]});
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+
+    // Créer un PDF A4 paysage (format standard)
+    const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
+
+    // Calcul pour centrer l'image et garder les proportions
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+    const x = (pdfWidth - imgWidth) / 2;
+    const y = (pdfHeight - imgHeight) / 2;
+
+    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
     pdf.save(`Certificat_${etu.nom}.pdf`);
 }
 </script>
-
 </body>
 </html>
