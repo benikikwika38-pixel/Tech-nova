@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin TechNova – Gestion des étudiants</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f4f9;
+padding:30px;
+color:#222;
+}
+
+h1{
+text-align:center;
+color:#2c3e50;
+}
+
+h2{
+color:#34495e;
+text-align:center;
+margin-top:20px;
+}
+
+table{
+width:95%;
+margin:20px auto;
+border-collapse:collapse;
+background:white;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+th, td{
+padding:12px;
+border:1px solid #ccc;
+text-align:center;
+}
+
+th{
+background:#6a0dad;
+color:white;
+}
+
+button{
+padding:6px 12px;
+margin:2px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+color:white;
+}
+
+.btn-edit{background:#2980b9;}
+.btn-edit:hover{background:#1f618d;}
+
+.btn-delete{background:#c0392b;}
+.btn-delete:hover{background:#96281b;}
+
+#total{
+text-align:center;
+margin-top:15px;
+font-weight:bold;
+font-size:1.1em;
+color:#2c3e50;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Admin TechNova – Gestion des étudiants</h1>
+
+<h2>Total étudiants : <span id="total">0</span></h2>
+
+<table id="tableEtudiants">
+<tr>
+<th>Nom</th>
+<th>Formation</th>
+<th>Matricule</th>
+<th>Mot de passe</th>
+<th>Actions</th>
+</tr>
+</table>
+
+<script>
+
+// Récupère les étudiants depuis localStorage
+function chargerEtudiants(){
+let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
+let table = document.getElementById("tableEtudiants");
+
+table.innerHTML = `
+<tr>
+<th>Nom</th>
+<th>Formation</th>
+<th>Matricule</th>
+<th>Mot de passe</th>
+<th>Actions</th>
+</tr>
+`;
+
+etudiants.forEach((e,index)=>{
+table.innerHTML += `
+<tr>
+<td><input type="text" value="${e.nom}" id="nom-${index}"></td>
+<td><input type="text" value="${e.formation}" id="formation-${index}"></td>
+<td>${e.matricule}</td>
+<td><input type="text" value="${e.password}" id="pass-${index}"></td>
+<td>
+<button class="btn-edit" onclick="modifier(${index})">Modifier</button>
+<button class="btn-delete" onclick="supprimer(${index})">Supprimer</button>
+</td>
+</tr>
+`;
+});
+
+// Affiche le total étudiants
+document.getElementById("total").innerText = etudiants.length;
+}
+
+// Supprimer un étudiant
+function supprimer(index){
+let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
+if(confirm(`Supprimer l'étudiant ${etudiants[index].nom} ?`)){
+etudiants.splice(index,1);
+localStorage.setItem("technova_etudiants",JSON.stringify(etudiants));
+chargerEtudiants();
+}
+}
+
+// Modifier un étudiant
+function modifier(index){
+let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
+let nom = document.getElementById(`nom-${index}`).value.trim();
+let formation = document.getElementById(`formation-${index}`).value.trim();
+let pass = document.getElementById(`pass-${index}`).value.trim();
+
+if(nom === "" || formation === "" || pass === ""){
+alert("Tous les champs doivent être remplis !");
+return;
+}
+
+etudiants[index].nom = nom;
+etudiants[index].formation = formation;
+etudiants[index].password = pass;
+
+localStorage.setItem("technova_etudiants",JSON.stringify(etudiants));
+alert("Étudiant modifié avec succès !");
+chargerEtudiants();
+}
+
+// Charger à l'ouverture
+window.onload = chargerEtudiants;
+
+</script>
+
+</body>
+  </html>
