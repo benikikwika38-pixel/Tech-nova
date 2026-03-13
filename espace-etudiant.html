@@ -3,27 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>TechNova - Espace Étudiant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
     font-family: Arial, sans-serif;
     background: #f4f4f9;
     text-align: center;
-    padding: 40px;
+    padding: 20px;
     color: #222;
 }
-h1 {color:#6a0dad; font-size:32px;}
-h3 {font-size:20px; margin-top:20px;}
+h1 {color:#6a0dad; font-size:28px;}
+h3 {font-size:18px; margin-top:15px;}
 input, select {
-    padding: 14px;
-    margin: 10px;
-    width: 320px;
+    padding: 12px;
+    margin: 8px 0;
+    width: 90%;
+    max-width: 320px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    font-size: 18px;
+    font-size: 16px;
 }
 button {
-    padding: 14px 35px;
-    font-size: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
     border-radius: 6px;
     background: #6a0dad;
     color: white;
@@ -34,34 +36,34 @@ button:hover {background: #4b078c;}
 .box {
     background:#9b59b6;
     color:white;
-    max-width:600px;
+    max-width:90%;
     margin:auto;
-    margin-top:30px;
-    padding:25px;
+    margin-top:20px;
+    padding:20px;
     border-radius:10px;
     display:none;
     text-align:left;
     line-height:1.6;
-    font-size:18px;
+    font-size:16px;
     position: relative;
 }
 .box img.logo {
     position: absolute;
     top:10px;
     right:10px;
-    width:50px;
-    height:50px;
+    width:40px;
+    height:40px;
 }
 .signature {
-    margin-top:15px;
+    margin-top:12px;
     font-style:italic;
     color:#ffd700;
-    font-size:16px;
+    font-size:14px;
 }
 </style>
 <script>
 // Mot de passe général
-const motPasseGeneral="223345";
+const motPasseGeneral="TECHBE12";
 
 // Charger les étudiants depuis localStorage
 let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
@@ -199,4 +201,4 @@ function afficher(e){
 </div>
 
 </body>
-    </html>
+</html>
