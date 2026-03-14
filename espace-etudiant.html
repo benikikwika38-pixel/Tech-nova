@@ -118,14 +118,14 @@ function genererPassword(){
     return pass;
 }
 
-// Connexion ancien étudiant
+// Connexion ancien étudiant (CORRIGÉ)
 function ancien(){
     let matricule=document.getElementById("matriculeLogin").value.trim();
     let mdp=document.getElementById("passAncien").value.trim();
 
     let etudiant = etudiants.find(e => 
         e.matricule.trim() === matricule &&
-        e.motDePasse.trim().toLowerCase() === mdp.toLowerCase()
+        e.motDePasse.trim() === mdp
     );
 
     if(etudiant){ 
@@ -194,7 +194,6 @@ document.getElementById("f").innerText=e.formations.join(", ");
 
 document.getElementById("m").innerText=e.matricule;
 
-/* AJOUT POUR AFFICHER LE MOT DE PASSE */
 document.getElementById("p").innerText=e.motDePasse;
 
 document.getElementById("d").innerText=new Date().toLocaleDateString();
@@ -254,9 +253,9 @@ document.getElementById("a").innerText="2026-2027";
 <p><strong>Date d'inscription :</strong> <span id="d">---</span></p>
 <p><strong>Année académique :</strong> <span id="a">---</span></p>
 
-<p class="signature">Signé par Beni Kikwika</p>
+<p class="signature">Signé par Beni Kikwika(fondateur)</p>
 
 </div>
 
 </body>
-    </html>
+</html>
