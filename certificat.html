@@ -4,13 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Certificat TechNova – Université</title>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<!-- QR Code -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <style>
 body {
     font-family: 'Georgia', serif;
@@ -21,7 +16,6 @@ body {
     min-height: 100vh;
     margin: 0;
 }
-
 .certificat {
     width: 850px;
     background: #fff;
@@ -32,155 +26,78 @@ body {
     position: relative;
     text-align: center;
 }
-
 .certificat .logo {
     width: 120px;
     position: absolute;
     top: 20px;
     right: 20px;
 }
-
-.numeroCertificat{
-    position:absolute;
-    top:20px;
-    left:20px;
-    font-weight:bold;
-}
-
-.qrcode{
-    position:absolute;
-    bottom:20px;
-    left:20px;
-}
-
 h1 { font-size: 3em; color: #b8860b; margin-bottom: 10px; }
 h2 { font-size: 2em; margin-bottom: 30px; color: #333; }
 p { font-size: 1.3em; margin: 20px 0; line-height: 1.6em; }
-
-input[type="text"] {
-font-size: 1.1em;
-padding: 10px;
-width: 300px;
-margin: 10px 0 20px 0;
-border-radius: 6px;
-border: 1px solid #aaa;
-text-align: center;
-}
-
-button {
-padding: 12px 25px;
-font-size: 16px;
-border: none;
-border-radius: 10px;
-cursor: pointer;
-background: #2980b9;
-color: white;
-margin-top: 20px;
-transition: 0.3s;
-}
-
+input[type="text"] { font-size: 1.1em; padding: 10px; width: 300px; margin: 10px 0 20px 0; border-radius: 6px; border: 1px solid #aaa; text-align: center; }
+button { padding: 12px 25px; font-size: 16px; border: none; border-radius: 10px; cursor: pointer; background: #2980b9; color: white; margin-top: 20px; transition: 0.3s; }
 button:hover { background: #1f618d; }
-
-.signature {
-margin-top: 60px;
-font-weight: bold;
-font-size: 1.1em;
-color: #2c3e50;
-text-align: right;
-}
+.signature { margin-top: 60px; font-weight: bold; font-size: 1.1em; color: #2c3e50; text-align: right; }
 </style>
 </head>
-
 <body>
-
 <div class="certificat" id="certificat">
+    <img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
+    <h1>Certificat de Réussite</h1>
+    <h2>TechNova Academy</h2>
 
-<div id="numeroCertificat" class="numeroCertificat"></div>
+    <p>Ce certificat est décerné à :</p>
+    <input type="text" id="nomEtudiant" placeholder="Nom de l'étudiant">
 
-<img src="logo-technova.png" alt="Logo TechNova" class="logo" id="logo">
+    <p>Pour avoir complété avec succès la formation :</p>
+    <p id="formationText"></p>
 
-<h1>Certificat de Réussite</h1>
-<h2>TechNova Academy</h2>
+    <input type="text" id="matriculeInput" placeholder="Entrez votre matricule pour vérification">
 
-<p>Ce certificat est décerné à :</p>
-<input type="text" id="nomEtudiant" placeholder="Nom de l'étudiant">
+    <button onclick="verifierEtudiant()">Vérifier et Télécharger PDF</button>
 
-<p>Pour avoir complété avec succès la formation :</p>
-<p id="formationText"></p>
-
-<input type="text" id="matriculeInput" placeholder="Entrez votre matricule pour vérification">
-
-<button onclick="verifierEtudiant()">Vérifier et Télécharger PDF</button>
-
-<div id="qrcode" class="qrcode"></div>
-
-<div class="signature">Signé par Béni Kikwika (Fondateur)</div>
-
+    <div class="signature">Signé par Béni Kikwika (Fondateur)</div>
 </div>
 
 <script>
-
-function genererNumeroCertificat(){
-return "TN-" + Date.now();
-}
-
 async function verifierEtudiant() {
+    const nom = document.getElementById("nomEtudiant").value.trim();
+    const matricule = document.getElementById("matriculeInput").value.trim();
+    const etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
+    const etu = etudiants.find(e => e.nom === nom && e.matricule === matricule);
 
-const nom = document.getElementById("nomEtudiant").value.trim();
-const matricule = document.getElementById("matriculeInput").value.trim();
+    if(!etu){
+        alert("Aucun étudiant trouvé avec ce nom et ce matricule !");
+        return;
+    }
 
-const etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
-const etu = etudiants.find(e => e.nom === nom && e.matricule === matricule);
+    document.getElementById("formationText").innerText = etu.formation;
 
-if(!etu){
-alert("Aucun étudiant trouvé avec ce nom et ce matricule !");
-return;
+    const certificatEl = document.getElementById("certificat");
+
+    // html2canvas avec échelle plus grande pour un rendu net
+    const canvas = await html2canvas(certificatEl, { scale: 3 });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+
+    // Créer un PDF A4 paysage (format standard)
+    const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
+
+    // Calcul pour centrer l'image et garder les proportions
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+    const x = (pdfWidth - imgWidth) / 2;
+    const y = (pdfHeight - imgHeight) / 2;
+
+    pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+    pdf.save(`Certificat_${etu.nom}.pdf`);
 }
-
-document.getElementById("formationText").innerText = etu.formation;
-
-/* Générer numéro certificat */
-const numero = genererNumeroCertificat();
-document.getElementById("numeroCertificat").innerText = "Certificat N° : " + numero;
-
-/* Générer QR Code */
-document.getElementById("qrcode").innerHTML = "";
-
-new QRCode(document.getElementById("qrcode"),{
-text:"Certificat TechNova\nNom:"+nom+"\nMatricule:"+matricule+"\nNumero:"+numero,
-width:90,
-height:90
-});
-
-const certificatEl = document.getElementById("certificat");
-
-/* Capture certificat */
-const canvas = await html2canvas(certificatEl, { scale: 3 });
-
-const imgData = canvas.toDataURL("image/png");
-
-const { jsPDF } = window.jspdf;
-
-/* PDF horizontal */
-const pdf = new jsPDF({orientation: "landscape", unit: "pt", format: "a4"});
-
-const pdfWidth = pdf.internal.pageSize.getWidth();
-const pdfHeight = pdf.internal.pageSize.getHeight();
-
-const ratio = Math.min(pdfWidth / canvas.width, pdfHeight / canvas.height);
-
-const imgWidth = canvas.width * ratio;
-const imgHeight = canvas.height * ratio;
-
-const x = (pdfWidth - imgWidth) / 2;
-const y = (pdfHeight - imgHeight) / 2;
-
-pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
-
-pdf.save(`Certificat_${etu.nom}.pdf`);
-}
-
 </script>
-
 </body>
-    </html>
+</html>
