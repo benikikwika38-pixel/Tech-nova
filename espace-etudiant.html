@@ -61,16 +61,38 @@ button:hover {background: #4b078c;}
     font-size:14px;
 }
 </style>
+
 <script>
+
+// EMAIL ADMIN
+const adminEmail="admin@technova.com";
+
 // Mot de passe général
 const motPasseGeneral="TECHBE12";
 
-// Charger les étudiants depuis localStorage
+// Charger les étudiants
 let etudiants = JSON.parse(localStorage.getItem("technova_etudiants")) || [];
 
-// Sauvegarder les étudiants
+// Sauvegarder
 function sauvegarder(){
     localStorage.setItem("technova_etudiants", JSON.stringify(etudiants));
+}
+
+// ENVOI AUTOMATIQUE CHEZ ADMIN
+function envoyerAdmin(etudiant){
+
+let message =
+"Nouvel étudiant TechNova%0A%0A"+
+"Nom : "+etudiant.nom+"%0A"+
+"Matricule : "+etudiant.matricule+"%0A"+
+"Formations : "+etudiant.formations.join(", ");
+
+let lien="mailto:"+adminEmail+
+"?subject=Nouvel étudiant TechNova"+
+"&body="+message;
+
+window.open(lien);
+
 }
 
 // Entrée mot de passe général
@@ -88,7 +110,7 @@ function genererMatricule(){
     return "TN-2026-"+numero;
 }
 
-// Générer mot de passe aléatoire
+// Générer mot de passe
 function genererPassword(){
     let chars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let pass="";
@@ -101,7 +123,6 @@ function ancien(){
     let matricule=document.getElementById("matriculeLogin").value.trim();
     let mdp=document.getElementById("passAncien").value.trim();
 
-    // Recherche insensible à la casse et aux espaces
     let etudiant = etudiants.find(e => 
         e.matricule.trim() === matricule &&
         e.motDePasse.trim().toLowerCase() === mdp.toLowerCase()
@@ -116,46 +137,76 @@ function ancien(){
 
 // Nouveau étudiant
 function nouveau(){
-    let nom=document.getElementById("nom").value.trim();
-    let formations=[...document.getElementById("formations").selectedOptions].map(o=>o.value);
-    if(nom=="" || formations.length==0){ alert("Remplissez les informations"); return; }
 
-    // Vérifier si l'étudiant existe déjà
-    let etudiantExistant = etudiants.find(e => e.nom.toLowerCase() === nom.toLowerCase() &&
-        JSON.stringify(e.formations) === JSON.stringify(formations));
+let nom=document.getElementById("nom").value.trim();
+let formations=[...document.getElementById("formations").selectedOptions].map(o=>o.value);
 
-    if(etudiantExistant){
-        alert("Cet espace étudiant existe déjà !\nMatricule : "+etudiantExistant.matricule+"\nMot de passe : "+etudiantExistant.motDePasse);
-        afficher(etudiantExistant);
-        return;
-    }
+if(nom=="" || formations.length==0){
+alert("Remplissez les informations");
+return;
+}
 
-    // Sinon créer un nouvel étudiant
-    let matricule = genererMatricule();
-    let mdp = genererPassword();
-    let etudiant = {nom:nom, formations:formations, matricule:matricule, motDePasse:mdp};
-    etudiants.push(etudiant);
-    sauvegarder();
-    afficher(etudiant);
-    alert("Votre espace a été créé !\nMatricule : "+matricule+"\nMot de passe : "+mdp);
+let etudiantExistant = etudiants.find(e => 
+e.nom.toLowerCase() === nom.toLowerCase() &&
+JSON.stringify(e.formations) === JSON.stringify(formations)
+);
+
+if(etudiantExistant){
+
+alert("Cet espace étudiant existe déjà !\nMatricule : "+etudiantExistant.matricule+"\nMot de passe : "+etudiantExistant.motDePasse);
+
+afficher(etudiantExistant);
+return;
+
+}
+
+let matricule = genererMatricule();
+let mdp = genererPassword();
+
+let etudiant = {
+nom:nom,
+formations:formations,
+matricule:matricule,
+motDePasse:mdp
+};
+
+etudiants.push(etudiant);
+
+sauvegarder();
+
+/* AJOUT : ENVOI AUTOMATIQUE ADMIN */
+envoyerAdmin(etudiant);
+
+afficher(etudiant);
+
+alert("Votre espace a été créé !\nMatricule : "+matricule+"\nMot de passe : "+mdp);
+
 }
 
 // Afficher espace étudiant
 function afficher(e){
-    document.getElementById("espace").style.display="block";
-    document.getElementById("n").innerText=e.nom;
-    document.getElementById("f").innerText=e.formations.join(", ");
-    document.getElementById("m").innerText=e.matricule;
-    document.getElementById("d").innerText=new Date().toLocaleDateString();
-    document.getElementById("a").innerText="2026-2027";
+
+document.getElementById("espace").style.display="block";
+
+document.getElementById("n").innerText=e.nom;
+
+document.getElementById("f").innerText=e.formations.join(", ");
+
+document.getElementById("m").innerText=e.matricule;
+
+document.getElementById("d").innerText=new Date().toLocaleDateString();
+
+document.getElementById("a").innerText="2026-2027";
+
 }
+
 </script>
 </head>
+
 <body>
 
 <h1>TechNova Academy</h1>
 
-<!-- Mot de passe général -->
 <div id="login">
 <h3>Mot de passe général</h3>
 <input type="password" id="passGeneral" placeholder="Mot de passe">
@@ -163,7 +214,6 @@ function afficher(e){
 <button onclick="entrer()">Entrer</button>
 </div>
 
-<!-- Menu principal -->
 <div id="menu" style="display:none">
 
 <h3>Connexion étudiant existant</h3>
@@ -178,6 +228,7 @@ function afficher(e){
 <h3>Nouveau étudiant</h3>
 <input type="text" id="nom" placeholder="Nom complet">
 <br>
+
 <select id="formations" multiple>
 <option>Initiation informatique</option>
 <option>Word</option>
@@ -185,19 +236,22 @@ function afficher(e){
 <option>Bases de données</option>
 <option>Programmation</option>
 </select><br>
+
 <button onclick="nouveau()">Créer mon espace</button>
 
 </div>
 
-<!-- Espace étudiant affiché -->
 <div class="box" id="espace">
 <img class="logo" src="https://i.imgur.com/5QfBHzM.png" alt="TechNova Logo">
+
 <p><strong>Nom complet :</strong> <span id="n">---</span></p>
 <p><strong>Formations choisies :</strong> <span id="f">---</span></p>
 <p><strong>Matricule :</strong> <span id="m">---</span></p>
 <p><strong>Date d'inscription :</strong> <span id="d">---</span></p>
 <p><strong>Année académique :</strong> <span id="a">---</span></p>
+
 <p class="signature">Signé par Beni Kikwika</p>
+
 </div>
 
 </body>
