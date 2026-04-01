@@ -222,7 +222,32 @@ Votre dossier sera examiné et validé par TechNova Academy.
   </p>
             </section>
 </section>
+    </p>
 
+    <!-- Bouton discret -->
+    <button onclick="toggleCreator()" 
+        style="font-size:10px; background:none; border:none; color:#888; cursor:pointer;">
+        À propos du créateur
+    </button>
+
+    <!-- Infos cachées -->
+    <div id="creatorInfo" style="display:none; margin-top:10px; font-size:12px; color:#ccc;">
+        Béni Kikwika Kambwala est passionné par l’informatique et fondateur de Technova.
+        Il aide les débutants à apprendre Word, Excel et les bases de données.
+    </div>
+
+</footer>
+
+<script>
+function toggleCreator() {
+    var info = document.getElementById("creatorInfo");
+    if (info.style.display === "none") {
+        info.style.display = "block";
+    } else {
+        info.style.display = "none";
+    }
+}
+            </script>
 <footer>
 
 © 2026 TechNova Academy – Tous droits réservés  
