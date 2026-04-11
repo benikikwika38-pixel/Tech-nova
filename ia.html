@@ -137,91 +137,30 @@ function botReply(message) {
   }
 
   // =========================
-  // 🔥 AJOUTS TECHNOVA (COURS COMPLET)
+  // 🔥 TECHNOVA COURS
   // =========================
 
-  // ORDINATEUR
   else if (message.includes("ordinateur") || message.includes("pc")) {
-    response = "Un ordinateur est une machine qui traite des informations grâce au matériel (hardware) et aux logiciels (software).";
+    response = "Un ordinateur est une machine qui traite des informations grâce au matériel et aux logiciels.";
   }
-
-  // CPU
   else if (message.includes("processeur") || message.includes("cpu")) {
-    response = "Le processeur (CPU) est le cerveau de l’ordinateur. Il exécute toutes les instructions.";
+    response = "Le processeur (CPU) est le cerveau de l’ordinateur.";
   }
-
-  // RAM
   else if (message.includes("ram") || message.includes("mémoire")) {
-    response = "La RAM est une mémoire temporaire qui stocke les programmes en cours d'utilisation.";
+    response = "La RAM est une mémoire temporaire utilisée pour les programmes en cours.";
   }
-
-  // DISQUE
   else if (message.includes("disque") || message.includes("ssd")) {
-    response = "Le disque dur ou SSD est une mémoire permanente où sont stockés les fichiers.";
+    response = "Le disque dur ou SSD stocke les fichiers de façon permanente.";
   }
-
-  // CARTE MÈRE
-  else if (message.includes("carte mère")) {
-    response = "La carte mère relie tous les composants de l'ordinateur entre eux.";
+  else if (message.includes("virus")) {
+    response = "Un virus est un logiciel dangereux qui peut infecter ton ordinateur.";
   }
-
-  // GPU
-  else if (message.includes("carte graphique") || message.includes("gpu")) {
-    response = "La carte graphique gère l'affichage des images et vidéos.";
-  }
-
-  // SYSTEME
-  else if (message.includes("windows") || message.includes("linux") || message.includes("macos")) {
-    response = "Le système d’exploitation est le logiciel principal qui gère l’ordinateur.";
-  }
-
-  // FICHIERS
-  else if (message.includes("fichier")) {
-    response = "Un fichier est une donnée enregistrée comme un document, image ou vidéo.";
-  }
-
-  // DOSSIER
-  else if (message.includes("dossier")) {
-    response = "Un dossier sert à organiser et regrouper des fichiers.";
-  }
-
-  // CORBEILLE
-  else if (message.includes("corbeille")) {
-    response = "La corbeille stocke temporairement les fichiers supprimés avant leur suppression définitive.";
-  }
-
-  // MOT DE PASSE
-  else if (message.includes("mot de passe") || message.includes("password")) {
-    response = "Un bon mot de passe doit être long, complexe et unique pour chaque compte.";
-  }
-
-  // VIRUS
-  else if (message.includes("virus") || message.includes("malware")) {
-    response = "Les virus sont des programmes malveillants qui peuvent endommager ton ordinateur.";
-  }
-
-  // PHISHING
   else if (message.includes("phishing")) {
-    response = "Le phishing est une technique de fraude pour voler tes informations personnelles.";
-  }
-
-  // ANTIVIRUS
-  else if (message.includes("antivirus")) {
-    response = "Un antivirus protège ton ordinateur contre les logiciels malveillants.";
-  }
-
-  // BACKUP
-  else if (message.includes("sauvegarde") || message.includes("backup")) {
-    response = "Une sauvegarde permet de protéger tes fichiers en cas de problème.";
-  }
-
-  // MISE À JOUR
-  else if (message.includes("mise à jour") || message.includes("update")) {
-    response = "Les mises à jour corrigent les failles de sécurité et améliorent le système.";
+    response = "Le phishing est une arnaque pour voler tes informations personnelles.";
   }
 
   else {
-    response = "Hmm 🤔 je n'ai pas compris. Essaie une question sur l'informatique (CPU, RAM, fichiers, sécurité...).";
+    response = "Hmm 🤔 je n'ai pas compris. Pose une question sur l'informatique.";
   }
 
   setTimeout(() => {
@@ -255,11 +194,16 @@ function startVoice() {
   recognition.start();
 }
 
-// 🔊 VOIX IA
+// 🔊 VOIX CORRIGÉE ✔
 function speak(text) {
+  window.speechSynthesis.cancel(); // stop ancienne voix
+
   const speech = new SpeechSynthesisUtterance(text);
   speech.lang = "fr-FR";
-  window.speechSynthesis.speak(text);
+  speech.rate = 1;
+  speech.pitch = 1;
+
+  window.speechSynthesis.speak(speech);
 }
 
 </script>
