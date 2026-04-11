@@ -99,6 +99,17 @@ button {
 
 <script>
 
+/* =========================
+   🧠 IDENTITÉ DE L'IA
+========================= */
+const AI_IDENTITY = {
+  name: "Technova AI",
+  creator: "Béni Kikwika Kambwala",
+  purpose: "Aider les étudiants de TechNova Academy à apprendre l'informatique"
+};
+
+/* ========================= */
+
 function addMessage(text, sender) {
   const chatBox = document.getElementById("chat-box");
   const msg = document.createElement("div");
@@ -110,57 +121,95 @@ function addMessage(text, sender) {
 
 function botReply(message) {
   let response = "";
+  let text = message.toLowerCase();
 
-  if (message.includes("bonjour") || message.includes("salut")) {
+  // =========================
+  // 🧠 IDENTITÉ IA
+  // =========================
+
+  if (
+    text.includes("qui t'a créé") ||
+    text.includes("créateur") ||
+    text.includes("qui est ton créateur")
+  ) {
+    response = "J'ai été créé par Béni Kikwika Kambwala 💻🔥, développeur web et créateur de TechNova AI pour aider les étudiants de TechNova Academy.";
+  }
+
+  else if (
+    text.includes("pourquoi tu as été créé") ||
+    text.includes("ton but")
+  ) {
+    response = "J'ai été créé pour aider les étudiants de TechNova Academy à apprendre l'informatique avec des explications simples et claires.";
+  }
+
+  else if (
+    text.includes("béni kikwika") ||
+    text.includes("parle moi de béni")
+  ) {
+    response = "Béni Kikwika Kambwala est un développeur web. Il a créé TechNova AI, TechNova Academy, Vortex Voice, Vortex Manage et Ordi Facile pour aider les étudiants dans l'informatique.";
+  }
+
+  // =========================
+  // 💻 BASE CHAT
+  // =========================
+
+  else if (text.includes("bonjour") || text.includes("salut")) {
     response = "Bonjour 👋 Je suis Technova AI 🤖, comment je peux t'aider ?";
   }
-  else if (message.includes("html")) {
+  else if (text.includes("html")) {
     response = "HTML sert à structurer une page web avec des balises comme <div>, <p>, <h1>.";
   }
-  else if (message.includes("css")) {
+  else if (text.includes("css")) {
     response = "CSS permet de styliser ton site : couleurs, design, position.";
   }
-  else if (message.includes("javascript")) {
+  else if (text.includes("javascript")) {
     response = "JavaScript rend ton site interactif : boutons, animations.";
   }
-  else if (message.includes("site")) {
+  else if (text.includes("site")) {
     response = "Pour créer un site : HTML + CSS + JavaScript.";
   }
-  else if (message.includes("ia")) {
+  else if (text.includes("ia")) {
     response = "Une IA est un programme capable de simuler l'intelligence humaine.";
   }
-  else if (message.includes("python")) {
+  else if (text.includes("python")) {
     response = "Python est un langage utilisé pour IA, web et automatisation.";
   }
-  else if (message.includes("createur") || message.includes("qui t'a créé")) {
-    response = "J'ai été créé par Béni Kikwika Kambwala 💻🔥";
-  }
 
   // =========================
-  // 🔥 TECHNOVA COURS
+  // 💻 INFORMATIQUE COURS
   // =========================
 
-  else if (message.includes("ordinateur") || message.includes("pc")) {
+  else if (text.includes("ordinateur") || text.includes("pc")) {
     response = "Un ordinateur est une machine qui traite des informations grâce au matériel et aux logiciels.";
   }
-  else if (message.includes("processeur") || message.includes("cpu")) {
+  else if (text.includes("processeur") || text.includes("cpu")) {
     response = "Le processeur (CPU) est le cerveau de l’ordinateur.";
   }
-  else if (message.includes("ram") || message.includes("mémoire")) {
+  else if (text.includes("ram")) {
     response = "La RAM est une mémoire temporaire utilisée pour les programmes en cours.";
   }
-  else if (message.includes("disque") || message.includes("ssd")) {
+  else if (text.includes("disque") || text.includes("ssd")) {
     response = "Le disque dur ou SSD stocke les fichiers de façon permanente.";
   }
-  else if (message.includes("virus")) {
-    response = "Un virus est un logiciel dangereux qui peut infecter ton ordinateur.";
+  else if (text.includes("virus")) {
+    response = "Un virus est un logiciel malveillant qui peut endommager ton ordinateur.";
   }
-  else if (message.includes("phishing")) {
+  else if (text.includes("phishing")) {
     response = "Le phishing est une arnaque pour voler tes informations personnelles.";
   }
+  else if (text.includes("antivirus")) {
+    response = "Un antivirus protège ton ordinateur contre les logiciels malveillants.";
+  }
+  else if (text.includes("sauvegarde") || text.includes("backup")) {
+    response = "Une sauvegarde permet de protéger tes fichiers en cas de problème.";
+  }
+
+  // =========================
+  // ❌ CAS PAR DÉFAUT
+  // =========================
 
   else {
-    response = "Hmm 🤔 je n'ai pas compris. Pose une question sur l'informatique.";
+    response = "🤖 Je suis TechNova AI.\nPose une question sur l'informatique, la sécurité ou les cours.";
   }
 
   setTimeout(() => {
@@ -196,7 +245,7 @@ function startVoice() {
 
 // 🔊 VOIX CORRIGÉE ✔
 function speak(text) {
-  window.speechSynthesis.cancel(); // stop ancienne voix
+  window.speechSynthesis.cancel();
 
   const speech = new SpeechSynthesisUtterance(text);
   speech.lang = "fr-FR";
