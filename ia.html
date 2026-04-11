@@ -250,7 +250,7 @@ function speak(text) {
   const speech = new SpeechSynthesisUtterance(text);
   speech.lang = "fr-FR";
   speech.rate = 5;
-  speech.pitch = 5;
+  speech.pitch = 1;
 
   window.speechSynthesis.speak(speech);
 }
