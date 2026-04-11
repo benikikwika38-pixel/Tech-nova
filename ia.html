@@ -1,4 +1,73 @@
-<div class="ai-container">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Technova AI 🤖</title>
+<style>
+body {
+  background: #0f172a;
+  font-family: Arial;
+}
+
+.container {
+  max-width: 700px;
+  margin: auto;
+  margin-top: 50px;
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+  color: white;
+}
+
+#chat-box {
+  height: 400px;
+  overflow-y: auto;
+  background: #020617;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.message {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.user {
+  background: #2563eb;
+  text-align: right;
+}
+
+.bot {
+  background: #334155;
+}
+
+.input-area {
+  display: flex;
+  margin-top: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-left: 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
   <h2>Technova AI 🤖</h2>
 
   <div id="chat-box"></div>
@@ -9,3 +78,63 @@
     <button onclick="startVoice()">🎤</button>
   </div>
 </div>
+
+<script>
+function addMessage(text, sender) {
+  const box = document.getElementById("chat-box");
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+}
+
+function botReply(message) {
+  let response = "Je suis Technova AI 🤖, pose-moi une question en informatique.";
+
+  if (message.includes("html")) {
+    response = "HTML sert à créer la structure d’un site web.";
+  } else if (message.includes("css")) {
+    response = "CSS permet de styliser un site.";
+  } else if (message.includes("javascript")) {
+    response = "JavaScript rend ton site interactif.";
+  }
+
+  setTimeout(() => {
+    addMessage(response, "bot");
+    speak(response);
+  }, 500);
+}
+
+function sendMessage() {
+  const input = document.getElementById("user-input");
+  const message = input.value.toLowerCase();
+
+  if (message === "") return;
+
+  addMessage(input.value, "user");
+  botReply(message);
+  input.value = "";
+}
+
+function startVoice() {
+  const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  rec.lang = "fr-FR";
+
+  rec.onresult = function(e) {
+    document.getElementById("user-input").value = e.results[0][0].transcript;
+    sendMessage();
+  };
+
+  rec.start();
+}
+
+function speak(text) {
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "fr-FR";
+  speechSynthesis.speak(speech);
+}
+</script>
+
+</body>
+  </html>
