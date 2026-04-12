@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Admin - Technova</title>
+
+<style>
+body {
+  margin: 0;
+  background: #0f172a;
+  font-family: Arial;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #1e293b;
+  color: #38bdf8;
+  padding: 15px;
+  text-align: center;
+}
+
+#chat-box {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #020617;
+}
+
+.message {
+  padding: 10px;
+  margin: 8px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.user {
+  background: #2563eb;
+  margin-left: auto;
+}
+
+.admin {
+  background: #16a34a;
+  margin-right: auto;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #1e293b;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-left: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #38bdf8;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <header>💬 Chat avec Admin</header>
+
+  <div id="chat-box"></div>
+
+  <div class="input-area">
+    <input type="text" id="message" placeholder="Écris ton message..." />
+    <button onclick="sendMessage()">Envoyer</button>
+  </div>
+</div>
+
+<script>
+
+// envoyer message étudiant
+function sendMessage() {
+  let input = document.getElementById("message");
+  let text = input.value;
+
+  if (text === "") return;
+
+  addMessage(text, "user");
+  autoReply(text);
+
+  input.value = "";
+}
+
+// ajouter message
+function addMessage(text, sender) {
+  let box = document.getElementById("chat-box");
+
+  let msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+
+  box.appendChild(msg);
+  box.scrollTop = box.scrollHeight;
+
+  saveChat();
+}
+
+// réponse admin simulée
+function autoReply(text) {
+  let reply = "Admin: Merci pour ton message, je vais te répondre bientôt.";
+
+  setTimeout(() => {
+    addMessage(reply, "admin");
+  }, 1000);
+}
+
+// sauvegarde
+function saveChat() {
+  localStorage.setItem("chat_admin", document.getElementById("chat-box").innerHTML);
+}
+
+// charger messages
+window.onload = function() {
+  let saved = localStorage.getItem("chat_admin");
+  if (saved) {
+    document.getElementById("chat-box").innerHTML = saved;
+  }
+}
+
+</script>
+
+</body>
+</html>
