@@ -57,20 +57,6 @@ button{
   border-radius:10px;
 }
 
-.comment{
-  background:#eee;
-  padding:5px;
-  margin-top:5px;
-  border-radius:5px;
-}
-
-.chat{
-  height:200px;
-  overflow:auto;
-  border:1px solid #ddd;
-  padding:5px;
-}
-
 .msg{
   background:#e4e6eb;
   padding:6px;
@@ -86,22 +72,25 @@ button{
 
 <div class="container">
 
-<!-- AUTH -->
+<!-- 🔐 AUTH -->
 <div class="box" id="authBox">
   <h3>🔐 Connexion</h3>
+
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Mot de passe">
+
   <button onclick="login()">Se connecter</button>
 
   <h4>Créer compte</h4>
+
   <input id="name" placeholder="Nom">
+
   <button onclick="register()">S'inscrire</button>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
 
-<!-- USER -->
 <div class="box">
   <h3 id="userName"></h3>
 </div>
@@ -120,7 +109,7 @@ button{
 <div class="box">
   <h3>💬 Messenger</h3>
 
-  <div class="chat" id="chat"></div>
+  <div id="chat" style="height:200px;overflow:auto;border:1px solid #ddd;padding:5px;"></div>
 
   <input id="msg" placeholder="Message...">
   <button onclick="sendMsg()">Envoyer</button>
@@ -138,9 +127,9 @@ button{
 <script>
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
-  authDomain: "technova-academy.firebaseapp.com",
-  projectId: "technova-academy"
+  apiKey: "TA_API_KEY",
+  authDomain: "TON_PROJECT.firebaseapp.com",
+  projectId: "TON_PROJECT"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -150,40 +139,55 @@ const db = firebase.firestore();
 
 let currentUser = "";
 
-/* 🔐 REGISTER */
+/* 🔐 INSCRIPTION */
 function register(){
-  const email = email.value;
-  const pass = password.value;
+
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
   const name = document.getElementById("name").value;
 
   auth.createUserWithEmailAndPassword(email, pass)
   .then(user=>{
+
     db.collection("users").doc(user.user.uid).set({
-      name
+      name: name,
+      email: email
     });
+
+    alert("Compte créé ✅");
+  })
+  .catch(err=>{
+    alert(err.message);
   });
 }
 
 /* 🔐 LOGIN */
 function login(){
+
   const email = document.getElementById("email").value;
   const pass = document.getElementById("password").value;
 
-  auth.signInWithEmailAndPassword(email, pass);
+  auth.signInWithEmailAndPassword(email, pass)
+  .then(()=>{
+    alert("Connexion OK ✅");
+  })
+  .catch(err=>{
+    alert(err.message);
+  });
 }
 
-/* SESSION */
+/* 🔁 SESSION */
 auth.onAuthStateChanged(user=>{
   if(user){
     currentUser = user.uid;
+
+    document.getElementById("authBox").style.display = "none";
+    document.getElementById("app").style.display = "block";
 
     db.collection("users").doc(user.uid).get()
     .then(doc=>{
       document.getElementById("userName").innerText = doc.data().name;
     });
-
-    authBox.style.display = "none";
-    app.style.display = "block";
 
     loadPosts();
     loadMessages();
@@ -197,8 +201,7 @@ function addPost(){
   db.collection("posts").add({
     text,
     userId: currentUser,
-    time: Date.now(),
-    likes: 0
+    time: Date.now()
   });
 
   document.getElementById("postText").value = "";
@@ -219,20 +222,10 @@ function loadPosts(){
           <div class="post">
             <strong>👤 ${u.data().name}</strong>
             <p>${p.text}</p>
-            <button onclick="likePost('${doc.id}', ${p.likes||0})">
-              ❤️ ${p.likes||0}
-            </button>
           </div>
         `;
       });
     });
-  });
-}
-
-/* ❤️ LIKE */
-function likePost(id, likes){
-  db.collection("posts").doc(id).update({
-    likes: likes + 1
   });
 }
 
