@@ -9,7 +9,7 @@
 body { font-family: Arial; background:#f0f2f5; }
 
 .box {
-  max-width: 600px;
+  max-width: 500px;
   margin: auto;
   background: white;
   padding: 15px;
@@ -28,6 +28,7 @@ input, button, textarea {
   padding:10px;
   margin-top:10px;
   border-radius:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 .comment {
@@ -35,11 +36,6 @@ input, button, textarea {
   padding:5px;
   margin-top:5px;
   border-radius:5px;
-}
-
-.admin {
-  background:#111;
-  color:white;
 }
 </style>
 </head>
@@ -56,10 +52,6 @@ input, button, textarea {
   <h4>Créer compte</h4>
   <input id="name" placeholder="Nom">
   <button onclick="register()">S'inscrire</button>
-
-  <h4>Admin</h4>
-  <input id="adminPass" placeholder="Mot admin">
-  <button onclick="adminLogin()">Entrer Admin</button>
 </div>
 
 <!-- APP -->
@@ -73,17 +65,6 @@ input, button, textarea {
 
 <div id="feed"></div>
 
-</div>
-
-<!-- ADMIN DASHBOARD -->
-<div id="adminPanel" class="box admin" style="display:none;">
-  <h3>👨‍💻 DASHBOARD ADMIN</h3>
-
-  <h4>👥 Utilisateurs</h4>
-  <div id="users"></div>
-
-  <h4>📢 Posts</h4>
-  <div id="adminPosts"></div>
 </div>
 
 <!-- FIREBASE -->
@@ -105,13 +86,12 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = null;
-let isAdmin = false;
 
 // 🔐 INSCRIPTION
 function register(){
-  const email = emailEl.value;
-  const pass = passwordEl.value;
-  const name = nameEl.value;
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+  const name = document.getElementById("name").value;
 
   auth.createUserWithEmailAndPassword(email, pass)
   .then(user=>{
@@ -122,25 +102,12 @@ function register(){
   });
 }
 
-// 🔐 LOGIN USER
+// 🔐 LOGIN
 function login(){
-  auth.signInWithEmailAndPassword(emailEl.value, passwordEl.value);
-}
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
 
-// 🔐 ADMIN LOGIN
-function adminLogin(){
-  const pass = document.getElementById("adminPass").value;
-
-  if(pass === "ADMIN123"){
-    isAdmin = true;
-    alert("Mode admin activé");
-
-    document.getElementById("adminPanel").style.display = "block";
-    loadUsers();
-    loadAdminPosts();
-  } else {
-    alert("Mot incorrect");
-  }
+  auth.signInWithEmailAndPassword(email, pass);
 }
 
 // 🔁 SESSION
@@ -150,11 +117,11 @@ auth.onAuthStateChanged(user=>{
 
     db.collection("users").doc(user.uid).get()
     .then(doc=>{
-      profileName.innerText = doc.data().name;
+      document.getElementById("profileName").innerText = doc.data().name;
     });
 
-    auth.style.display = "none";
-    app.style.display = "block";
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").style.display = "block";
 
     loadPosts();
   }
@@ -162,17 +129,47 @@ auth.onAuthStateChanged(user=>{
 
 // ➕ POST
 function addPost(){
+  const text = document.getElementById("postText").value;
+
   db.collection("posts").add({
-    text: postText.value,
+    text,
     userId: currentUser,
+    likes: 0,
     time: Date.now()
+  });
+
+  document.getElementById("postText").value = "";
+}
+
+// ❤️ LIKE
+function likePost(id, currentLikes){
+  db.collection("posts").doc(id).update({
+    likes: currentLikes + 1
   });
 }
 
-// 📡 POSTS
+// 💬 COMMENTAIRE
+function addComment(postId){
+  const input = document.getElementById("c-"+postId);
+  const text = input.value;
+
+  if(!text) return;
+
+  db.collection("comments").add({
+    postId,
+    userId: currentUser,
+    text,
+    time: Date.now()
+  });
+
+  input.value = "";
+}
+
+// 📡 LOAD POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
+    const feed = document.getElementById("feed");
     feed.innerHTML = "";
 
     snap.forEach(doc=>{
@@ -180,10 +177,49 @@ function loadPosts(){
 
       db.collection("users").doc(p.userId).get()
       .then(u=>{
-        feed.innerHTML += `
+
+        let html = `
           <div class="post">
             <strong>${u.data().name}</strong>
             <p>${p.text}</p>
+            <button onclick="likePost('${doc.id}', ${p.likes||0})">
+              ❤️ ${p.likes||0}
+            </button>
+
+            <div id="comments-${doc.id}"></div>
+
+            <input id="c-${doc.id}" placeholder="Commenter...">
+            <button onclick="addComment('${doc.id}')">Envoyer</button>
+          </div>
+        `;
+
+        feed.innerHTML += html;
+
+        loadComments(doc.id);
+      });
+    });
+  });
+}
+
+// 📡 LOAD COMMENTS
+function loadComments(postId){
+  db.collection("comments")
+  .where("postId","==",postId)
+  .orderBy("time")
+  .onSnapshot(snap=>{
+    const div = document.getElementById("comments-"+postId);
+    if(!div) return;
+
+    div.innerHTML = "";
+
+    snap.forEach(doc=>{
+      const c = doc.data();
+
+      db.collection("users").doc(c.userId).get()
+      .then(u=>{
+        div.innerHTML += `
+          <div class="comment">
+            <strong>${u.data().name}</strong> : ${c.text}
           </div>
         `;
       });
@@ -191,40 +227,7 @@ function loadPosts(){
   });
 }
 
-// 👨‍💻 USERS ADMIN
-function loadUsers(){
-  db.collection("users").onSnapshot(snap=>{
-    users.innerHTML = "";
-    snap.forEach(doc=>{
-      users.innerHTML += `<p>${doc.data().name}</p>`;
-    });
-  });
-}
-
-// 👨‍💻 POSTS ADMIN
-function loadAdminPosts(){
-  db.collection("posts").onSnapshot(snap=>{
-    adminPosts.innerHTML = "";
-
-    snap.forEach(doc=>{
-      const p = doc.data();
-
-      adminPosts.innerHTML += `
-        <div>
-          ${p.text}
-          <button onclick="deletePost('${doc.id}')">❌</button>
-        </div>
-      `;
-    });
-  });
-}
-
-// ❌ DELETE POST
-function deletePost(id){
-  db.collection("posts").doc(id).delete();
-}
-
 </script>
 
 </body>
-</html>
+  </html>
