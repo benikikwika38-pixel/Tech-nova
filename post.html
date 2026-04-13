@@ -21,7 +21,7 @@ header{
 }
 
 .container{
-  max-width:650px;
+  max-width:600px;
   margin:auto;
   padding:10px;
 }
@@ -57,11 +57,17 @@ button{
   border-radius:10px;
 }
 
-.msg{
-  background:#e4e6eb;
-  padding:6px;
-  margin:5px;
-  border-radius:8px;
+.post img{
+  width:100%;
+  margin-top:8px;
+  border-radius:10px;
+}
+
+.comment{
+  background:#eee;
+  padding:5px;
+  margin-top:5px;
+  border-radius:5px;
 }
 </style>
 </head>
@@ -72,48 +78,27 @@ button{
 
 <div class="container">
 
-<!-- 🔐 AUTH -->
-<div class="box" id="authBox">
-  <h3>🔐 Connexion</h3>
-
-  <input id="email" placeholder="Email">
+<!-- 🔐 LOGIN -->
+<div class="box" id="loginBox">
+  <h3>🔐 Entrer dans le réseau</h3>
+  <input id="name" placeholder="Ton nom">
   <input id="password" type="password" placeholder="Mot de passe">
-
-  <button onclick="login()">Se connecter</button>
-
-  <h4>Créer compte</h4>
-
-  <input id="name" placeholder="Nom">
-
-  <button onclick="register()">S'inscrire</button>
+  <button onclick="login()">Entrer</button>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
 
 <div class="box">
-  <h3 id="userName"></h3>
-</div>
-
-<!-- POST -->
-<div class="box">
   <h3>📢 Publication</h3>
   <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
+  
+  <input type="file" id="image">
+
   <button onclick="addPost()">Publier</button>
 </div>
 
-<!-- FEED -->
 <div id="feed"></div>
-
-<!-- CHAT -->
-<div class="box">
-  <h3>💬 Messenger</h3>
-
-  <div id="chat" style="height:200px;overflow:auto;border:1px solid #ddd;padding:5px;"></div>
-
-  <input id="msg" placeholder="Message...">
-  <button onclick="sendMsg()">Envoyer</button>
-</div>
 
 </div>
 
@@ -121,144 +106,114 @@ button{
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
 const firebaseConfig = {
-  apiKey: "TA_API_KEY",
-  authDomain: "TON_PROJECT.firebaseapp.com",
-  projectId: "TON_PROJECT"
+  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy"
 };
 
 firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = "";
 
-/* 🔐 INSCRIPTION */
-function register(){
+/* 🔐 MOT DE PASSE FIXE */
+const APP_PASSWORD = "Nova@2026";
 
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-  const name = document.getElementById("name").value;
-
-  auth.createUserWithEmailAndPassword(email, pass)
-  .then(user=>{
-
-    db.collection("users").doc(user.user.uid).set({
-      name: name,
-      email: email
-    });
-
-    alert("Compte créé ✅");
-  })
-  .catch(err=>{
-    alert(err.message);
-  });
-}
-
-/* 🔐 LOGIN */
+/* LOGIN */
 function login(){
-
-  const email = document.getElementById("email").value;
+  const name = document.getElementById("name").value;
   const pass = document.getElementById("password").value;
 
-  auth.signInWithEmailAndPassword(email, pass)
-  .then(()=>{
-    alert("Connexion OK ✅");
-  })
-  .catch(err=>{
-    alert(err.message);
-  });
+  if(pass !== APP_PASSWORD){
+    alert("Mot de passe incorrect ❌");
+    return;
+  }
+
+  if(!name){
+    alert("Entre ton nom");
+    return;
+  }
+
+  currentUser = name;
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  loadPosts();
 }
 
-/* 🔁 SESSION */
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user.uid;
-
-    document.getElementById("authBox").style.display = "none";
-    document.getElementById("app").style.display = "block";
-
-    db.collection("users").doc(user.uid).get()
-    .then(doc=>{
-      document.getElementById("userName").innerText = doc.data().name;
-    });
-
-    loadPosts();
-    loadMessages();
-  }
-});
+/* 📸 IMAGE -> BASE64 */
+function toBase64(file, callback){
+  const reader = new FileReader();
+  reader.onload = () => callback(reader.result);
+  reader.readAsDataURL(file);
+}
 
 /* ➕ POST */
 function addPost(){
   const text = document.getElementById("postText").value;
+  const file = document.getElementById("image").files[0];
 
+  if(!text){
+    alert("Écris quelque chose");
+    return;
+  }
+
+  if(file){
+    toBase64(file, (img)=>{
+      savePost(text, img);
+    });
+  }else{
+    savePost(text, "");
+  }
+}
+
+function savePost(text, image){
   db.collection("posts").add({
     text,
-    userId: currentUser,
+    image,
+    user: currentUser,
+    likes: 0,
     time: Date.now()
   });
 
   document.getElementById("postText").value = "";
 }
 
-/* 📡 POSTS */
+/* ❤️ LIKE */
+function likePost(id, likes){
+  db.collection("posts").doc(id).update({
+    likes: likes + 1
+  });
+}
+
+/* 📡 LOAD POSTS */
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
+    const feed = document.getElementById("feed");
     feed.innerHTML = "";
 
     snap.forEach(doc=>{
       const p = doc.data();
 
-      db.collection("users").doc(p.userId).get()
-      .then(u=>{
-        feed.innerHTML += `
-          <div class="post">
-            <strong>👤 ${u.data().name}</strong>
-            <p>${p.text}</p>
-          </div>
-        `;
-      });
-    });
-  });
-}
+      feed.innerHTML += `
+        <div class="box">
+          <strong>👤 ${p.user}</strong>
+          <p>${p.text}</p>
 
-/* 💬 CHAT */
-function sendMsg(){
-  const text = document.getElementById("msg").value;
+          ${p.image ? `<img src="${p.image}">` : ""}
 
-  db.collection("messages").add({
-    text,
-    userId: currentUser,
-    time: Date.now()
-  });
-
-  document.getElementById("msg").value = "";
-}
-
-/* 📡 MESSAGES */
-function loadMessages(){
-  db.collection("messages").orderBy("time","asc")
-  .onSnapshot(snap=>{
-    chat.innerHTML = "";
-
-    snap.forEach(doc=>{
-      const m = doc.data();
-
-      db.collection("users").doc(m.userId).get()
-      .then(u=>{
-        chat.innerHTML += `
-          <div class="msg">
-            <strong>${u.data().name}</strong>: ${m.text}
-          </div>
-        `;
-      });
+          <button onclick="likePost('${doc.id}', ${p.likes||0})">
+            ❤️ ${p.likes||0}
+          </button>
+        </div>
+      `;
     });
   });
 }
@@ -266,4 +221,4 @@ function loadMessages(){
 </script>
 
 </body>
-</html>
+  </html>
