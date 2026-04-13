@@ -7,57 +7,22 @@
 
 <style>
 body {
-  margin: 0;
-  font-family: system-ui, Arial;
+  font-family: Arial;
   background: #f0f2f5;
 }
 
-header {
-  background: #1877f2;
-  padding: 12px;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 10px;
-}
-
-.post {
+.box {
+  max-width: 400px;
+  margin: 15px auto;
   background: white;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 15px;
+  border-radius: 10px;
 }
 
-input, textarea, button {
+button, input, textarea {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
-
-button {
-  background: #1877f2;
-  color: white;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-}
-
-#loginBox, #registerBox {
-  max-width: 400px;
-  margin: auto;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-top: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 #app {
@@ -68,47 +33,60 @@ button {
 
 <body>
 
-<header>📢 TechNova Academy</header>
+<!-- CHOIX -->
+<div class="box">
+  <h3>Connexion</h3>
+  <button onclick="showStudent()">Étudiant</button>
+  <button onclick="showAdmin()">Admin</button>
+</div>
 
-<!-- 🔐 LOGIN -->
-<div id="loginBox">
+<!-- LOGIN ETUDIANT -->
+<div class="box" id="studentBox">
   <h3>Connexion Étudiant</h3>
-  <input id="matricule" placeholder="Matricule">
-  <input id="password" type="password" placeholder="Mot de passe">
+  <input id="mat" placeholder="Matricule">
+  <input id="pass" placeholder="Mot de passe">
   <button onclick="login()">Se connecter</button>
 </div>
 
-<!-- 🧑‍🎓 INSCRIPTION -->
-<div id="registerBox">
-  <h3>Créer un compte</h3>
-  <input id="r-mat" placeholder="Matricule">
-  <input id="r-name" placeholder="Nom">
-  <input id="r-pass" type="password" placeholder="Mot de passe">
+<!-- INSCRIPTION -->
+<div class="box">
+  <h3>Créer compte</h3>
+  <input id="rmat" placeholder="Matricule">
+  <input id="rname" placeholder="Nom">
+  <input id="rpass" placeholder="Mot de passe">
   <button onclick="register()">S'inscrire</button>
 </div>
 
-<!-- 📡 APP -->
-<div id="app">
-  <div class="container">
-
-    <h3>📢 Publications</h3>
-
-    <input type="password" id="pass" placeholder="Mot de passe admin">
-    <textarea id="text" placeholder="Message..."></textarea>
-    <button onclick="addPost()">Publier</button>
-
-    <div id="posts"></div>
-
-  </div>
+<!-- LOGIN ADMIN -->
+<div class="box" id="adminBox" style="display:none;">
+  <h3>Connexion Admin</h3>
+  <input id="adminUser" placeholder="Nom admin">
+  <input id="adminPass" type="password" placeholder="Mot de passe">
+  <button onclick="adminLogin()">Se connecter</button>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<!-- APP -->
+<div id="app" class="box">
+
+  <h3>📢 Publications</h3>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" style="display:none;">
+    <textarea id="text" placeholder="Message..."></textarea>
+    <button onclick="addPost()">Publier</button>
+  </div>
+
+  <div id="posts"></div>
+
+</div>
+
+<!-- FIREBASE STABLE -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
-// 🔥 CONFIG FIREBASE
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -118,14 +96,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const ADMIN_PASSWORD = "Tk@2026Nova!";
 let currentUser = null;
+
+// 🔄 SWITCH
+function showStudent(){
+  document.getElementById("studentBox").style.display = "block";
+  document.getElementById("adminBox").style.display = "none";
+}
+
+function showAdmin(){
+  document.getElementById("studentBox").style.display = "none";
+  document.getElementById("adminBox").style.display = "block";
+}
 
 // 🧑‍🎓 INSCRIPTION
 function register(){
-  const mat = document.getElementById("r-mat").value;
-  const name = document.getElementById("r-name").value;
-  const pass = document.getElementById("r-pass").value;
+  const mat = document.getElementById("rmat").value;
+  const name = document.getElementById("rname").value;
+  const pass = document.getElementById("rpass").value;
 
   if(!mat || !name || !pass){
     alert("Remplis tous les champs");
@@ -137,74 +125,55 @@ function register(){
     password: pass
   }).then(()=>{
     alert("Compte créé !");
-  }).catch(err=>{
-    alert("Erreur inscription: " + err.message);
   });
 }
 
-// 🔐 LOGIN (CORRIGÉ + DEBUG)
+// 🔐 LOGIN ETUDIANT
 function login(){
-
-  console.log("LOGIN CLICKED");
-
-  const mat = document.getElementById("matricule").value;
-  const pass = document.getElementById("password").value;
-
-  if(!mat || !pass){
-    alert("Remplis tous les champs");
-    return;
-  }
+  const mat = document.getElementById("mat").value;
+  const pass = document.getElementById("pass").value;
 
   db.collection("students").doc(mat).get()
   .then(doc=>{
+    if(doc.exists && doc.data().password === pass){
 
-    console.log("FIREBASE OK");
+      currentUser = mat;
 
-    if(doc.exists){
+      alert("Bienvenue " + doc.data().name);
 
-      const data = doc.data();
+      document.getElementById("app").style.display = "block";
 
-      if(data.password === pass){
-
-        currentUser = mat;
-
-        alert("Bienvenue " + data.name);
-
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("registerBox").style.display = "none";
-        document.getElementById("app").style.display = "block";
-
-        loadPosts();
-
-      } else {
-        alert("Mot de passe incorrect");
-      }
+      loadPosts();
 
     } else {
-      alert("Matricule introuvable");
+      alert("Erreur login");
     }
-
-  })
-  .catch(err=>{
-    console.error(err);
-    alert("Erreur Firebase: " + err.message);
   });
 }
 
-// ➕ POST ADMIN
-function addPost(){
-  const pass = document.getElementById("pass").value;
+// 👨‍💻 LOGIN ADMIN
+function adminLogin(){
+  const user = document.getElementById("adminUser").value;
+  const pass = document.getElementById("adminPass").value;
 
-  if(pass !== ADMIN_PASSWORD){
+  if(user === "beni" && pass === "admin2026"){
+    alert("Bienvenue Admin 🔥");
+
+    document.getElementById("app").style.display = "block";
+    document.getElementById("adminPanel").style.display = "block";
+
+    loadPosts();
+  } else {
     alert("Accès refusé");
-    return;
   }
+}
 
+// ➕ POST
+function addPost(){
   const text = document.getElementById("text").value;
 
   db.collection("posts").add({
     text,
-    likes: 0,
     time: Date.now()
   });
 
@@ -214,22 +183,14 @@ function addPost(){
 // 📡 LOAD POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snapshot=>{
+  .onSnapshot(snap=>{
     const container = document.getElementById("posts");
     container.innerHTML = "";
 
-    snapshot.forEach(doc=>{
+    snap.forEach(doc=>{
       const p = doc.data();
 
-      const div = document.createElement("div");
-      div.classList.add("post");
-
-      div.innerHTML = `
-        <p>${p.text}</p>
-        <p>❤️ ${p.likes || 0}</p>
-      `;
-
-      container.appendChild(div);
+      container.innerHTML += `<div style="background:#eee;padding:10px;margin-top:10px;">${p.text}</div>`;
     });
   });
 }
