@@ -12,7 +12,7 @@ body {
   background: #f0f2f5;
 }
 
-/* HEADER FACEBOOK STYLE */
+/* HEADER */
 header {
   background: #1877f2;
   padding: 12px;
@@ -35,7 +35,7 @@ header div {
   padding: 10px;
 }
 
-/* POSTS */
+/* POST */
 .post {
   background: white;
   padding: 12px;
@@ -80,7 +80,7 @@ button {
 }
 
 /* BOX */
-#loginBox, #registerBox {
+#loginBox, #registerBox, #chatBox {
   max-width: 400px;
   margin: auto;
   background: white;
@@ -139,13 +139,21 @@ button {
 </div>
 </div>
 
+<!-- 💬 CHAT -->
+<div id="chatBox" style="display:none;">
+  <h3>💬 Chat TechNova</h3>
+  <input id="msg" placeholder="Message...">
+  <button onclick="sendMsg()">Envoyer</button>
+  <div id="messages"></div>
+</div>
+
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
 
-// 🔥 FIREBASE CONFIG
+// 🔥 FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -156,6 +164,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const ADMIN_PASSWORD = "Tk@2026Nova!";
+let currentUser = null;
 
 // 🔐 INSCRIPTION
 function register(){
@@ -163,12 +172,17 @@ function register(){
   const name = document.getElementById("r-name").value;
   const pass = document.getElementById("r-pass").value;
 
-  db.collection("students").doc(mat).set({
-    name: name,
-    password: pass
-  });
+  if(!mat || !name || !pass){
+    alert("Remplis tous les champs");
+    return;
+  }
 
-  alert("Compte créé !");
+  db.collection("students").doc(mat).set({
+    name,
+    password: pass
+  }).then(()=>{
+    alert("Compte créé !");
+  });
 }
 
 // 🔐 LOGIN
@@ -176,15 +190,27 @@ function login(){
   const mat = document.getElementById("matricule").value;
   const pass = document.getElementById("password").value;
 
-  db.collection("students").doc(mat).get().then(doc=>{
+  if(!mat || !pass){
+    alert("Remplis tous les champs");
+    return;
+  }
+
+  db.collection("students").doc(mat).get()
+  .then(doc=>{
     if(doc.exists && doc.data().password === pass){
+
+      currentUser = mat;
+
       alert("Bienvenue " + doc.data().name);
 
       document.getElementById("loginBox").style.display = "none";
       document.getElementById("registerBox").style.display = "none";
       document.getElementById("app").style.display = "block";
+      document.getElementById("chatBox").style.display = "block";
 
       loadPosts();
+      loadChat();
+
     } else {
       alert("Erreur login");
     }
@@ -198,7 +224,7 @@ function toBase64(file, cb){
   r.readAsDataURL(file);
 }
 
-// ➕ POST
+// ➕ POST ADMIN
 function addPost(){
   const pass = document.getElementById("pass").value;
 
@@ -253,7 +279,7 @@ function addComment(id){
   });
 }
 
-// 📡 LOAD POSTS
+// 📡 POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
@@ -287,7 +313,34 @@ function loadPosts(){
   });
 }
 
+// 💬 CHAT
+function sendMsg(){
+  const msg = document.getElementById("msg").value;
+  if(!msg || !currentUser) return;
+
+  db.collection("messages").add({
+    user: currentUser,
+    text: msg,
+    time: Date.now()
+  });
+
+  document.getElementById("msg").value = "";
+}
+
+function loadChat(){
+  db.collection("messages").orderBy("time")
+  .onSnapshot(snap=>{
+    const box = document.getElementById("messages");
+    box.innerHTML = "";
+
+    snap.forEach(doc=>{
+      const m = doc.data();
+      box.innerHTML += `<p><b>${m.user}:</b> ${m.text}</p>`;
+    });
+  });
+}
+
 </script>
 
 </body>
-  </html>
+</html>
