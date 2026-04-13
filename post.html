@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technova Feed</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+}
+
+header {
+  background: #1e293b;
+  padding: 15px;
+  text-align: center;
+  color: #38bdf8;
+}
+
+.container {
+  padding: 15px;
+}
+
+.admin {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+input, textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #38bdf8;
+  cursor: pointer;
+}
+
+.post {
+  background: #1e293b;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.post img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 15px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.comment {
+  background: #020617;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 5px;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>📢 Technova Publications</header>
+
+<div class="container">
+
+<div class="admin">
+  <h3>Poster (Admin)</h3>
+  <input type="password" id="adminPass" placeholder="Mot de passe admin">
+  <textarea id="text" placeholder="Message..."></textarea>
+  <input type="file" id="imageFile">
+  <button onclick="addPost()">Publier</button>
+</div>
+
+<div id="posts"></div>
+
+</div>
+
+<script>
+
+const ADMIN_PASSWORD = "kikwika12";
+
+// 📸 Convertir image en base64
+function getImageBase64(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function() {
+    callback(reader.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ➕ Ajouter post
+function addPost() {
+  const pass = document.getElementById("adminPass").value;
+  if (pass !== ADMIN_PASSWORD) {
+    alert("❌ Accès refusé");
+    return;
+  }
+
+  const text = document.getElementById("text").value;
+  const file = document.getElementById("imageFile").files[0];
+
+  if (text === "") return;
+
+  if (file) {
+    getImageBase64(file, function(imageData) {
+      savePost(text, imageData);
+    });
+  } else {
+    savePost(text, "");
+  }
+}
+
+function savePost(text, image) {
+  let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+  posts.unshift({
+    text: text,
+    image: image,
+    likes: 0,
+    comments: []
+  });
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+
+  document.getElementById("text").value = "";
+  document.getElementById("imageFile").value = "";
+
+  displayPosts();
+}
+
+// ❤️ LIKE
+function likePost(index) {
+  let posts = JSON.parse(localStorage.getItem("posts"));
+  posts[index].likes++;
+  localStorage.setItem("posts", JSON.stringify(posts));
+  displayPosts();
+}
+
+// 💬 COMMENTAIRE AVEC NOM
+function addComment(index, input) {
+  const name = prompt("Ton nom ?");
+  if (!name || input.trim() === "") return;
+
+  let posts = JSON.parse(localStorage.getItem("posts"));
+  posts[index].comments.push(name + " : " + input);
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+  displayPosts();
+}
+
+// 🗑️ SUPPRIMER POST
+function deletePost(index) {
+  const pass = prompt("Mot de passe admin ?");
+  if (pass !== ADMIN_PASSWORD) {
+    alert("❌ Refusé");
+    return;
+  }
+
+  let posts = JSON.parse(localStorage.getItem("posts"));
+  posts.splice(index, 1);
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+  displayPosts();
+}
+
+// 📄 AFFICHER
+function displayPosts() {
+  const container = document.getElementById("posts");
+  container.innerHTML = "";
+
+  let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+  posts.forEach((p, index) => {
+
+    let div = document.createElement("div");
+    div.classList.add("post");
+
+    div.innerHTML = `
+      <p>${p.text}</p>
+      ${p.image ? `<img src="${p.image}">` : ""}
+
+      <div class="actions">
+        <span onclick="likePost(${index})">❤️ ${p.likes}</span>
+        <span onclick="deletePost(${index})">🗑️</span>
+      </div>
+
+      ${p.comments.map(c => `<div class="comment">${c}</div>`).join("")}
+
+      <input type="text" placeholder="Commenter..."
+        onkeydown="if(event.key==='Enter'){addComment(${index}, this.value); this.value='';}">
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+displayPosts();
+
+</script>
+
+</body>
+</html>
