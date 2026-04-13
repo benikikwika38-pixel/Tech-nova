@@ -6,10 +6,7 @@
 <title>TechNova Academy</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f0f2f5;
-}
+body { font-family: Arial; background: #f0f2f5; }
 
 .box {
   max-width: 400px;
@@ -19,15 +16,13 @@ body {
   border-radius: 10px;
 }
 
-button, input, textarea {
+input, button, textarea {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
 }
 
-#app {
-  display: none;
-}
+#app { display: none; }
 </style>
 </head>
 
@@ -40,24 +35,24 @@ button, input, textarea {
   <button onclick="showAdmin()">Admin</button>
 </div>
 
-<!-- LOGIN ETUDIANT -->
+<!-- ETUDIANT -->
 <div class="box" id="studentBox">
   <h3>Connexion Étudiant</h3>
   <input id="mat" placeholder="Matricule">
-  <input id="pass" placeholder="Mot de passe">
+  <input id="pass" type="password" placeholder="Mot de passe">
   <button onclick="login()">Se connecter</button>
 </div>
 
 <!-- INSCRIPTION -->
 <div class="box">
-  <h3>Créer compte</h3>
+  <h3>Créer compte étudiant</h3>
   <input id="rmat" placeholder="Matricule">
   <input id="rname" placeholder="Nom">
-  <input id="rpass" placeholder="Mot de passe">
+  <input id="rpass" type="password" placeholder="Mot de passe">
   <button onclick="register()">S'inscrire</button>
 </div>
 
-<!-- LOGIN ADMIN -->
+<!-- ADMIN (PAS D'INSCRIPTION) -->
 <div class="box" id="adminBox" style="display:none;">
   <h3>Connexion Admin</h3>
   <input id="adminUser" placeholder="Nom admin">
@@ -80,13 +75,12 @@ button, input, textarea {
 
 </div>
 
-<!-- FIREBASE STABLE -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -95,8 +89,6 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-let currentUser = null;
 
 // 🔄 SWITCH
 function showStudent(){
@@ -109,7 +101,7 @@ function showAdmin(){
   document.getElementById("adminBox").style.display = "block";
 }
 
-// 🧑‍🎓 INSCRIPTION
+// 🧑‍🎓 INSCRIPTION ETUDIANT
 function register(){
   const mat = document.getElementById("rmat").value;
   const name = document.getElementById("rname").value;
@@ -124,7 +116,7 @@ function register(){
     name,
     password: pass
   }).then(()=>{
-    alert("Compte créé !");
+    alert("Compte étudiant créé !");
   });
 }
 
@@ -136,8 +128,6 @@ function login(){
   db.collection("students").doc(mat).get()
   .then(doc=>{
     if(doc.exists && doc.data().password === pass){
-
-      currentUser = mat;
 
       alert("Bienvenue " + doc.data().name);
 
@@ -151,24 +141,30 @@ function login(){
   });
 }
 
-// 👨‍💻 LOGIN ADMIN
+// 🔥 LOGIN ADMIN (ULTRA IMPORTANT)
 function adminLogin(){
   const user = document.getElementById("adminUser").value;
   const pass = document.getElementById("adminPass").value;
 
-  if(user === "beni" && pass === "admin2026"){
-    alert("Bienvenue Admin 🔥");
+  // ⚠️ CHANGE ÇA PAR TON SECRET
+  const ADMIN_NAME = "beni";
+  const ADMIN_PASS = "Tk@2026Nova!";
+
+  if(user === ADMIN_NAME && pass === ADMIN_PASS){
+
+    alert("Bienvenue ADMIN 🔥");
 
     document.getElementById("app").style.display = "block";
     document.getElementById("adminPanel").style.display = "block";
 
     loadPosts();
+
   } else {
-    alert("Accès refusé");
+    alert("Accès refusé ❌");
   }
 }
 
-// ➕ POST
+// ➕ POST (ADMIN)
 function addPost(){
   const text = document.getElementById("text").value;
 
@@ -180,7 +176,7 @@ function addPost(){
   document.getElementById("text").value = "";
 }
 
-// 📡 LOAD POSTS
+// 📡 POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
@@ -190,7 +186,11 @@ function loadPosts(){
     snap.forEach(doc=>{
       const p = doc.data();
 
-      container.innerHTML += `<div style="background:#eee;padding:10px;margin-top:10px;">${p.text}</div>`;
+      container.innerHTML += `
+        <div style="background:#eee;padding:10px;margin-top:10px;">
+          ${p.text}
+        </div>
+      `;
     });
   });
 }
@@ -198,4 +198,4 @@ function loadPosts(){
 </script>
 
 </body>
-</html>
+  </html>
