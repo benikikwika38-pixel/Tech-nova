@@ -3,80 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Academy</title>
+<title>TechNova Social</title>
 
 <style>
-body { font-family: Arial; background: #f0f2f5; }
+body { font-family: Arial; background:#f0f2f5; }
 
 .box {
-  max-width: 400px;
-  margin: 15px auto;
+  max-width: 600px;
+  margin: auto;
   background: white;
   padding: 15px;
+  margin-top: 10px;
   border-radius: 10px;
 }
 
 input, button, textarea {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
+  width:100%;
+  padding:10px;
+  margin-top:8px;
 }
 
-#app { display: none; }
+.post {
+  background:#fff;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
+
+.comment {
+  background:#eee;
+  padding:5px;
+  margin-top:5px;
+  border-radius:5px;
+}
+
+.admin {
+  background:#111;
+  color:white;
+}
 </style>
 </head>
 
 <body>
 
-<!-- CHOIX -->
-<div class="box">
+<!-- AUTH -->
+<div class="box" id="auth">
   <h3>Connexion</h3>
-  <button onclick="showStudent()">Étudiant</button>
-  <button onclick="showAdmin()">Admin</button>
-</div>
-
-<!-- ETUDIANT -->
-<div class="box" id="studentBox">
-  <h3>Connexion Étudiant</h3>
-  <input id="mat" placeholder="Matricule">
-  <input id="pass" type="password" placeholder="Mot de passe">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Mot de passe">
   <button onclick="login()">Se connecter</button>
-</div>
 
-<!-- INSCRIPTION -->
-<div class="box">
-  <h3>Créer compte étudiant</h3>
-  <input id="rmat" placeholder="Matricule">
-  <input id="rname" placeholder="Nom">
-  <input id="rpass" type="password" placeholder="Mot de passe">
+  <h4>Créer compte</h4>
+  <input id="name" placeholder="Nom">
   <button onclick="register()">S'inscrire</button>
-</div>
 
-<!-- ADMIN (PAS D'INSCRIPTION) -->
-<div class="box" id="adminBox" style="display:none;">
-  <h3>Connexion Admin</h3>
-  <input id="adminUser" placeholder="Nom admin">
-  <input id="adminPass" type="password" placeholder="Mot de passe">
-  <button onclick="adminLogin()">Se connecter</button>
+  <h4>Admin</h4>
+  <input id="adminPass" placeholder="Mot admin">
+  <button onclick="adminLogin()">Entrer Admin</button>
 </div>
 
 <!-- APP -->
-<div id="app" class="box">
+<div id="app" style="display:none;">
 
-  <h3>📢 Publications</h3>
+<div class="box">
+  <h3 id="profileName"></h3>
+  <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
+  <button onclick="addPost()">Publier</button>
+</div>
 
-  <!-- ADMIN PANEL -->
-  <div id="adminPanel" style="display:none;">
-    <textarea id="text" placeholder="Message..."></textarea>
-    <button onclick="addPost()">Publier</button>
-  </div>
+<div id="feed"></div>
 
-  <div id="posts"></div>
+</div>
 
+<!-- ADMIN DASHBOARD -->
+<div id="adminPanel" class="box admin" style="display:none;">
+  <h3>👨‍💻 DASHBOARD ADMIN</h3>
+
+  <h4>👥 Utilisateurs</h4>
+  <div id="users"></div>
+
+  <h4>📢 Posts</h4>
+  <div id="adminPosts"></div>
 </div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
@@ -88,114 +100,131 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 🔄 SWITCH
-function showStudent(){
-  document.getElementById("studentBox").style.display = "block";
-  document.getElementById("adminBox").style.display = "none";
-}
+let currentUser = null;
+let isAdmin = false;
 
-function showAdmin(){
-  document.getElementById("studentBox").style.display = "none";
-  document.getElementById("adminBox").style.display = "block";
-}
-
-// 🧑‍🎓 INSCRIPTION ETUDIANT
+// 🔐 INSCRIPTION
 function register(){
-  const mat = document.getElementById("rmat").value;
-  const name = document.getElementById("rname").value;
-  const pass = document.getElementById("rpass").value;
+  const email = emailEl.value;
+  const pass = passwordEl.value;
+  const name = nameEl.value;
 
-  if(!mat || !name || !pass){
-    alert("Remplis tous les champs");
-    return;
-  }
-
-  db.collection("students").doc(mat).set({
-    name,
-    password: pass
-  }).then(()=>{
-    alert("Compte étudiant créé !");
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(user=>{
+    db.collection("users").doc(user.user.uid).set({
+      name,
+      email
+    });
   });
 }
 
-// 🔐 LOGIN ETUDIANT
+// 🔐 LOGIN USER
 function login(){
-  const mat = document.getElementById("mat").value;
-  const pass = document.getElementById("pass").value;
-
-  db.collection("students").doc(mat).get()
-  .then(doc=>{
-    if(doc.exists && doc.data().password === pass){
-
-      alert("Bienvenue " + doc.data().name);
-
-      document.getElementById("app").style.display = "block";
-
-      loadPosts();
-
-    } else {
-      alert("Erreur login");
-    }
-  });
+  auth.signInWithEmailAndPassword(emailEl.value, passwordEl.value);
 }
 
-// 🔥 LOGIN ADMIN (ULTRA IMPORTANT)
+// 🔐 ADMIN LOGIN
 function adminLogin(){
-  const user = document.getElementById("adminUser").value;
   const pass = document.getElementById("adminPass").value;
 
-  // ⚠️ CHANGE ÇA PAR TON SECRET
-  const ADMIN_NAME = "admin";
-  const ADMIN_PASS = "jemima";
+  if(pass === "ADMIN123"){
+    isAdmin = true;
+    alert("Mode admin activé");
 
-  if(user === ADMIN_NAME && pass === ADMIN_PASS){
-
-    alert("Bienvenue ADMIN 🔥");
-
-    document.getElementById("app").style.display = "block";
     document.getElementById("adminPanel").style.display = "block";
-
-    loadPosts();
-
+    loadUsers();
+    loadAdminPosts();
   } else {
-    alert("Accès refusé ❌");
+    alert("Mot incorrect");
   }
 }
 
-// ➕ POST (ADMIN)
-function addPost(){
-  const text = document.getElementById("text").value;
+// 🔁 SESSION
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser = user.uid;
 
+    db.collection("users").doc(user.uid).get()
+    .then(doc=>{
+      profileName.innerText = doc.data().name;
+    });
+
+    auth.style.display = "none";
+    app.style.display = "block";
+
+    loadPosts();
+  }
+});
+
+// ➕ POST
+function addPost(){
   db.collection("posts").add({
-    text,
+    text: postText.value,
+    userId: currentUser,
     time: Date.now()
   });
-
-  document.getElementById("text").value = "";
 }
 
 // 📡 POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
-    const container = document.getElementById("posts");
-    container.innerHTML = "";
+    feed.innerHTML = "";
 
     snap.forEach(doc=>{
       const p = doc.data();
 
-      container.innerHTML += `
-        <div style="background:#eee;padding:10px;margin-top:10px;">
+      db.collection("users").doc(p.userId).get()
+      .then(u=>{
+        feed.innerHTML += `
+          <div class="post">
+            <strong>${u.data().name}</strong>
+            <p>${p.text}</p>
+          </div>
+        `;
+      });
+    });
+  });
+}
+
+// 👨‍💻 USERS ADMIN
+function loadUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    users.innerHTML = "";
+    snap.forEach(doc=>{
+      users.innerHTML += `<p>${doc.data().name}</p>`;
+    });
+  });
+}
+
+// 👨‍💻 POSTS ADMIN
+function loadAdminPosts(){
+  db.collection("posts").onSnapshot(snap=>{
+    adminPosts.innerHTML = "";
+
+    snap.forEach(doc=>{
+      const p = doc.data();
+
+      adminPosts.innerHTML += `
+        <div>
           ${p.text}
+          <button onclick="deletePost('${doc.id}')">❌</button>
         </div>
       `;
     });
   });
 }
 
+// ❌ DELETE POST
+function deletePost(id){
+  db.collection("posts").doc(id).delete();
+}
+
 </script>
 
 </body>
-  </html>
+</html>
