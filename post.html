@@ -3,35 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Social</title>
+<title>TechNova Facebook Pro</title>
 
 <style>
-body { font-family: Arial; background:#f0f2f5; }
-
-.box {
-  max-width: 500px;
-  margin: auto;
-  background: white;
-  padding: 15px;
-  margin-top: 10px;
-  border-radius: 10px;
+body{
+  margin:0;
+  font-family: Arial;
+  background:#f0f2f5;
 }
 
-input, button, textarea {
-  width:100%;
+header{
+  background:#1877f2;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.container{
+  max-width:600px;
+  margin:auto;
   padding:10px;
-  margin-top:8px;
 }
 
-.post {
-  background:#fff;
+.box{
+  background:white;
   padding:10px;
   margin-top:10px;
   border-radius:10px;
   box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-.comment {
+input, button, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+button{
+  background:#1877f2;
+  color:white;
+  border:none;
+  font-weight:bold;
+}
+
+.post{
+  background:white;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
+
+.comment{
   background:#eee;
   padding:5px;
   margin-top:5px;
@@ -42,34 +67,30 @@ input, button, textarea {
 
 <body>
 
-<!-- AUTH -->
-<div class="box" id="auth">
-  <h3>Connexion</h3>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Mot de passe">
-  <button onclick="login()">Se connecter</button>
+<header>📘 TechNova Social</header>
 
-  <h4>Créer compte</h4>
-  <input id="name" placeholder="Nom">
-  <button onclick="register()">S'inscrire</button>
+<div class="container">
+
+<!-- USER -->
+<div class="box">
+  <input id="name" placeholder="Ton nom">
+  <button onclick="setProfile()">Entrer</button>
 </div>
 
-<!-- APP -->
-<div id="app" style="display:none;">
-
+<!-- POST -->
 <div class="box">
-  <h3 id="profileName"></h3>
+  <h3>📢 Publication</h3>
   <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
   <button onclick="addPost()">Publier</button>
 </div>
 
+<!-- FEED -->
 <div id="feed"></div>
 
 </div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
@@ -81,59 +102,34 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
 const db = firebase.firestore();
 
-let currentUser = null;
+let currentUser = "";
 
-// 🔐 INSCRIPTION
-function register(){
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-  const name = document.getElementById("name").value;
+/* 👤 PROFIL */
+function setProfile(){
+  currentUser = document.getElementById("name").value;
 
-  auth.createUserWithEmailAndPassword(email, pass)
-  .then(user=>{
-    db.collection("users").doc(user.user.uid).set({
-      name,
-      email
-    });
-  });
-}
-
-// 🔐 LOGIN
-function login(){
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email, pass);
-}
-
-// 🔁 SESSION
-auth.onAuthStateChanged(user=>{
-  if(user){
-    currentUser = user.uid;
-
-    db.collection("users").doc(user.uid).get()
-    .then(doc=>{
-      document.getElementById("profileName").innerText = doc.data().name;
-    });
-
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("app").style.display = "block";
-
-    loadPosts();
+  if(!currentUser){
+    alert("Entre ton nom");
+    return;
   }
-});
 
-// ➕ POST
+  alert("Bienvenue " + currentUser);
+}
+
+/* ➕ POST */
 function addPost(){
   const text = document.getElementById("postText").value;
 
+  if(!text || !currentUser){
+    alert("Entre ton nom et ton message");
+    return;
+  }
+
   db.collection("posts").add({
     text,
-    userId: currentUser,
+    user: currentUser,
     likes: 0,
     time: Date.now()
   });
@@ -141,71 +137,65 @@ function addPost(){
   document.getElementById("postText").value = "";
 }
 
-// ❤️ LIKE
-function likePost(id, currentLikes){
+/* ❤️ LIKE */
+function likePost(id, likes){
   db.collection("posts").doc(id).update({
-    likes: currentLikes + 1
+    likes: likes + 1
   });
 }
 
-// 💬 COMMENTAIRE
-function addComment(postId){
-  const input = document.getElementById("c-"+postId);
+/* 💬 COMMENT */
+function addComment(id){
+  const input = document.getElementById("c-"+id);
   const text = input.value;
 
   if(!text) return;
 
   db.collection("comments").add({
-    postId,
-    userId: currentUser,
+    postId: id,
     text,
+    user: currentUser,
     time: Date.now()
   });
 
   input.value = "";
 }
 
-// 📡 LOAD POSTS
-function loadPosts(){
-  db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snap=>{
-    const feed = document.getElementById("feed");
-    feed.innerHTML = "";
+/* 📡 FEED */
+db.collection("posts").orderBy("time","desc")
+.onSnapshot(snap=>{
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
 
-    snap.forEach(doc=>{
-      const p = doc.data();
+  snap.forEach(doc=>{
+    const p = doc.data();
 
-      db.collection("users").doc(p.userId).get()
-      .then(u=>{
+    let html = `
+      <div class="box">
+        <strong>👤 ${p.user}</strong>
+        <p>${p.text}</p>
 
-        let html = `
-          <div class="post">
-            <strong>${u.data().name}</strong>
-            <p>${p.text}</p>
-            <button onclick="likePost('${doc.id}', ${p.likes||0})">
-              ❤️ ${p.likes||0}
-            </button>
+        <button onclick="likePost('${doc.id}', ${p.likes||0})">
+          ❤️ ${p.likes||0}
+        </button>
 
-            <div id="comments-${doc.id}"></div>
+        <div id="comments-${doc.id}"></div>
 
-            <input id="c-${doc.id}" placeholder="Commenter...">
-            <button onclick="addComment('${doc.id}')">Envoyer</button>
-          </div>
-        `;
+        <input id="c-${doc.id}" placeholder="Commenter...">
+        <button onclick="addComment('${doc.id}')">Envoyer</button>
+      </div>
+    `;
 
-        feed.innerHTML += html;
+    feed.innerHTML += html;
 
-        loadComments(doc.id);
-      });
-    });
+    loadComments(doc.id);
   });
-}
+});
 
-// 📡 LOAD COMMENTS
+/* 💬 LOAD COMMENTS */
 function loadComments(postId){
   db.collection("comments")
   .where("postId","==",postId)
-  .orderBy("time")
   .onSnapshot(snap=>{
     const div = document.getElementById("comments-"+postId);
     if(!div) return;
@@ -215,14 +205,11 @@ function loadComments(postId){
     snap.forEach(doc=>{
       const c = doc.data();
 
-      db.collection("users").doc(c.userId).get()
-      .then(u=>{
-        div.innerHTML += `
-          <div class="comment">
-            <strong>${u.data().name}</strong> : ${c.text}
-          </div>
-        `;
-      });
+      div.innerHTML += `
+        <div class="comment">
+          <strong>${c.user}</strong> : ${c.text}
+        </div>
+      `;
     });
   });
 }
@@ -230,4 +217,4 @@ function loadComments(postId){
 </script>
 
 </body>
-  </html>
+</html>
