@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Facebook Pro</title>
+<title>TechNova Social</title>
 
 <style>
 body{
@@ -21,7 +21,7 @@ header{
 }
 
 .container{
-  max-width:600px;
+  max-width:650px;
   margin:auto;
   padding:10px;
 }
@@ -47,6 +47,7 @@ button{
   color:white;
   border:none;
   font-weight:bold;
+  cursor:pointer;
 }
 
 .post{
@@ -62,6 +63,20 @@ button{
   margin-top:5px;
   border-radius:5px;
 }
+
+.chat{
+  height:200px;
+  overflow:auto;
+  border:1px solid #ddd;
+  padding:5px;
+}
+
+.msg{
+  background:#e4e6eb;
+  padding:6px;
+  margin:5px;
+  border-radius:8px;
+}
 </style>
 </head>
 
@@ -71,10 +86,24 @@ button{
 
 <div class="container">
 
+<!-- AUTH -->
+<div class="box" id="authBox">
+  <h3>🔐 Connexion</h3>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Mot de passe">
+  <button onclick="login()">Se connecter</button>
+
+  <h4>Créer compte</h4>
+  <input id="name" placeholder="Nom">
+  <button onclick="register()">S'inscrire</button>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
 <!-- USER -->
 <div class="box">
-  <input id="name" placeholder="Ton nom">
-  <button onclick="setProfile()">Entrer</button>
+  <h3 id="userName"></h3>
 </div>
 
 <!-- POST -->
@@ -87,10 +116,23 @@ button{
 <!-- FEED -->
 <div id="feed"></div>
 
+<!-- CHAT -->
+<div class="box">
+  <h3>💬 Messenger</h3>
+
+  <div class="chat" id="chat"></div>
+
+  <input id="msg" placeholder="Message...">
+  <button onclick="sendMsg()">Envoyer</button>
+</div>
+
+</div>
+
 </div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
@@ -102,39 +144,89 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = "";
 
-/* 👤 PROFIL */
-function setProfile(){
-  currentUser = document.getElementById("name").value;
+/* 🔐 REGISTER */
+function register(){
+  const email = email.value;
+  const pass = password.value;
+  const name = document.getElementById("name").value;
 
-  if(!currentUser){
-    alert("Entre ton nom");
-    return;
-  }
-
-  alert("Bienvenue " + currentUser);
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(user=>{
+    db.collection("users").doc(user.user.uid).set({
+      name
+    });
+  });
 }
+
+/* 🔐 LOGIN */
+function login(){
+  const email = document.getElementById("email").value;
+  const pass = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, pass);
+}
+
+/* SESSION */
+auth.onAuthStateChanged(user=>{
+  if(user){
+    currentUser = user.uid;
+
+    db.collection("users").doc(user.uid).get()
+    .then(doc=>{
+      document.getElementById("userName").innerText = doc.data().name;
+    });
+
+    authBox.style.display = "none";
+    app.style.display = "block";
+
+    loadPosts();
+    loadMessages();
+  }
+});
 
 /* ➕ POST */
 function addPost(){
   const text = document.getElementById("postText").value;
 
-  if(!text || !currentUser){
-    alert("Entre ton nom et ton message");
-    return;
-  }
-
   db.collection("posts").add({
     text,
-    user: currentUser,
-    likes: 0,
-    time: Date.now()
+    userId: currentUser,
+    time: Date.now(),
+    likes: 0
   });
 
   document.getElementById("postText").value = "";
+}
+
+/* 📡 POSTS */
+function loadPosts(){
+  db.collection("posts").orderBy("time","desc")
+  .onSnapshot(snap=>{
+    feed.innerHTML = "";
+
+    snap.forEach(doc=>{
+      const p = doc.data();
+
+      db.collection("users").doc(p.userId).get()
+      .then(u=>{
+        feed.innerHTML += `
+          <div class="post">
+            <strong>👤 ${u.data().name}</strong>
+            <p>${p.text}</p>
+            <button onclick="likePost('${doc.id}', ${p.likes||0})">
+              ❤️ ${p.likes||0}
+            </button>
+          </div>
+        `;
+      });
+    });
+  });
 }
 
 /* ❤️ LIKE */
@@ -144,72 +236,36 @@ function likePost(id, likes){
   });
 }
 
-/* 💬 COMMENT */
-function addComment(id){
-  const input = document.getElementById("c-"+id);
-  const text = input.value;
+/* 💬 CHAT */
+function sendMsg(){
+  const text = document.getElementById("msg").value;
 
-  if(!text) return;
-
-  db.collection("comments").add({
-    postId: id,
+  db.collection("messages").add({
     text,
-    user: currentUser,
+    userId: currentUser,
     time: Date.now()
   });
 
-  input.value = "";
+  document.getElementById("msg").value = "";
 }
 
-/* 📡 FEED */
-db.collection("posts").orderBy("time","desc")
-.onSnapshot(snap=>{
-  const feed = document.getElementById("feed");
-  feed.innerHTML = "";
-
-  snap.forEach(doc=>{
-    const p = doc.data();
-
-    let html = `
-      <div class="box">
-        <strong>👤 ${p.user}</strong>
-        <p>${p.text}</p>
-
-        <button onclick="likePost('${doc.id}', ${p.likes||0})">
-          ❤️ ${p.likes||0}
-        </button>
-
-        <div id="comments-${doc.id}"></div>
-
-        <input id="c-${doc.id}" placeholder="Commenter...">
-        <button onclick="addComment('${doc.id}')">Envoyer</button>
-      </div>
-    `;
-
-    feed.innerHTML += html;
-
-    loadComments(doc.id);
-  });
-});
-
-/* 💬 LOAD COMMENTS */
-function loadComments(postId){
-  db.collection("comments")
-  .where("postId","==",postId)
+/* 📡 MESSAGES */
+function loadMessages(){
+  db.collection("messages").orderBy("time","asc")
   .onSnapshot(snap=>{
-    const div = document.getElementById("comments-"+postId);
-    if(!div) return;
-
-    div.innerHTML = "";
+    chat.innerHTML = "";
 
     snap.forEach(doc=>{
-      const c = doc.data();
+      const m = doc.data();
 
-      div.innerHTML += `
-        <div class="comment">
-          <strong>${c.user}</strong> : ${c.text}
-        </div>
-      `;
+      db.collection("users").doc(m.userId).get()
+      .then(u=>{
+        chat.innerHTML += `
+          <div class="msg">
+            <strong>${u.data().name}</strong>: ${m.text}
+          </div>
+        `;
+      });
     });
   });
 }
