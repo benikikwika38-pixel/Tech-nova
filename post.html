@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova freed</title>
+<title>TechNova Academy</title>
 
 <style>
 body {
@@ -12,30 +12,20 @@ body {
   background: #f0f2f5;
 }
 
-/* HEADER */
 header {
   background: #1877f2;
   padding: 12px;
   color: white;
-  position: sticky;
-  top: 0;
+  text-align: center;
+  font-weight: bold;
 }
 
-header div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* CONTAINER */
 .container {
   max-width: 600px;
   margin: auto;
   padding: 10px;
 }
 
-/* POST */
 .post {
   background: white;
   padding: 12px;
@@ -44,43 +34,23 @@ header div {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.post img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 8px;
-}
-
-/* ACTIONS */
-.actions {
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #65676b;
-}
-
-/* INPUTS */
-input, textarea {
+input, textarea, button {
   width: 100%;
   padding: 10px;
   margin-top: 8px;
-  border: 1px solid #ddd;
   border-radius: 8px;
+  border: 1px solid #ddd;
 }
 
 button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border: none;
-  border-radius: 8px;
   background: #1877f2;
   color: white;
   font-weight: bold;
+  border: none;
+  cursor: pointer;
 }
 
-/* BOX */
-#loginBox, #registerBox, #chatBox {
+#loginBox, #registerBox {
   max-width: 400px;
   margin: auto;
   background: white;
@@ -89,21 +59,16 @@ button {
   margin-top: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+#app {
+  display: none;
+}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header>
-  <div>
-    <img src="https://via.placeholder.com/35" style="border-radius:8px;">
-    <div>
-      <div style="font-weight:bold;">TechNova Academy</div>
-      <div style="font-size:12px;">📢 Feed des étudiants</div>
-    </div>
-  </div>
-</header>
+<header>📢 TechNova Academy</header>
 
 <!-- 🔐 LOGIN -->
 <div id="loginBox">
@@ -123,28 +88,18 @@ button {
 </div>
 
 <!-- 📡 APP -->
-<div id="app" style="display:none;">
+<div id="app">
+  <div class="container">
 
-<div class="container">
+    <h3>📢 Publications</h3>
 
-<!-- ADMIN -->
-<input type="password" id="pass" placeholder="Mot de passe admin">
-<textarea id="text" placeholder="Message..."></textarea>
-<input type="file" id="image">
-<button onclick="addPost()">Publier</button>
+    <input type="password" id="pass" placeholder="Mot de passe admin">
+    <textarea id="text" placeholder="Message..."></textarea>
+    <button onclick="addPost()">Publier</button>
 
-<!-- POSTS -->
-<div id="posts"></div>
+    <div id="posts"></div>
 
-</div>
-</div>
-
-<!-- 💬 CHAT -->
-<div id="chatBox" style="display:none;">
-  <h3>💬 Chat TechNova</h3>
-  <input id="msg" placeholder="Message...">
-  <button onclick="sendMsg()">Envoyer</button>
-  <div id="messages"></div>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -153,7 +108,7 @@ button {
 
 <script>
 
-// 🔥 FIREBASE
+// 🔥 CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -166,7 +121,7 @@ const db = firebase.firestore();
 const ADMIN_PASSWORD = "Tk@2026Nova!";
 let currentUser = null;
 
-// 🔐 INSCRIPTION
+// 🧑‍🎓 INSCRIPTION
 function register(){
   const mat = document.getElementById("r-mat").value;
   const name = document.getElementById("r-name").value;
@@ -182,11 +137,16 @@ function register(){
     password: pass
   }).then(()=>{
     alert("Compte créé !");
+  }).catch(err=>{
+    alert("Erreur inscription: " + err.message);
   });
 }
 
-// 🔐 LOGIN
+// 🔐 LOGIN (CORRIGÉ + DEBUG)
 function login(){
+
+  console.log("LOGIN CLICKED");
+
   const mat = document.getElementById("matricule").value;
   const pass = document.getElementById("password").value;
 
@@ -197,31 +157,38 @@ function login(){
 
   db.collection("students").doc(mat).get()
   .then(doc=>{
-    if(doc.exists && doc.data().password === pass){
 
-      currentUser = mat;
+    console.log("FIREBASE OK");
 
-      alert("Bienvenue " + doc.data().name);
+    if(doc.exists){
 
-      document.getElementById("loginBox").style.display = "none";
-      document.getElementById("registerBox").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      document.getElementById("chatBox").style.display = "block";
+      const data = doc.data();
 
-      loadPosts();
-      loadChat();
+      if(data.password === pass){
+
+        currentUser = mat;
+
+        alert("Bienvenue " + data.name);
+
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("registerBox").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        loadPosts();
+
+      } else {
+        alert("Mot de passe incorrect");
+      }
 
     } else {
-      alert("Erreur login");
+      alert("Matricule introuvable");
     }
-  });
-}
 
-// 📸 IMAGE
-function toBase64(file, cb){
-  const r = new FileReader();
-  r.onload = ()=>cb(r.result);
-  r.readAsDataURL(file);
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Erreur Firebase: " + err.message);
+  });
 }
 
 // ➕ POST ADMIN
@@ -234,59 +201,24 @@ function addPost(){
   }
 
   const text = document.getElementById("text").value;
-  const file = document.getElementById("image").files[0];
 
-  if(file){
-    toBase64(file, img=>{
-      savePost(text, img);
-    });
-  } else {
-    savePost(text, "");
-  }
-}
-
-function savePost(text, image){
   db.collection("posts").add({
     text,
-    image,
     likes: 0,
-    comments: [],
     time: Date.now()
   });
+
+  document.getElementById("text").value = "";
 }
 
-// ❤️ LIKE
-function likePost(id, likes){
-  db.collection("posts").doc(id).update({
-    likes: likes + 1
-  });
-}
-
-// 💬 COMMENTAIRES
-function addComment(id){
-  const input = document.getElementById("c-"+id);
-  const text = input.value;
-
-  db.collection("posts").doc(id).get().then(doc=>{
-    let c = doc.data().comments || [];
-    c.push(text);
-
-    db.collection("posts").doc(id).update({
-      comments: c
-    });
-
-    input.value = "";
-  });
-}
-
-// 📡 POSTS
+// 📡 LOAD POSTS
 function loadPosts(){
   db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snap=>{
+  .onSnapshot(snapshot=>{
     const container = document.getElementById("posts");
     container.innerHTML = "";
 
-    snap.forEach(doc=>{
+    snapshot.forEach(doc=>{
       const p = doc.data();
 
       const div = document.createElement("div");
@@ -294,48 +226,10 @@ function loadPosts(){
 
       div.innerHTML = `
         <p>${p.text}</p>
-        ${p.image ? `<img src="${p.image}">` : ""}
-
-        <div class="actions">
-          <span onclick="likePost('${doc.id}', ${p.likes})">❤️ ${p.likes}</span>
-        </div>
-
-        <input id="c-${doc.id}" placeholder="Commentaire">
-        <button onclick="addComment('${doc.id}')">Envoyer</button>
-
-        <div>
-          ${(p.comments || []).map(c=>`<p>💬 ${c}</p>`).join("")}
-        </div>
+        <p>❤️ ${p.likes || 0}</p>
       `;
 
       container.appendChild(div);
-    });
-  });
-}
-
-// 💬 CHAT
-function sendMsg(){
-  const msg = document.getElementById("msg").value;
-  if(!msg || !currentUser) return;
-
-  db.collection("messages").add({
-    user: currentUser,
-    text: msg,
-    time: Date.now()
-  });
-
-  document.getElementById("msg").value = "";
-}
-
-function loadChat(){
-  db.collection("messages").orderBy("time")
-  .onSnapshot(snap=>{
-    const box = document.getElementById("messages");
-    box.innerHTML = "";
-
-    snap.forEach(doc=>{
-      const m = doc.data();
-      box.innerHTML += `<p><b>${m.user}:</b> ${m.text}</p>`;
     });
   });
 }
