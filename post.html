@@ -50,24 +50,17 @@ button{
   cursor:pointer;
 }
 
-.post{
-  background:white;
-  padding:10px;
-  margin-top:10px;
-  border-radius:10px;
+.comment{
+  background:#eee;
+  padding:5px;
+  margin-top:5px;
+  border-radius:5px;
 }
 
 .post img{
   width:100%;
   margin-top:8px;
   border-radius:10px;
-}
-
-.comment{
-  background:#eee;
-  padding:5px;
-  margin-top:5px;
-  border-radius:5px;
 }
 </style>
 </head>
@@ -92,7 +85,7 @@ button{
 <div class="box">
   <h3>📢 Publication</h3>
   <textarea id="postText" placeholder="Quoi de neuf ?"></textarea>
-  
+
   <input type="file" id="image">
 
   <button onclick="addPost()">Publier</button>
@@ -121,11 +114,12 @@ const db = firebase.firestore();
 
 let currentUser = "";
 
-/* 🔐 MOT DE PASSE FIXE */
+/* 🔐 MOT DE PASSE */
 const APP_PASSWORD = "Nova@2026";
 
 /* LOGIN */
 function login(){
+
   const name = document.getElementById("name").value;
   const pass = document.getElementById("password").value;
 
@@ -147,7 +141,7 @@ function login(){
   loadPosts();
 }
 
-/* 📸 IMAGE -> BASE64 */
+/* 📸 IMAGE */
 function toBase64(file, callback){
   const reader = new FileReader();
   reader.onload = () => callback(reader.result);
@@ -192,10 +186,32 @@ function likePost(id, likes){
   });
 }
 
-/* 📡 LOAD POSTS */
+/* 💬 COMMENTAIRE */
+function addComment(postId){
+
+  const input = document.getElementById("c-" + postId);
+  const text = input.value;
+
+  if(!text) return;
+
+  db.collection("posts")
+    .doc(postId)
+    .collection("comments")
+    .add({
+      text,
+      user: currentUser,
+      time: Date.now()
+    });
+
+  input.value = "";
+}
+
+/* 📡 POSTS */
 function loadPosts(){
+
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
+
     const feed = document.getElementById("feed");
     feed.innerHTML = "";
 
@@ -204,6 +220,7 @@ function loadPosts(){
 
       feed.innerHTML += `
         <div class="box">
+
           <strong>👤 ${p.user}</strong>
           <p>${p.text}</p>
 
@@ -212,13 +229,52 @@ function loadPosts(){
           <button onclick="likePost('${doc.id}', ${p.likes||0})">
             ❤️ ${p.likes||0}
           </button>
+
+          <!-- COMMENTAIRE -->
+          <div>
+            <input id="c-${doc.id}" placeholder="Écrire un commentaire">
+            <button onclick="addComment('${doc.id}')">Commenter</button>
+          </div>
+
+          <div id="comments-${doc.id}"></div>
+
         </div>
       `;
+
+      loadComments(doc.id);
     });
+
   });
+}
+
+/* 📡 LOAD COMMENTS */
+function loadComments(postId){
+
+  db.collection("posts")
+    .doc(postId)
+    .collection("comments")
+    .orderBy("time","asc")
+    .onSnapshot(snap=>{
+
+      const box = document.getElementById("comments-" + postId);
+      if(!box) return;
+
+      box.innerHTML = "";
+
+      snap.forEach(doc=>{
+        const c = doc.data();
+
+        box.innerHTML += `
+          <div class="comment">
+            <strong>${c.user}</strong>: ${c.text}
+          </div>
+        `;
+      });
+
+    });
 }
 
 </script>
 
 </body>
-  </html>
+</html>
