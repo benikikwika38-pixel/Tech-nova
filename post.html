@@ -100,10 +100,8 @@ header{
 <!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>🔐 Connexion étudiant</h3>
-
   <input id="name" placeholder="Nom étudiant">
   <input id="password" type="password" placeholder="Mot de passe">
-
   <button onclick="login()">Entrer</button>
 </div>
 
@@ -140,6 +138,8 @@ header{
 
 </div>
 
+</div>
+
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -161,7 +161,7 @@ let selected = "";
 /* 🔐 MOT DE PASSE */
 const STUDENT_PASSWORD = "jemima";
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 function login(){
 
   const name = document.getElementById("name").value;
@@ -179,14 +179,16 @@ function login(){
 
   me = name;
 
-  db.collection("users").doc(me).set({
-    name: me,
-    online: true,
-    lastSeen: Date.now()
-  });
-
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("app").style.display = "block";
+
+  // 🔥 présence en ligne (fix mobile)
+  setInterval(()=>{
+    db.collection("users").doc(me).set({
+      name: me,
+      lastSeen: Date.now()
+    });
+  }, 3000);
 
   loadPosts();
   loadUsers();
@@ -200,7 +202,6 @@ function show(page){
 
 /* ================= POSTS ================= */
 
-/* ➕ POST */
 function addPost(){
 
   const text = document.getElementById("postText").value;
@@ -208,50 +209,39 @@ function addPost(){
 
   if(!text && !file) return;
 
-  if(file){
-
-    const reader = new FileReader();
-
-    reader.onload = function(){
-
-      db.collection("posts").add({
-        text,
-        image: reader.result,
-        user: me,
-        likes: 0,
-        time: Date.now()
-      });
-
-    };
-
-    reader.readAsDataURL(file);
-
-  } else {
-
+  const save = (img="") => {
     db.collection("posts").add({
       text,
-      image: "",
+      image: img,
       user: me,
       likes: 0,
       time: Date.now()
     });
+  };
 
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => save(reader.result);
+    reader.readAsDataURL(file);
+  } else {
+    save();
   }
 
   document.getElementById("postText").value = "";
   document.getElementById("postImage").value = "";
 }
 
-/* 📡 LOAD POSTS */
 function loadPosts(){
 
-  db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snap=>{
+  const feed = document.getElementById("feed");
 
-    const feed = document.getElementById("feed");
+  db.collection("posts").orderBy("time","desc")
+  .onSnapshot(snapshot => {
+
     feed.innerHTML = "";
 
-    snap.forEach(doc=>{
+    snapshot.forEach(doc => {
+
       const p = doc.data();
 
       feed.innerHTML += `
@@ -262,8 +252,8 @@ function loadPosts(){
 
           ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:10px;">` : ""}
 
-          <button onclick="like('${doc.id}',${p.likes})">
-            ❤️ ${p.likes}
+          <button onclick="like('${doc.id}',${p.likes || 0})">
+            ❤️ ${p.likes || 0}
           </button>
 
           <input id="c-${doc.id}" placeholder="Commenter">
@@ -280,14 +270,12 @@ function loadPosts(){
   });
 }
 
-/* ❤️ LIKE */
 function like(id, likes){
   db.collection("posts").doc(id).update({
     likes: likes + 1
   });
 }
 
-/* 💬 COMMENT */
 function comment(id){
 
   const input = document.getElementById("c-"+id);
@@ -304,7 +292,6 @@ function comment(id){
   input.value = "";
 }
 
-/* LOAD COMMENTS */
 function loadComments(id){
 
   db.collection("posts")
@@ -313,6 +300,8 @@ function loadComments(id){
   .onSnapshot(snap=>{
 
     const box = document.getElementById("comments-"+id);
+    if(!box) return;
+
     box.innerHTML = "";
 
     snap.forEach(d=>{
@@ -342,9 +331,11 @@ function loadUsers(){
 
       if(u.name !== me){
 
+        const isOnline = Date.now() - (u.lastSeen || 0) < 5000;
+
         box.innerHTML += `
           <div onclick="openChat('${u.name}')">
-            👤 ${u.name} ${u.online?"🟢":"⚫"}
+            👤 ${u.name} ${isOnline ? "🟢" : "⚫"}
           </div>
         `;
       }
@@ -353,18 +344,15 @@ function loadUsers(){
   });
 }
 
-/* CHAT ID */
 function chatId(a,b){
   return [a,b].sort().join("_");
 }
 
-/* OPEN CHAT */
 function openChat(u){
   selected = u;
   loadMessages();
 }
 
-/* SEND MSG */
 function sendMsg(){
 
   const text = document.getElementById("msg").value;
@@ -382,7 +370,6 @@ function sendMsg(){
   document.getElementById("msg").value = "";
 }
 
-/* LOAD MSG */
 function loadMessages(){
 
   db.collection("chats")
@@ -392,6 +379,8 @@ function loadMessages(){
   .onSnapshot(snap=>{
 
     const box = document.getElementById("chatBox");
+    if(!box) return;
+
     box.innerHTML = "";
 
     snap.forEach(d=>{
@@ -407,15 +396,7 @@ function loadMessages(){
   });
 }
 
-/* OFFLINE */
-window.onbeforeunload = () => {
-  db.collection("users").doc(me).update({
-    online:false,
-    lastSeen:Date.now()
-  });
-};
-
 </script>
 
 </body>
-  </html>
+</html>
