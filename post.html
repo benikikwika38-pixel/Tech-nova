@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>TechNova Social PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Facebook</title>
 
 <style>
 body{
@@ -12,20 +12,38 @@ body{
   background:#f0f2f5;
 }
 
+/* HEADER */
 header{
   background:#1877f2;
   color:white;
-  padding:15px;
+  padding:10px;
   text-align:center;
   font-weight:bold;
 }
 
+/* NAV */
+.nav{
+  display:flex;
+  justify-content:space-around;
+  background:white;
+  padding:10px;
+}
+
+.nav button{
+  border:none;
+  background:none;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* CONTAINER */
 .container{
-  max-width:650px;
+  max-width:700px;
   margin:auto;
   padding:10px;
 }
 
+/* BOX */
 .box{
   background:white;
   padding:10px;
@@ -33,19 +51,7 @@ header{
   border-radius:10px;
 }
 
-input, button, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-}
-
-button{
-  background:#1877f2;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-
+/* POST */
 .post{
   background:white;
   padding:10px;
@@ -53,54 +59,88 @@ button{
   border-radius:10px;
 }
 
+/* COMMENT */
 .comment{
   background:#eee;
   padding:5px;
   margin-top:5px;
   border-radius:5px;
-  font-size:14px;
+  font-size:13px;
 }
 
-.admin{
-  background:#fff3cd;
+/* CHAT */
+.chatBox{
+  height:300px;
+  overflow:auto;
+  background:white;
   padding:10px;
-  margin-top:10px;
-  border-radius:10px;
+}
+
+.msg{
+  padding:6px;
+  margin:5px;
+  border-radius:8px;
+}
+
+.me{
+  background:#d1e7ff;
+  text-align:right;
+}
+
+.other{
+  background:#eee;
 }
 </style>
 </head>
 
 <body>
 
-<header>📘 TechNova réseau(Mode Sécurisé)</header>
+<header>📘 TechNova Social PRO</header>
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button onclick="show('posts')">📢 Posts</button>
+  <button onclick="show('chat')">💬 Chat</button>
+</div>
 
 <div class="container">
 
 <!-- LOGIN -->
 <div class="box" id="loginBox">
-  <h3>🔐 Connexion étudiant</h3>
+  <h3>🔐 Connexion</h3>
   <input id="name" placeholder="Nom">
-  <input id="password" type="password" placeholder="Mot de passe">
   <button onclick="login()">Entrer</button>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
 
-<!-- POST -->
-<div class="box">
-  <h3>📢 Publier (en attente de validation)</h3>
-  <textarea id="postText"></textarea>
-  <button onclick="addPost()">Envoyer</button>
+<!-- POSTS -->
+<div id="postsSection">
+
+  <div class="box">
+    <textarea id="postText" placeholder="Exprime-toi..."></textarea>
+    <button onclick="addPost()">Publier</button>
+  </div>
+
+  <div id="feed"></div>
+
 </div>
 
-<!-- FEED -->
-<div id="feed"></div>
+<!-- CHAT -->
+<div id="chatSection" style="display:none;">
 
-<!-- ADMIN -->
-<div class="admin" id="adminPanel" style="display:none;">
-  <h3>🛡️ Admin - Validation des posts</h3>
-  <div id="pending"></div>
+  <div class="box">
+    <h3>👥 Étudiants</h3>
+    <div id="users"></div>
+  </div>
+
+  <div class="chatBox" id="chatBox"></div>
+
+  <input id="msg" placeholder="Message...">
+  <button onclick="sendMsg()">Envoyer</button>
+  <button onclick="startVoice()">🎤</button>
+
 </div>
 
 </div>
@@ -122,58 +162,56 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let currentUser = "";
-
-/* 🔐 ADMIN PASSWORD */
-const ADMIN_PASS = "Admin@2026";
+let me = "";
+let selected = "";
 
 /* LOGIN */
 function login(){
 
-  const name = document.getElementById("name").value;
-  const pass = document.getElementById("password").value;
+  me = document.getElementById("name").value;
 
-  if(!name){
-    alert("Entre ton nom");
-    return;
-  }
+  if(!me) return;
 
-  currentUser = name;
+  db.collection("users").doc(me).set({
+    name: me,
+    online: true,
+    lastSeen: Date.now()
+  });
 
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  loadApprovedPosts();
-
-  if(pass === ADMIN_PASS){
-    document.getElementById("adminPanel").style.display = "block";
-    loadPendingPosts();
-  }
+  loadPosts();
+  loadUsers();
 }
 
-/* ➕ POST (EN ATTENTE) */
+/* NAV */
+function show(page){
+  document.getElementById("postsSection").style.display = page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display = page==='chat'?'block':'none';
+}
+
+/* ================= POSTS ================= */
+
+/* ➕ POST */
 function addPost(){
 
   const text = document.getElementById("postText").value;
-  if(!text) return;
 
   db.collection("posts").add({
     text,
-    user: currentUser,
-    status: "pending",
+    user: me,
+    likes: 0,
     time: Date.now()
   });
 
-  alert("Post envoyé pour validation ⏳");
   document.getElementById("postText").value = "";
 }
 
-/* 📡 POSTS VALIDÉS */
-function loadApprovedPosts(){
+/* 📡 LOAD POSTS */
+function loadPosts(){
 
-  db.collection("posts")
-  .where("status","==","approved")
-  .orderBy("time","desc")
+  db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
 
     const feed = document.getElementById("feed");
@@ -185,12 +223,15 @@ function loadApprovedPosts(){
       feed.innerHTML += `
         <div class="post">
 
-          <strong>${p.user}</strong>
+          <b>${p.user}</b>
           <p>${p.text}</p>
 
-          <!-- COMMENTAIRES -->
-          <input id="c-${doc.id}" placeholder="Commentaire">
-          <button onclick="addComment('${doc.id}')">Commenter</button>
+          <button onclick="like('${doc.id}',${p.likes})">
+            ❤️ ${p.likes}
+          </button>
+
+          <input id="c-${doc.id}" placeholder="Commenter">
+          <button onclick="comment('${doc.id}')">Envoyer</button>
 
           <div id="comments-${doc.id}"></div>
 
@@ -203,93 +244,141 @@ function loadApprovedPosts(){
   });
 }
 
-/* 🛡️ POSTS EN ATTENTE (ADMIN) */
-function loadPendingPosts(){
-
-  db.collection("posts")
-  .where("status","==","pending")
-  .onSnapshot(snap=>{
-
-    const box = document.getElementById("pending");
-    box.innerHTML = "";
-
-    snap.forEach(doc=>{
-      const p = doc.data();
-
-      box.innerHTML += `
-        <div class="post">
-
-          <strong>${p.user}</strong>
-          <p>${p.text}</p>
-
-          <button onclick="approve('${doc.id}')">✔ Valider</button>
-          <button onclick="reject('${doc.id}')">❌ Refuser</button>
-
-        </div>
-      `;
-    });
-
-  });
-}
-
-/* ✔ APPROUVER */
-function approve(id){
+/* ❤️ LIKE */
+function like(id, likes){
   db.collection("posts").doc(id).update({
-    status: "approved"
+    likes: likes + 1
   });
 }
 
-/* ❌ REFUSER */
-function reject(id){
-  db.collection("posts").doc(id).delete();
-}
+/* 💬 COMMENT */
+function comment(id){
 
-/* 💬 COMMENTAIRE */
-function addComment(postId){
-
-  const input = document.getElementById("c-" + postId);
-  const text = input.value;
-
-  if(!text) return;
+  const input = document.getElementById("c-"+id);
 
   db.collection("posts")
-  .doc(postId)
+  .doc(id)
   .collection("comments")
   .add({
-    text,
-    user: currentUser,
+    text: input.value,
+    user: me,
     time: Date.now()
   });
 
   input.value = "";
 }
 
-/* 📡 LOAD COMMENTS */
-function loadComments(postId){
+/* LOAD COMMENTS */
+function loadComments(id){
 
   db.collection("posts")
-  .doc(postId)
+  .doc(id)
   .collection("comments")
-  .orderBy("time","asc")
   .onSnapshot(snap=>{
 
-    const box = document.getElementById("comments-" + postId);
-    if(!box) return;
-
+    const box = document.getElementById("comments-"+id);
     box.innerHTML = "";
 
-    snap.forEach(doc=>{
-      const c = doc.data();
+    snap.forEach(d=>{
+      const c = d.data();
 
       box.innerHTML += `
         <div class="comment">
-          <strong>${c.user}</strong>: ${c.text}
+          <b>${c.user}</b>: ${c.text}
         </div>
       `;
     });
 
   });
 }
+
+/* ================= CHAT ================= */
+
+/* USERS */
+function loadUsers(){
+
+  db.collection("users").onSnapshot(snap=>{
+
+    const box = document.getElementById("users");
+    box.innerHTML = "";
+
+    snap.forEach(d=>{
+      const u = d.data();
+
+      if(u.name !== me){
+
+        box.innerHTML += `
+          <div onclick="openChat('${u.name}')">
+            👤 ${u.name} ${u.online?"🟢":"⚫"}
+          </div>
+        `;
+      }
+    });
+
+  });
+}
+
+/* CHAT ID */
+function chatId(a,b){
+  return [a,b].sort().join("_");
+}
+
+/* OPEN CHAT */
+function openChat(u){
+  selected = u;
+  loadMessages();
+}
+
+/* SEND MSG */
+function sendMsg(){
+
+  const text = document.getElementById("msg").value;
+  if(!text || !selected) return;
+
+  db.collection("chats")
+  .doc(chatId(me,selected))
+  .collection("messages")
+  .add({
+    text,
+    from: me,
+    time: Date.now()
+  });
+
+  document.getElementById("msg").value = "";
+}
+
+/* LOAD MSG */
+function loadMessages(){
+
+  db.collection("chats")
+  .doc(chatId(me,selected))
+  .collection("messages")
+  .orderBy("time")
+  .onSnapshot(snap=>{
+
+    const box = document.getElementById("chatBox");
+    box.innerHTML = "";
+
+    snap.forEach(d=>{
+      const m = d.data();
+
+      box.innerHTML += `
+        <div class="msg ${m.from===me?'me':'other'}">
+          ${m.text}
+        </div>
+      `;
+    });
+
+  });
+}
+
+/* OFFLINE */
+window.onbeforeunload = () => {
+  db.collection("users").doc(me).update({
+    online:false,
+    lastSeen:Date.now()
+  });
+};
 
 </script>
 
