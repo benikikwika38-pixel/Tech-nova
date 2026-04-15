@@ -49,12 +49,6 @@ header{
   font-size:12px;
   color:gray;
 }
-
-.user{
-  padding:8px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
-}
 </style>
 </head>
 
@@ -62,13 +56,17 @@ header{
 
 <header>📱 WhatsApp ULTRA NEXT LEVEL 🔥</header>
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Mot de passe">
+  <br><br>
   <button onclick="login()">Entrer</button>
+  <button onclick="signup()">Créer compte</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
   <div class="box">
@@ -95,7 +93,7 @@ header{
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
-  projectId: "technova-academy",
+  projectId: "technova-academy"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -104,40 +102,42 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let me="";
-let chatWith="";
-
-/* 🔥 CREATE USER AUTO */
-function createUserIfNotExists(){
-
-  const ref = db.collection("users").doc(me);
-
-  ref.get().then(doc=>{
-    if(!doc.exists){
-      ref.set({
-        email: me,
-        lastSeen: Date.now()
-      });
-    }
-  });
-
-}
+let currentChatUser="";
 
 /* LOGIN */
 function login(){
   auth.signInWithEmailAndPassword(
-    document.getElementById("email").value,
-    document.getElementById("password").value
+    email.value,
+    password.value
   )
   .then(u=>{
     me=u.user.email;
-
-    createUserIfNotExists(); // 🔥 correction
 
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
     loadUsers();
     presence();
+  })
+  .catch(e=>alert(e.message));
+}
+
+/* SIGNUP (🔥 FIX IMPORTANT) */
+function signup(){
+  auth.createUserWithEmailAndPassword(
+    email.value,
+    password.value
+  )
+  .then(u=>{
+    me=u.user.email;
+
+    // 🔥 créer user dans Firestore
+    db.collection("users").doc(me).set({
+      email: me,
+      lastSeen: Date.now()
+    });
+
+    alert("Compte créé, connecte-toi maintenant");
   })
   .catch(e=>alert(e.message));
 }
@@ -149,40 +149,37 @@ function loadUsers(){
     box.innerHTML="";
 
     snap.forEach(doc=>{
-      let u=doc.id;
+      let u=doc.data();
 
-      if(u===me) return;
-
-      box.innerHTML+=`
-        <div class="user" onclick="selectUser('${u}')">
-          👤 ${u}
-        </div>
-      `;
+      if(u.email !== me){
+        box.innerHTML+=`
+          <div onclick="openChat('${u.email}')">
+            👤 ${u.email}
+          </div>
+        `;
+      }
     });
   });
 }
 
-/* SELECT USER */
-function selectUser(user){
-  chatWith=user;
+/* OPEN PRIVATE CHAT */
+function openChat(user){
+  currentChatUser=user;
   loadChat();
 }
 
-/* SEND MSG */
+/* SEND MESSAGE */
 function sendMsg(){
+  if(!currentChatUser) return alert("Choisis un utilisateur");
 
-  if(!chatWith){
-    alert("Choisis un utilisateur !");
-    return;
-  }
-
-  const text=document.getElementById("msg").value;
+  let text=document.getElementById("msg").value;
   if(!text) return;
 
-  db.collection("chats").add({
+  let id = [me,currentChatUser].sort().join("_");
+
+  db.collection("chats").doc(id).collection("messages").add({
     text,
     from:me,
-    to:chatWith,
     time:Date.now(),
     seen:false
   });
@@ -190,10 +187,13 @@ function sendMsg(){
   document.getElementById("msg").value="";
 }
 
-/* LOAD CHAT PRIVÉ */
+/* LOAD CHAT */
 function loadChat(){
 
-  db.collection("chats")
+  let id = [me,currentChatUser].sort().join("_");
+
+  db.collection("chats").doc(id)
+  .collection("messages")
   .orderBy("time")
   .onSnapshot(snap=>{
 
@@ -203,24 +203,19 @@ function loadChat(){
     snap.forEach(doc=>{
       let m=doc.data();
 
-      if(
-        (m.from===me && m.to===chatWith) ||
-        (m.from===chatWith && m.to===me)
-      ){
+      let status = m.seen ? "✔✔" : "✔";
 
-        let status = m.seen ? "✔✔ vu" : "✔ envoyé";
+      box.innerHTML+=`
+        <div class="msg ${m.from===me?'me':'other'}">
+          ${m.text}
+          <div class="small">${status}</div>
+        </div>
+      `;
 
-        box.innerHTML+=`
-          <div class="msg ${m.from===me?'me':'other'}">
-            ${m.text}
-            <div class="small">${status}</div>
-          </div>
-        `;
-
-        if(m.to===me){
-          db.collection("chats").doc(doc.id).update({seen:true});
-        }
-
+      if(m.from !== me){
+        db.collection("chats").doc(id)
+        .collection("messages").doc(doc.id)
+        .update({seen:true});
       }
 
     });
@@ -228,7 +223,7 @@ function loadChat(){
   });
 }
 
-/* ONLINE */
+/* ONLINE STATUS */
 function presence(){
   setInterval(()=>{
     if(me){
