@@ -2,99 +2,116 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>TechNova ULTRA WhatsApp</title>
+<title>WhatsApp PRO MAX ULTRA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
-  background:#eef0f3;
+  font-family: Arial;
+  background:#eef1f5;
 }
 
 header{
-  background:#1877f2;
+  background:#0b57d0;
   color:white;
-  padding:10px;
+  padding:12px;
   text-align:center;
   font-weight:bold;
 }
 
+/* NAV */
 .nav{
   display:flex;
   justify-content:space-around;
   background:white;
   padding:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 .nav button{
   border:none;
   background:none;
   font-weight:bold;
+  cursor:pointer;
 }
 
-.container{
-  max-width:700px;
-  margin:auto;
-  padding:10px;
-}
-
+/* BOX */
 .box{
   background:white;
+  margin:10px;
   padding:10px;
-  margin-top:10px;
-  border-radius:10px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* POST */
 .post{
   background:white;
   padding:10px;
   margin-top:10px;
-  border-radius:10px;
+  border-radius:12px;
 }
 
+/* COMMENT */
 .comment{
-  background:#f0f2f5;
+  background:#f1f1f1;
   padding:5px;
   margin-top:5px;
-  border-radius:6px;
+  border-radius:8px;
+  font-size:13px;
 }
 
+/* CHAT */
 .chatBox{
-  height:300px;
+  height:320px;
   overflow:auto;
-  background:#e5ddd5;
+  background:white;
   padding:10px;
+  border-radius:12px;
 }
 
 .msg{
+  margin:6px;
   padding:8px;
-  margin:5px;
   border-radius:10px;
   max-width:70%;
 }
 
-.me{background:#dcf8c6;margin-left:auto;}
-.other{background:white;}
-
-img.avatar{
-  width:35px;
-  height:35px;
-  border-radius:50%;
+.me{
+  background:#d0e6ff;
+  margin-left:auto;
+  text-align:right;
 }
+
+.other{
+  background:#eee;
+}
+
+/* AVATAR */
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  vertical-align:middle;
+  margin-right:5px;
+}
+
+/* ONLINE */
+.online{color:green;font-size:12px;}
+.offline{color:gray;font-size:12px;}
 </style>
 </head>
 
 <body>
 
-<header>📘 TechNova ULTRA</header>
+<header>📱 WhatsApp PRO MAX ULTRA 🔥</header>
 
 <div class="nav">
-<button onclick="show('posts')">Posts</button>
-<button onclick="show('chat')">Chat</button>
+  <button onclick="show('posts')">📢 Posts</button>
+  <button onclick="show('chat')">💬 Chat</button>
 </div>
-
-<div class="container">
 
 <!-- LOGIN -->
 <div class="box" id="loginBox">
@@ -104,39 +121,44 @@ img.avatar{
   <button onclick="login()">Entrer</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
-<!-- PROFILE -->
-<div class="box">
-  <h3>Profil</h3>
-  <input id="username" placeholder="Nom">
-  <input id="bio" placeholder="Bio">
-  <input type="file" id="avatar">
-  <button onclick="saveProfile()">Sauvegarder</button>
-  <div id="profile"></div>
-</div>
-
-<!-- POSTS -->
-<div id="postsSection">
+  <!-- PROFIL -->
   <div class="box">
-    <textarea id="postText"></textarea>
-    <button onclick="addPost()">Publier</button>
-  </div>
-  <div id="feed"></div>
-</div>
+    <h3>👤 Profil</h3>
 
-<!-- CHAT -->
-<div id="chatSection" style="display:none;">
-  <div class="box">
-    <h3>Utilisateurs</h3>
-    <div id="users"></div>
+    <input id="username" placeholder="Nom">
+    <input id="bio" placeholder="Bio">
+    <input type="file" id="avatar">
+
+    <button onclick="saveProfile()">💾 Sauvegarder</button>
+
+    <div id="profile"></div>
   </div>
 
-  <div class="chatBox" id="chatBox"></div>
-  <input id="msg">
-  <button onclick="sendMsg()">Envoyer</button>
-</div>
+  <!-- POSTS -->
+  <div id="postsSection">
+
+    <div class="box">
+      <textarea id="postText" placeholder="Exprime-toi..."></textarea>
+      <button onclick="addPost()">📤 Publier</button>
+    </div>
+
+    <div id="feed"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="chatSection" style="display:none;">
+
+    <div class="box">
+      <h3>💬 Chat global</h3>
+      <div class="chatBox" id="chatBox"></div>
+    </div>
+
+    <input id="msg" placeholder="Message...">
+    <button onclick="sendMsg()">Envoyer</button>
+
+  </div>
 
 </div>
 
@@ -147,12 +169,9 @@ img.avatar{
 <script>
 
 const firebaseConfig = {
-apiKey:"AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
-authDomain:"technova-academy.firebaseapp.com",
-projectId:"technova-academy",
-storageBucket:"technova-academy.appspot.com",
-messagingSenderId:"321716769948",
-appId:"1:321716769948:web:c8e2d7a4d3e6be795e0959"
+  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy",
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -164,191 +183,182 @@ let me = "";
 
 /* LOGIN */
 function login(){
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
 
-auth.signInWithEmailAndPassword(email,password)
-.then(u=>{
-  me=u.user.email;
+  auth.signInWithEmailAndPassword(email,password)
+  .then(u=>{
+    me=u.user.email;
 
-  document.getElementById("loginBox").style.display="none";
-  document.getElementById("app").style.display="block";
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("app").style.display="block";
 
-  loadProfile();
-  loadPosts();
-  loadUsers();
-  loadChat();
-  setOnline();
-});
+    loadProfile();
+    loadPosts();
+    loadChat();
+  })
+  .catch(e=>alert(e.message));
 }
 
-/* PROFILE */
+/* ================= PROFILE WITH AVATAR ================= */
 function saveProfile(){
-const name=document.getElementById("username").value;
-const bio=document.getElementById("bio").value;
-const file=document.getElementById("avatar").files[0];
 
-const ref=db.collection("users").doc(me);
+  const name=document.getElementById("username").value;
+  const bio=document.getElementById("bio").value;
+  const file=document.getElementById("avatar").files[0];
 
-ref.get().then(doc=>{
-const old=doc.exists?doc.data():{};
+  const ref=db.collection("users").doc(me);
 
-const save=(img="")=>{
-ref.set({
-name:name||old.name||me,
-bio:bio||old.bio||"",
-avatar:img||old.avatar||"",
-online:true,
-lastSeen:Date.now()
-},{merge:true});
-};
+  const save=(img="")=>{
+    ref.set({
+      name,
+      bio,
+      avatar:img,
+      lastSeen:Date.now()
+    },{merge:true});
+  };
 
-if(file){
-const r=new FileReader();
-r.onload=()=>save(r.result);
-r.readAsDataURL(file);
-}else save();
-});
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save();
 }
 
 function loadProfile(){
-db.collection("users").doc(me).onSnapshot(doc=>{
-if(!doc.exists)return;
-const u=doc.data();
+  db.collection("users").doc(me).onSnapshot(doc=>{
+    if(!doc.exists) return;
 
-document.getElementById("profile").innerHTML=`
-<div class="post">
-<img class="avatar" src="${u.avatar||''}">
-<b>${u.name}</b>
-<p>${u.bio}</p>
-</div>`;
-});
+    const u=doc.data();
+
+    document.getElementById("profile").innerHTML=`
+      <div class="post">
+        <img class="avatar" src="${u.avatar||''}">
+        <b>${u.name||me}</b>
+        <p>${u.bio||''}</p>
+      </div>
+    `;
+  });
 }
 
-/* POSTS */
+/* ================= POSTS ================= */
 function addPost(){
-const text=document.getElementById("postText").value;
-
-db.collection("posts").add({
-text,
-user:me,
-likes:0,
-time:Date.now()
-});
+  db.collection("posts").add({
+    text:document.getElementById("postText").value,
+    user:me,
+    likes:0,
+    time:Date.now()
+  });
 }
 
 function loadPosts(){
-db.collection("posts").orderBy("time","desc")
-.onSnapshot(snap=>{
-const feed=document.getElementById("feed");
-feed.innerHTML="";
+  db.collection("posts")
+  .orderBy("time","desc")
+  .onSnapshot(snap=>{
 
-snap.forEach(doc=>{
-const p=doc.data();
+    let feed=document.getElementById("feed");
+    feed.innerHTML="";
 
-feed.innerHTML+=`
-<div class="post">
-<b>${p.user}</b>
-<p>${p.text}</p>
-❤️ ${p.likes}
-<button onclick="like('${doc.id}',${p.likes})">Like</button>
-</div>`;
-});
-});
+    snap.forEach(doc=>{
+      let p=doc.data();
+
+      feed.innerHTML+=`
+        <div class="post">
+          <img class="avatar" src="${p.avatar||''}">
+          <b>${p.user}</b>
+          <p>${p.text}</p>
+
+          ❤️ ${p.likes||0}
+          <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
+
+          <input id="c-${doc.id}" placeholder="comment">
+          <button onclick="comment('${doc.id}')">OK</button>
+
+          <div id="comments-${doc.id}"></div>
+        </div>
+      `;
+
+      loadComments(doc.id);
+    });
+
+  });
 }
 
 function like(id,l){
-db.collection("posts").doc(id).update({likes:l+1});
+  db.collection("posts").doc(id).update({
+    likes:l+1
+  });
 }
 
-/* USERS ONLINE */
-function loadUsers(){
-db.collection("users").onSnapshot(snap=>{
-const box=document.getElementById("users");
-box.innerHTML="";
+function comment(id){
+  let input=document.getElementById("c-"+id);
 
-snap.forEach(d=>{
-const u=d.data();
-const online=Date.now()-u.lastSeen<5000;
+  db.collection("posts").doc(id)
+  .collection("comments").add({
+    text:input.value,
+    user:me
+  });
 
-box.innerHTML+=`
-<div>
-<img class="avatar" src="${u.avatar||''}">
-${u.name} ${online?"🟢":"⚫"}
-</div>`;
-});
-});
+  input.value="";
 }
 
-/* CHAT PRIVATE SIMPLE */
+function loadComments(id){
+  db.collection("posts").doc(id)
+  .collection("comments")
+  .onSnapshot(s=>{
+    let box=document.getElementById("comments-"+id);
+    box.innerHTML="";
+
+    s.forEach(d=>{
+      box.innerHTML+=`
+        <div class="comment">
+          <b>${d.data().user}</b>: ${d.data().text}
+        </div>
+      `;
+    });
+  });
+}
+
+/* ================= CHAT ================= */
 function sendMsg(){
-const text=document.getElementById("msg").value;
-if(!text)return;
+  let text=document.getElementById("msg").value;
 
-db.collection("chats").add({
-text,
-from:me,
-time:Date.now(),
-seenBy:[]
-});
-document.getElementById("msg").value="";
+  db.collection("chats").add({
+    text,
+    from:me,
+    time:Date.now()
+  });
+
+  document.getElementById("msg").value="";
 }
 
 function loadChat(){
-db.collection("chats").orderBy("time")
-.onSnapshot(snap=>{
-const box=document.getElementById("chatBox");
-box.innerHTML="";
+  db.collection("chats")
+  .orderBy("time")
+  .onSnapshot(s=>{
+    let box=document.getElementById("chatBox");
+    box.innerHTML="";
 
-snap.forEach(doc=>{
-const m=doc.data();
-const isMe=m.from===me;
+    s.forEach(d=>{
+      let m=d.data();
 
-let check="✓";
-
-if(m.seenBy && m.seenBy.includes(me)){
-check="✓✓ 🔵";
-}
-
-box.innerHTML+=`
-<div class="${isMe?'msg me':'msg other'}">
-${m.text}
-<div style="font-size:10px">${isMe?check:""}</div>
-</div>`;
-});
-});
-}
-
-/* MARK SEEN */
-function markSeen(){
-db.collection("chats").get().then(snap=>{
-snap.forEach(d=>{
-const m=d.data();
-if(m.from!==me){
-db.collection("chats").doc(d.id).update({
-seenBy:firebase.firestore.FieldValue.arrayUnion(me)
-});
-}
-});
-});
-}
-
-/* ONLINE */
-function setOnline(){
-setInterval(()=>{
-db.collection("users").doc(me).set({
-lastSeen:Date.now()
-},{merge:true});
-},5000);
+      box.innerHTML+=`
+        <div class="msg ${m.from===me?'me':'other'}">
+          <b>${m.from}</b><br>
+          ${m.text}
+        </div>
+      `;
+    });
+  });
 }
 
 /* NAV */
-function show(p){
-document.getElementById("postsSection").style.display=p==='posts'?'block':'none';
-document.getElementById("chatSection").style.display=p==='chat'?'block':'none';
+function show(page){
+  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
 </script>
 
 </body>
-</html>
+        </html>
