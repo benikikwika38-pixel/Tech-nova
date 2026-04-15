@@ -31,6 +31,7 @@ header{
   border:none;
   background:none;
   font-weight:bold;
+  cursor:pointer;
 }
 
 .container{
@@ -58,6 +59,7 @@ header{
   padding:5px;
   margin-top:5px;
   border-radius:5px;
+  font-size:13px;
 }
 
 .chatBox{
@@ -77,8 +79,8 @@ header{
 .other{ background:#eee; }
 
 img.avatar{
-  width:40px;
-  height:40px;
+  width:35px;
+  height:35px;
   border-radius:50%;
 }
 </style>
@@ -98,7 +100,7 @@ img.avatar{
 <!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>🔐 Connexion TechNova</h3>
-  <input id="name" placeholder="Email">
+  <input id="name" placeholder="Email étudiant ou admin">
   <input id="password" type="password" placeholder="Mot de passe">
   <button onclick="login()">Entrer</button>
   <button onclick="signup()">Créer compte</button>
@@ -107,13 +109,13 @@ img.avatar{
 <!-- APP -->
 <div id="app" style="display:none;">
 
-<!-- 👤 PROFIL -->
+<!-- 👤 PROFIL AJOUTÉ -->
 <div class="box">
-  <h3>👤 Ton profil</h3>
+  <h3>👤 Profil utilisateur</h3>
 
   <input id="username" placeholder="Nom affiché">
   <input id="bio" placeholder="Bio">
-  <input type="file" id="avatar">
+  <input type="file" id="avatar" accept="image/*">
 
   <button onclick="saveProfile()">💾 Sauvegarder profil</button>
 
@@ -125,7 +127,7 @@ img.avatar{
 
   <div class="box">
     <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-    <input type="file" id="postImage">
+    <input type="file" id="postImage" accept="image/*">
     <button onclick="addPost()">Publier</button>
   </div>
 
@@ -159,9 +161,12 @@ img.avatar{
 
 /* ================= FIREBASE ================= */
 const firebaseConfig = {
-  apiKey: "TA_KEY",
-  authDomain: "TON_DOMAIN",
-  projectId: "TON_ID"
+  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy",
+  storageBucket: "technova-academy.appspot.com",
+  messagingSenderId: "321716769948",
+  appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -171,6 +176,7 @@ const db = firebase.firestore();
 
 /* ================= VARIABLES ================= */
 let me = "";
+let selected = "";
 let profile = {};
 
 /* ================= LOGIN ================= */
@@ -179,9 +185,18 @@ function login(){
   const email = document.getElementById("name").value;
   const password = document.getElementById("password").value;
 
-  auth.signInWithEmailAndPassword(email, password)
-  .then(user=>{
+  if(email === "admin" && password === "jemima"){
+    me = "ADMIN";
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("app").style.display="block";
+    loadPosts();
+    loadUsers();
+    loadProfile();
+    return;
+  }
 
+  auth.signInWithEmailAndPassword(email,password)
+  .then(user=>{
     me = user.user.email;
 
     document.getElementById("loginBox").style.display="none";
@@ -199,8 +214,8 @@ function login(){
 /* ================= SIGNUP ================= */
 function signup(){
 
-  const email = document.getElementById("name").value;
-  const password = document.getElementById("password").value;
+  const email=document.getElementById("name").value;
+  const password=document.getElementById("password").value;
 
   auth.createUserWithEmailAndPassword(email,password)
   .then(()=>alert("Compte créé"))
@@ -210,40 +225,38 @@ function signup(){
 /* ================= PROFIL ================= */
 function saveProfile(){
 
-  const name = document.getElementById("username").value;
-  const bio = document.getElementById("bio").value;
-  const file = document.getElementById("avatar").files[0];
+  const name=document.getElementById("username").value;
+  const bio=document.getElementById("bio").value;
+  const file=document.getElementById("avatar").files[0];
 
-  const save = (img="")=>{
+  const save=(img="")=>{
 
-    profile = {name,bio,avatar:img};
+    profile={name,bio,avatar:img};
 
     db.collection("users").doc(me).set({
-      email: me,
       name,
       bio,
-      avatar: img,
-      lastSeen: Date.now()
+      avatar:img,
+      lastSeen:Date.now()
     });
 
     loadProfile();
   };
 
   if(file){
-    const reader = new FileReader();
+    const reader=new FileReader();
     reader.onload=()=>save(reader.result);
     reader.readAsDataURL(file);
-  } else save(profile.avatar);
+  } else save();
 }
 
 function loadProfile(){
 
   db.collection("users").doc(me).get()
   .then(doc=>{
-
     if(!doc.exists) return;
 
-    const u = doc.data();
+    const u=doc.data();
 
     document.getElementById("myProfile").innerHTML=`
       <div class="post">
@@ -258,25 +271,24 @@ function loadProfile(){
 /* ================= POSTS ================= */
 function addPost(){
 
-  const text = document.getElementById("postText").value;
-  const file = document.getElementById("postImage").files[0];
+  const text=document.getElementById("postText").value;
+  const file=document.getElementById("postImage").files[0];
 
-  const save = (img="")=>{
+  const save=(img="")=>{
     db.collection("posts").add({
       text,
-      image: img,
-      user: me,
-      likes: 0,
-      time: Date.now()
+      image:img,
+      user:me,
+      likes:0,
+      time:Date.now()
     });
   };
 
   if(file){
-    const reader = new FileReader();
+    const reader=new FileReader();
     reader.onload=()=>save(reader.result);
     reader.readAsDataURL(file);
   } else save();
-
 }
 
 function loadPosts(){
@@ -288,18 +300,16 @@ function loadPosts(){
     feed.innerHTML="";
 
     snap.forEach(doc=>{
-
       const p=doc.data();
 
       feed.innerHTML+=`
         <div class="post">
           <b>${p.user}</b>
-          <p>${p.text}</p>
+          <p>${p.text||""}</p>
           ${p.image?`<img src="${p.image}" style="width:100%">`:``}
           ❤️ ${p.likes||0}
         </div>
       `;
-
     });
 
   });
@@ -313,15 +323,14 @@ function loadUsers(){
     const box=document.getElementById("users");
     box.innerHTML="";
 
-    snap.forEach(doc=>{
-
-      const u=doc.data();
-      const online = Date.now()-u.lastSeen<5000;
+    snap.forEach(d=>{
+      const u=d.data();
+      const online=Date.now()-u.lastSeen<5000;
 
       box.innerHTML+=`
         <div>
           <img class="avatar" src="${u.avatar||''}">
-          ${u.name||u.email} ${online?"🟢":"⚫"}
+          👤 ${u.name||u.email} ${online?"🟢":"⚫"}
         </div>
       `;
     });
@@ -334,7 +343,8 @@ function startPresence(){
   setInterval(()=>{
 
     if(me){
-      db.collection("users").doc(me).update({
+      db.collection("users").doc(me).set({
+        name:me,
         lastSeen:Date.now()
       }).catch(()=>{});
     }
@@ -346,7 +356,7 @@ function startPresence(){
 function sendMsg(){
 
   const text=document.getElementById("msg").value;
-  if(!text) return;
+  if(!text||!selected) return;
 
   db.collection("chats").add({
     text,
@@ -355,6 +365,12 @@ function sendMsg(){
   });
 
   document.getElementById("msg").value="";
+}
+
+/* ================= NAV ================= */
+function show(page){
+  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
 </script>
