@@ -6,83 +6,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family: Arial;
-  background:#f0f2f5;
-}
-
-header{
-  background:#1877f2;
-  color:white;
-  padding:10px;
-  text-align:center;
-  font-weight:bold;
-}
-
-.nav{
-  display:flex;
-  justify-content:space-around;
-  background:white;
-  padding:10px;
-}
-
-.nav button{
-  border:none;
-  background:none;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-.container{
-  max-width:700px;
-  margin:auto;
-  padding:10px;
-}
-
-.box{
-  background:white;
-  padding:10px;
-  margin-top:10px;
-  border-radius:10px;
-}
-
-.post{
-  background:white;
-  padding:10px;
-  margin-top:10px;
-  border-radius:10px;
-}
-
-.comment{
-  background:#eee;
-  padding:5px;
-  margin-top:5px;
-  border-radius:5px;
-  font-size:13px;
-}
-
-.chatBox{
-  height:300px;
-  overflow:auto;
-  background:white;
-  padding:10px;
-}
-
-.msg{
-  padding:6px;
-  margin:5px;
-  border-radius:8px;
-}
-
-.me{
-  background:#d1e7ff;
-  text-align:right;
-}
-
-.other{
-  background:#eee;
-}
+body{margin:0;font-family:Arial;background:#f0f2f5;}
+header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight:bold;}
+.nav{display:flex;justify-content:space-around;background:white;padding:10px;}
+.nav button{border:none;background:none;font-weight:bold;cursor:pointer;}
+.container{max-width:700px;margin:auto;padding:10px;}
+.box{background:white;padding:10px;margin-top:10px;border-radius:10px;}
+.post{background:white;padding:10px;margin-top:10px;border-radius:10px;}
+.comment{background:#eee;padding:5px;margin-top:5px;border-radius:5px;font-size:13px;}
+.chatBox{height:300px;overflow:auto;background:white;padding:10px;}
+.msg{padding:6px;margin:5px;border-radius:8px;}
+.me{background:#d1e7ff;text-align:right;}
+.other{background:#eee;}
 </style>
 </head>
 
@@ -108,292 +43,337 @@ header{
 <!-- APP -->
 <div id="app" style="display:none;">
 
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none;background:#fff3cd;padding:10px;border-radius:10px;">
+  <h3>🛡️ Admin Panel</h3>
+  <div id="adminPosts"></div>
+</div>
+
 <!-- POSTS -->
 <div id="postsSection">
 
-  <div class="box">
-    <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-    <input type="file" id="postImage" accept="image/*">
-    <button onclick="addPost()">Publier</button>
-  </div>
+<div class="box">
+  <textarea id="postText" placeholder="Exprime-toi..."></textarea>
+  <input type="file" id="postImage" accept="image/*">
+  <button onclick="addPost()">Publier</button>
+</div>
 
-  <div id="feed"></div>
+<div id="feed"></div>
 
 </div>
 
 <!-- CHAT -->
 <div id="chatSection" style="display:none;">
 
-  <div class="box">
-    <h3>👥 Étudiants</h3>
-    <div id="users"></div>
-  </div>
+<div class="box">
+  <h3>👥 Étudiants</h3>
+  <div id="users"></div>
+</div>
 
-  <div class="chatBox" id="chatBox"></div>
+<div class="chatBox" id="chatBox"></div>
+<div id="typing" style="font-size:12px;color:gray;"></div>
 
-  <input id="msg" placeholder="Message...">
-  <button onclick="sendMsg()">Envoyer</button>
+<input id="msg" placeholder="Message...">
+<button onclick="sendMsg()">Envoyer</button>
+<button onclick="startVoice()">🎤</button>
 
 </div>
 
 </div>
-
 </div>
 
-<!-- FIREBASE -->
+<!-- ✅ FIREBASE COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
+// 🔥 TES VRAIES CLÉS FIREBASE
 const firebaseConfig = {
-  apiKey: "TA_KEY",
-  authDomain: "TON_DOMAIN",
-  projectId: "TON_ID"
+  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy",
+  storageBucket: "technova-academy.firebasestorage.app",
+  messagingSenderId: "321716769948",
+  appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let me = "";
-let selected = "";
+let me="";
+let selected="";
+let isAdmin=false;
 
-/* 🔐 MOT DE PASSE */
-const STUDENT_PASSWORD = "jemima";
+const STUDENT_PASSWORD="jemima";
+const ADMIN_PASSWORD="Admin@2026";
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 function login(){
 
-  const name = document.getElementById("name").value;
-  const pass = document.getElementById("password").value;
+const name=document.getElementById("name").value;
+const pass=document.getElementById("password").value;
 
-  if(!name){
-    alert("Entre ton nom");
-    return;
-  }
+if(!name){alert("Entre ton nom");return;}
 
-  if(pass !== STUDENT_PASSWORD){
-    alert("❌ Mot de passe incorrect");
-    return;
-  }
+db.collection("banned").doc(name).get().then(doc=>{
+if(doc.exists){alert("🚫 Tu es banni");return;}
 
-  me = name;
+if(pass!==STUDENT_PASSWORD && pass!==ADMIN_PASSWORD){
+alert("❌ Mot de passe incorrect");return;
+}
 
-  document.getElementById("loginBox").style.display = "none";
-  document.getElementById("app").style.display = "block";
+me=name;
 
-  // 🔥 présence en ligne (fix mobile)
-  setInterval(()=>{
-    db.collection("users").doc(me).set({
-      name: me,
-      lastSeen: Date.now()
-    });
-  }, 3000);
+if(me==="admin" && pass===ADMIN_PASSWORD){
+isAdmin=true;
+document.getElementById("adminPanel").style.display="block";
+loadAdminPosts();
+}
 
-  loadPosts();
-  loadUsers();
+document.getElementById("loginBox").style.display="none";
+document.getElementById("app").style.display="block";
+
+// 🔥 présence en ligne
+setInterval(()=>{
+db.collection("users").doc(me).set({
+name:me,
+lastSeen:Date.now()
+});
+},3000);
+
+loadPosts();
+loadUsers();
+
+});
+
 }
 
 /* NAV */
-function show(page){
-  document.getElementById("postsSection").style.display = page==='posts'?'block':'none';
-  document.getElementById("chatSection").style.display = page==='chat'?'block':'none';
+function show(p){
+document.getElementById("postsSection").style.display=p==='posts'?'block':'none';
+document.getElementById("chatSection").style.display=p==='chat'?'block':'none';
 }
 
-/* ================= POSTS ================= */
-
+/* POSTS */
 function addPost(){
 
-  const text = document.getElementById("postText").value;
-  const file = document.getElementById("postImage").files[0];
+const text=document.getElementById("postText").value;
+const file=document.getElementById("postImage").files[0];
 
-  if(!text && !file) return;
+if(!text && !file) return;
 
-  const save = (img="") => {
-    db.collection("posts").add({
-      text,
-      image: img,
-      user: me,
-      likes: 0,
-      time: Date.now()
-    });
-  };
+const save=(img="")=>{
+db.collection("posts").add({
+text,
+image:img,
+user:me,
+likes:0,
+isAd:isAdmin,
+time:Date.now()
+});
+};
 
-  if(file){
-    const reader = new FileReader();
-    reader.onload = () => save(reader.result);
-    reader.readAsDataURL(file);
-  } else {
-    save();
-  }
+if(file){
+const reader=new FileReader();
+reader.onload=()=>save(reader.result);
+reader.readAsDataURL(file);
+}else{save();}
 
-  document.getElementById("postText").value = "";
-  document.getElementById("postImage").value = "";
+document.getElementById("postText").value="";
+document.getElementById("postImage").value="";
 }
 
 function loadPosts(){
 
-  const feed = document.getElementById("feed");
+db.collection("posts").orderBy("time","desc")
+.onSnapshot(snap=>{
 
-  db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snapshot => {
+const feed=document.getElementById("feed");
+feed.innerHTML="";
 
-    feed.innerHTML = "";
+snap.forEach(doc=>{
+const p=doc.data();
 
-    snapshot.forEach(doc => {
+feed.innerHTML+=`
+<div class="post" style="${p.isAd?'border:2px solid gold;':''}">
+${p.isAd?'<b style="color:orange">📢 Sponsorisé</b><br>':''}
+<b>${p.user}</b>
+<p>${p.text}</p>
 
-      const p = doc.data();
+${p.image?`<img src="${p.image}" style="width:100%;border-radius:10px;">`:""}
 
-      feed.innerHTML += `
-        <div class="post">
+<button onclick="like('${doc.id}',${p.likes||0})">
+❤️ ${p.likes||0}
+</button>
 
-          <b>${p.user}</b>
-          <p>${p.text}</p>
+<input id="c-${doc.id}" placeholder="Commenter">
+<button onclick="comment('${doc.id}')">Envoyer</button>
 
-          ${p.image ? `<img src="${p.image}" style="width:100%;border-radius:10px;">` : ""}
+<div id="comments-${doc.id}"></div>
 
-          <button onclick="like('${doc.id}',${p.likes || 0})">
-            ❤️ ${p.likes || 0}
-          </button>
+</div>
+`;
 
-          <input id="c-${doc.id}" placeholder="Commenter">
-          <button onclick="comment('${doc.id}')">Envoyer</button>
+loadComments(doc.id);
+});
 
-          <div id="comments-${doc.id}"></div>
-
-        </div>
-      `;
-
-      loadComments(doc.id);
-    });
-
-  });
+});
 }
 
-function like(id, likes){
-  db.collection("posts").doc(id).update({
-    likes: likes + 1
-  });
+function like(id,l){
+db.collection("posts").doc(id).update({likes:l+1});
 }
 
 function comment(id){
 
-  const input = document.getElementById("c-"+id);
+const input=document.getElementById("c-"+id);
 
-  db.collection("posts")
-  .doc(id)
-  .collection("comments")
-  .add({
-    text: input.value,
-    user: me,
-    time: Date.now()
-  });
+if(!input.value) return;
 
-  input.value = "";
+db.collection("posts").doc(id)
+.collection("comments")
+.add({
+text:input.value,
+user:me,
+time:Date.now()
+});
+
+input.value="";
 }
 
 function loadComments(id){
 
-  db.collection("posts")
-  .doc(id)
-  .collection("comments")
-  .onSnapshot(snap=>{
+db.collection("posts").doc(id)
+.collection("comments")
+.onSnapshot(snap=>{
 
-    const box = document.getElementById("comments-"+id);
-    if(!box) return;
+const box=document.getElementById("comments-"+id);
+if(!box) return;
 
-    box.innerHTML = "";
+box.innerHTML="";
 
-    snap.forEach(d=>{
-      const c = d.data();
+snap.forEach(d=>{
+const c=d.data();
+box.innerHTML+=`
+<div class="comment">
+<b>${c.user}</b>: ${c.text}
+</div>
+`;
+});
 
-      box.innerHTML += `
-        <div class="comment">
-          <b>${c.user}</b>: ${c.text}
-        </div>
-      `;
-    });
-
-  });
+});
 }
 
-/* ================= CHAT ================= */
-
+/* USERS */
 function loadUsers(){
 
-  db.collection("users").onSnapshot(snap=>{
+db.collection("users").onSnapshot(snap=>{
 
-    const box = document.getElementById("users");
-    box.innerHTML = "";
+const box=document.getElementById("users");
+box.innerHTML="";
 
-    snap.forEach(d=>{
-      const u = d.data();
+snap.forEach(d=>{
+const u=d.data();
 
-      if(u.name !== me){
+if(u.name!==me){
 
-        const isOnline = Date.now() - (u.lastSeen || 0) < 5000;
+const online=Date.now()-(u.lastSeen||0)<5000;
 
-        box.innerHTML += `
-          <div onclick="openChat('${u.name}')">
-            👤 ${u.name} ${isOnline ? "🟢" : "⚫"}
-          </div>
-        `;
-      }
-    });
+box.innerHTML+=`
+<div onclick="openChat('${u.name}')">
+👤 ${u.name} ${online?"🟢":"⚫"}
+</div>
+`;
+}
+});
 
-  });
+});
 }
 
-function chatId(a,b){
-  return [a,b].sort().join("_");
-}
+/* CHAT */
+function chatId(a,b){return[a,b].sort().join("_");}
 
 function openChat(u){
-  selected = u;
-  loadMessages();
+selected=u;
+loadMessages();
 }
 
 function sendMsg(){
 
-  const text = document.getElementById("msg").value;
-  if(!text || !selected) return;
+const text=document.getElementById("msg").value;
+if(!text||!selected) return;
 
-  db.collection("chats")
-  .doc(chatId(me,selected))
-  .collection("messages")
-  .add({
-    text,
-    from: me,
-    time: Date.now()
-  });
+db.collection("chats")
+.doc(chatId(me,selected))
+.collection("messages")
+.add({
+text,
+from:me,
+time:Date.now()
+});
 
-  document.getElementById("msg").value = "";
+document.getElementById("msg").value="";
 }
 
 function loadMessages(){
 
-  db.collection("chats")
-  .doc(chatId(me,selected))
-  .collection("messages")
-  .orderBy("time")
-  .onSnapshot(snap=>{
+db.collection("chats")
+.doc(chatId(me,selected))
+.collection("messages")
+.orderBy("time")
+.onSnapshot(snap=>{
 
-    const box = document.getElementById("chatBox");
-    if(!box) return;
+const box=document.getElementById("chatBox");
+box.innerHTML="";
 
-    box.innerHTML = "";
+snap.forEach(d=>{
+const m=d.data();
 
-    snap.forEach(d=>{
-      const m = d.data();
+box.innerHTML+=`
+<div class="msg ${m.from===me?'me':'other'}">
+${m.text||""}
+${m.audio?`<audio controls src="${m.audio}"></audio>`:""}
+</div>
+`;
+});
 
-      box.innerHTML += `
-        <div class="msg ${m.from===me?'me':'other'}">
-          ${m.text}
-        </div>
-      `;
-    });
+});
+}
 
-  });
+/* ADMIN */
+function loadAdminPosts(){
+
+db.collection("posts").orderBy("time","desc")
+.onSnapshot(snap=>{
+
+const box=document.getElementById("adminPosts");
+box.innerHTML="";
+
+snap.forEach(doc=>{
+const p=doc.data();
+
+box.innerHTML+=`
+<div class="post">
+<b>${p.user}</b>
+<p>${p.text}</p>
+
+<button onclick="deletePost('${doc.id}')">🗑 Supprimer</button>
+<button onclick="banUser('${p.user}')">🚫 Bannir</button>
+</div>
+`;
+});
+
+});
+}
+
+function deletePost(id){
+db.collection("posts").doc(id).delete();
+}
+
+function banUser(u){
+db.collection("banned").doc(u).set({name:u});
+alert("Utilisateur banni 🚫");
 }
 
 </script>
