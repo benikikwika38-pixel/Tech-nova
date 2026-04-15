@@ -20,13 +20,6 @@ header{
   font-weight:bold;
 }
 
-.nav{
-  display:flex;
-  justify-content:space-around;
-  background:white;
-  padding:10px;
-}
-
 .box{
   background:white;
   margin:10px;
@@ -78,13 +71,11 @@ header{
 
 <div id="app" style="display:none;">
 
-  <!-- USERS -->
   <div class="box">
     <h3>👥 Utilisateurs</h3>
     <div id="users"></div>
   </div>
 
-  <!-- CHAT -->
   <div class="box">
     <h3>💬 Chat privé</h3>
     <div class="chatBox" id="chatBox"></div>
@@ -113,7 +104,23 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let me="";
-let chatWith=""; // 👈 utilisateur sélectionné
+let chatWith="";
+
+/* 🔥 CREATE USER AUTO */
+function createUserIfNotExists(){
+
+  const ref = db.collection("users").doc(me);
+
+  ref.get().then(doc=>{
+    if(!doc.exists){
+      ref.set({
+        email: me,
+        lastSeen: Date.now()
+      });
+    }
+  });
+
+}
 
 /* LOGIN */
 function login(){
@@ -123,6 +130,8 @@ function login(){
   )
   .then(u=>{
     me=u.user.email;
+
+    createUserIfNotExists(); // 🔥 correction
 
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
@@ -159,7 +168,7 @@ function selectUser(user){
   loadChat();
 }
 
-/* SEND MSG (PRIVÉ) */
+/* SEND MSG */
 function sendMsg(){
 
   if(!chatWith){
@@ -194,7 +203,6 @@ function loadChat(){
     snap.forEach(doc=>{
       let m=doc.data();
 
-      // 🔥 CONDITION PRIVÉ
       if(
         (m.from===me && m.to===chatWith) ||
         (m.from===chatWith && m.to===me)
@@ -209,7 +217,6 @@ function loadChat(){
           </div>
         `;
 
-        // mark seen
         if(m.to===me){
           db.collection("chats").doc(doc.id).update({seen:true});
         }
@@ -221,7 +228,7 @@ function loadChat(){
   });
 }
 
-/* ONLINE STATUS */
+/* ONLINE */
 function presence(){
   setInterval(()=>{
     if(me){
