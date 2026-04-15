@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>TechNova Social PRO MAX</title>
+<title>TechNova Social PRO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
+  font-family: Arial;
   background:#f0f2f5;
 }
 
@@ -31,15 +31,36 @@ header{
   border:none;
   background:none;
   font-weight:bold;
+  cursor:pointer;
 }
 
-.container{max-width:700px;margin:auto;padding:10px;}
+.container{
+  max-width:700px;
+  margin:auto;
+  padding:10px;
+}
 
-.box{background:white;padding:10px;margin-top:10px;border-radius:10px;}
+.box{
+  background:white;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
 
-.post{background:white;padding:10px;margin-top:10px;border-radius:10px;}
+.post{
+  background:white;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
 
-.comment{background:#eee;padding:5px;margin-top:5px;border-radius:5px;}
+.comment{
+  background:#eee;
+  padding:5px;
+  margin-top:5px;
+  border-radius:5px;
+  font-size:13px;
+}
 
 .chatBox{
   height:300px;
@@ -49,32 +70,25 @@ header{
 }
 
 .msg{
-  padding:10px;
-  margin:6px;
-  border-radius:12px;
-  max-width:70%;
+  padding:6px;
+  margin:5px;
+  border-radius:8px;
 }
 
-.me{
-  background:linear-gradient(135deg,#1877f2,#4aa3ff);
-  color:white;
-  margin-left:auto;
-}
+.me{ background:#d1e7ff; text-align:right; }
+.other{ background:#eee; }
 
-.other{
-  background:#eee;
-}
-
-#typing{
-  font-size:12px;
-  color:gray;
+img.avatar{
+  width:35px;
+  height:35px;
+  border-radius:50%;
 }
 </style>
 </head>
 
 <body>
 
-<header>📘 TechNova Social PRO MAX</header>
+<header>📘 TechNova Social PRO</header>
 
 <div class="nav">
   <button onclick="show('posts')">📢 Posts</button>
@@ -85,8 +99,8 @@ header{
 
 <!-- LOGIN -->
 <div class="box" id="loginBox">
-  <h3>🔐 Connexion</h3>
-  <input id="name" placeholder="Email">
+  <h3>🔐 Connexion TechNova</h3>
+  <input id="name" placeholder="Email ou admin">
   <input id="password" type="password" placeholder="Mot de passe">
   <button onclick="login()">Entrer</button>
   <button onclick="signup()">Créer compte</button>
@@ -95,15 +109,30 @@ header{
 <!-- APP -->
 <div id="app" style="display:none;">
 
+<!-- 👤 PROFIL -->
+<div class="box">
+  <h3>👤 Profil utilisateur</h3>
+
+  <input id="username" placeholder="Nom affiché">
+  <input id="bio" placeholder="Bio">
+  <input type="file" id="avatar">
+
+  <button onclick="saveProfile()">💾 Sauvegarder profil</button>
+
+  <div id="myProfile"></div>
+</div>
+
 <!-- POSTS -->
 <div id="postsSection">
 
   <div class="box">
     <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-    <button onclick="addPost()">Publier</button>
+    <input type="file" id="postImage">
+    <button onclick="addPost()">📤 Publier</button>
   </div>
 
   <div id="feed"></div>
+
 </div>
 
 <!-- CHAT -->
@@ -115,8 +144,6 @@ header{
   </div>
 
   <div class="chatBox" id="chatBox"></div>
-
-  <div id="typing"></div>
 
   <input id="msg" placeholder="Message...">
   <button onclick="sendMsg()">Envoyer</button>
@@ -132,6 +159,7 @@ header{
 
 <script>
 
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -146,50 +174,151 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me="";
-let selected="";
+/* ================= VARIABLES ================= */
+let me = "";
+let selected = "";
+let isAdmin = false;
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 function login(){
-  auth.signInWithEmailAndPassword(
-    document.getElementById("name").value,
-    document.getElementById("password").value
-  )
-  .then(u=>{
-    me=u.user.email;
+
+  const email = document.getElementById("name").value;
+  const password = document.getElementById("password").value;
+
+  if(email === "admin" && password === "jemima"){
+    me = "ADMIN";
+    isAdmin = true;
+
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
+
     loadPosts();
     loadUsers();
+    loadProfile();
+    return;
+  }
+
+  auth.signInWithEmailAndPassword(email,password)
+  .then(user=>{
+
+    me = user.user.email;
+
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("app").style.display="block";
+
+    startPresence();
+    loadPosts();
+    loadUsers();
+    loadProfile();
+
   })
-  .catch(e=>alert(e.message));
+  .catch(err=>alert(err.message));
 }
 
-/* SIGNUP */
+/* ================= SIGNUP ================= */
 function signup(){
-  auth.createUserWithEmailAndPassword(
-    document.getElementById("name").value,
-    document.getElementById("password").value
-  ).then(()=>alert("Compte créé"));
+  const email=document.getElementById("name").value;
+  const password=document.getElementById("password").value;
+
+  auth.createUserWithEmailAndPassword(email,password)
+  .then(()=>alert("Compte créé"))
+  .catch(err=>alert(err.message));
 }
 
-/* POSTS */
-function addPost(){
-  const text=document.getElementById("postText").value;
+/* ================= PROFILE ================= */
+function saveProfile(){
 
-  db.collection("posts").add({
-    text,
-    user:me,
-    likes:0,
-    time:Date.now()
+  const name=document.getElementById("username").value;
+  const bio=document.getElementById("bio").value;
+  const file=document.getElementById("avatar").files[0];
+
+  const save=(img="")=>{
+
+    db.collection("users").doc(me).set({
+      name,
+      bio,
+      avatar:img,
+      lastSeen:Date.now()
+    })
+    .then(()=>{
+      loadProfile();
+    })
+    .catch(err=>{
+      alert("Erreur profil: " + err.message);
+    });
+
+  };
+
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save();
+}
+
+function loadProfile(){
+
+  if(!me) return;
+
+  db.collection("users").doc(me).get()
+  .then(doc=>{
+    if(!doc.exists) return;
+
+    const u=doc.data();
+
+    document.getElementById("myProfile").innerHTML=`
+      <div class="post">
+        <img class="avatar" src="${u.avatar||''}">
+        <b>${u.name||u.email||me}</b>
+        <p>${u.bio||''}</p>
+      </div>
+    `;
   });
+}
 
-  document.getElementById("postText").value="";
+/* ================= POSTS FIXED ================= */
+function addPost(){
+
+  const text=document.getElementById("postText").value;
+  const file=document.getElementById("postImage").files[0];
+
+  if(!text && !file){
+    alert("Écris quelque chose !");
+    return;
+  }
+
+  const save=(img="")=>{
+
+    db.collection("posts").add({
+      text:text||"",
+      image:img||"",
+      user:me||"unknown",
+      likes:0,
+      time:Date.now()
+    })
+    .then(()=>{
+      document.getElementById("postText").value="";
+      document.getElementById("postImage").value="";
+      console.log("Post publié ✅");
+    })
+    .catch(err=>{
+      alert("Erreur publication: " + err.message);
+    });
+
+  };
+
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save("");
 }
 
 function loadPosts(){
+
   db.collection("posts").orderBy("time","desc")
   .onSnapshot(snap=>{
+
     const feed=document.getElementById("feed");
     feed.innerHTML="";
 
@@ -198,13 +327,16 @@ function loadPosts(){
 
       feed.innerHTML+=`
         <div class="post">
+
           <b>${p.user}</b>
-          <p>${p.text}</p>
+          <p>${p.text||""}</p>
+
+          ${p.image?`<img src="${p.image}" style="width:100%">`:``}
 
           ❤️ ${p.likes||0}
           <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
 
-          <input id="c-${doc.id}">
+          <input id="c-${doc.id}" placeholder="comment...">
           <button onclick="comment('${doc.id}')">💬</button>
 
           <div id="comments-${doc.id}"></div>
@@ -213,16 +345,22 @@ function loadPosts(){
 
       loadComments(doc.id);
     });
+
   });
 }
 
-function like(id,l){
-  db.collection("posts").doc(id).update({likes:l+1});
+/* ================= LIKE ================= */
+function like(id,likes){
+  db.collection("posts").doc(id).update({
+    likes:likes+1
+  });
 }
 
-/* COMMENTS */
+/* ================= COMMENT ================= */
 function comment(id){
+
   const input=document.getElementById("c-"+id);
+  if(!input || !input.value) return;
 
   db.collection("posts").doc(id)
   .collection("comments").add({
@@ -235,106 +373,70 @@ function comment(id){
 }
 
 function loadComments(id){
+
   db.collection("posts").doc(id)
   .collection("comments")
-  .onSnapshot(s=>{
-    const box=document.getElementById("comments-"+id);
-    box.innerHTML="";
-    s.forEach(d=>{
-      const c=d.data();
-      box.innerHTML+=`<div class="comment"><b>${c.user}</b>: ${c.text}</div>`;
-    });
-  });
-}
-
-/* USERS */
-function loadUsers(){
-  db.collection("users").onSnapshot(snap=>{
-    const box=document.getElementById("users");
-    box.innerHTML="";
-    snap.forEach(d=>{
-      const u=d.data();
-      box.innerHTML+=`<div>👤 ${u.name||u.email}</div>`;
-    });
-  });
-}
-
-/* CHAT */
-function sendMsg(){
-  const text=document.getElementById("msg").value;
-
-  const chatId=[me,selected].sort().join("_");
-
-  db.collection("chats").doc(chatId)
-  .collection("messages").add({
-    text,
-    from:me,
-    time:Date.now(),
-    seen:false
-  });
-
-  document.getElementById("msg").value="";
-}
-
-/* TYPING */
-document.getElementById("msg").addEventListener("input",()=>{
-  if(!selected) return;
-
-  db.collection("typing").doc([me,selected].sort().join("_"))
-  .set({user:me,time:Date.now()});
-});
-
-function listenTyping(){
-  db.collection("typing").doc([me,selected].sort().join("_"))
-  .onSnapshot(doc=>{
-    const box=document.getElementById("typing");
-    if(!doc.exists) return;
-
-    const d=doc.data();
-
-    if(d.user!==me && Date.now()-d.time<3000){
-      box.innerHTML="✍️ "+d.user+" écrit...";
-    } else box.innerHTML="";
-  });
-}
-
-/* CHAT LOAD */
-function loadMessages(){
-  const chatId=[me,selected].sort().join("_");
-
-  db.collection("chats").doc(chatId)
-  .collection("messages").orderBy("time")
   .onSnapshot(snap=>{
-    const box=document.getElementById("chatBox");
+
+    const box=document.getElementById("comments-"+id);
+    if(!box) return;
+
     box.innerHTML="";
 
     snap.forEach(d=>{
-      const m=d.data();
+      const c=d.data();
 
       box.innerHTML+=`
-        <div class="msg ${m.from===me?'me':'other'}">
-          ${m.text}
-          ${m.from===me? (m.seen?" ✓✓":" ✓"):""}
+        <div class="comment">
+          <b>${c.user}</b>: ${c.text}
         </div>
       `;
-
-      if(m.from!==me){
-        d.ref.update({seen:true});
-      }
     });
+
   });
 }
 
-/* OPEN CHAT */
-function openChat(u){
-  selected=u;
-  loadMessages();
-  listenTyping();
+/* ================= USERS ================= */
+function loadUsers(){
+
+  db.collection("users").onSnapshot(snap=>{
+
+    const box=document.getElementById("users");
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      const u=d.data();
+      const online=Date.now()-u.lastSeen<5000;
+
+      box.innerHTML+=`
+        <div>
+          <img class="avatar" src="${u.avatar||''}">
+          👤 ${u.name||u.email} ${online?"🟢":"⚫"}
+        </div>
+      `;
+    });
+
+  });
 }
 
-function show(p){
-  document.getElementById("postsSection").style.display=p==='posts'?'block':'none';
-  document.getElementById("chatSection").style.display=p==='chat'?'block':'none';
+function startPresence(){
+
+  setInterval(()=>{
+
+    if(me){
+      db.collection("users").doc(me).set({
+        name:me,
+        lastSeen:Date.now()
+      }).catch(()=>{});
+    }
+
+  },3000);
+}
+
+/* ================= NAV ================= */
+function show(page){
+  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
 </script>
