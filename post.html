@@ -32,7 +32,6 @@ header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight
 
 <div class="container">
 
-<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>🔐 Connexion étudiant</h3>
   <input id="name" placeholder="Nom étudiant">
@@ -40,16 +39,13 @@ header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight
   <button onclick="login()">Entrer</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
-<!-- ADMIN PANEL -->
 <div id="adminPanel" style="display:none;background:#fff3cd;padding:10px;border-radius:10px;">
   <h3>🛡️ Admin Panel</h3>
   <div id="adminPosts"></div>
 </div>
 
-<!-- POSTS -->
 <div id="postsSection">
 
 <div class="box">
@@ -62,7 +58,6 @@ header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight
 
 </div>
 
-<!-- CHAT -->
 <div id="chatSection" style="display:none;">
 
 <div class="box">
@@ -82,13 +77,11 @@ header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight
 </div>
 </div>
 
-<!-- ✅ FIREBASE COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
-// 🔥 TES VRAIES CLÉS FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -108,69 +101,74 @@ let isAdmin=false;
 const STUDENT_PASSWORD="jemima";
 const ADMIN_PASSWORD="Admin@2026";
 
-/* LOGIN */
+/* ✅ LOGIN CORRIGÉ */
 function login(){
 
-const name=document.getElementById("name").value;
-const pass=document.getElementById("password").value;
+const name = document.getElementById("name").value.trim();
+const pass = document.getElementById("password").value.trim();
 
-if(!name){alert("Entre ton nom");return;}
-
-db.collection("banned").doc(name).get().then(doc=>{
-if(doc.exists){alert("🚫 Tu es banni");return;}
-
-if(pass!==STUDENT_PASSWORD && pass!==ADMIN_PASSWORD){
-alert("❌ Mot de passe incorrect");return;
+if(!name){
+  alert("Entre ton nom");
+  return;
 }
 
-me=name;
-
-if(me==="admin" && pass===ADMIN_PASSWORD){
-isAdmin=true;
-document.getElementById("adminPanel").style.display="block";
-loadAdminPosts();
+if(pass !== STUDENT_PASSWORD && pass !== ADMIN_PASSWORD){
+  alert("❌ Mot de passe incorrect");
+  return;
 }
 
-document.getElementById("loginBox").style.display="none";
-document.getElementById("app").style.display="block";
+db.collection("banned").doc(name).get()
+.then(doc=>{
 
-// 🔥 présence en ligne
-setInterval(()=>{
-db.collection("users").doc(me).set({
-name:me,
-lastSeen:Date.now()
+  if(doc.exists){
+    alert("🚫 Tu es banni");
+    return;
+  }
+
+  me = name;
+
+  if(me === "admin" && pass === ADMIN_PASSWORD){
+    isAdmin = true;
+    document.getElementById("adminPanel").style.display = "block";
+    loadAdminPosts();
+  }
+
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("app").style.display = "block";
+
+  setInterval(()=>{
+    db.collection("users").doc(me).set({
+      name: me,
+      lastSeen: Date.now()
+    });
+  }, 3000);
+
+  loadPosts();
+  loadUsers();
+
+})
+.catch(err=>{
+  console.error(err);
+  alert("Erreur Firebase ⚠️");
 });
-},3000);
-
-loadPosts();
-loadUsers();
-
-});
 
 }
 
-/* NAV */
+/* RESTE DU CODE INCHANGÉ */
+
 function show(p){
 document.getElementById("postsSection").style.display=p==='posts'?'block':'none';
 document.getElementById("chatSection").style.display=p==='chat'?'block':'none';
 }
 
-/* POSTS */
 function addPost(){
-
 const text=document.getElementById("postText").value;
 const file=document.getElementById("postImage").files[0];
-
 if(!text && !file) return;
 
 const save=(img="")=>{
 db.collection("posts").add({
-text,
-image:img,
-user:me,
-likes:0,
-isAd:isAdmin,
-time:Date.now()
+text,image:img,user:me,likes:0,isAd:isAdmin,time:Date.now()
 });
 };
 
@@ -185,39 +183,25 @@ document.getElementById("postImage").value="";
 }
 
 function loadPosts(){
-
 db.collection("posts").orderBy("time","desc")
 .onSnapshot(snap=>{
-
 const feed=document.getElementById("feed");
 feed.innerHTML="";
-
 snap.forEach(doc=>{
 const p=doc.data();
-
 feed.innerHTML+=`
 <div class="post" style="${p.isAd?'border:2px solid gold;':''}">
 ${p.isAd?'<b style="color:orange">📢 Sponsorisé</b><br>':''}
 <b>${p.user}</b>
 <p>${p.text}</p>
-
 ${p.image?`<img src="${p.image}" style="width:100%;border-radius:10px;">`:""}
-
-<button onclick="like('${doc.id}',${p.likes||0})">
-❤️ ${p.likes||0}
-</button>
-
+<button onclick="like('${doc.id}',${p.likes||0})">❤️ ${p.likes||0}</button>
 <input id="c-${doc.id}" placeholder="Commenter">
 <button onclick="comment('${doc.id}')">Envoyer</button>
-
 <div id="comments-${doc.id}"></div>
-
-</div>
-`;
-
+</div>`;
 loadComments(doc.id);
 });
-
 });
 }
 
@@ -226,72 +210,41 @@ db.collection("posts").doc(id).update({likes:l+1});
 }
 
 function comment(id){
-
 const input=document.getElementById("c-"+id);
-
 if(!input.value) return;
-
-db.collection("posts").doc(id)
-.collection("comments")
-.add({
-text:input.value,
-user:me,
-time:Date.now()
+db.collection("posts").doc(id).collection("comments").add({
+text:input.value,user:me,time:Date.now()
 });
-
 input.value="";
 }
 
 function loadComments(id){
-
-db.collection("posts").doc(id)
-.collection("comments")
+db.collection("posts").doc(id).collection("comments")
 .onSnapshot(snap=>{
-
 const box=document.getElementById("comments-"+id);
 if(!box) return;
-
 box.innerHTML="";
-
 snap.forEach(d=>{
 const c=d.data();
-box.innerHTML+=`
-<div class="comment">
-<b>${c.user}</b>: ${c.text}
-</div>
-`;
+box.innerHTML+=`<div class="comment"><b>${c.user}</b>: ${c.text}</div>`;
 });
-
 });
 }
 
-/* USERS */
 function loadUsers(){
-
 db.collection("users").onSnapshot(snap=>{
-
 const box=document.getElementById("users");
 box.innerHTML="";
-
 snap.forEach(d=>{
 const u=d.data();
-
 if(u.name!==me){
-
 const online=Date.now()-(u.lastSeen||0)<5000;
-
-box.innerHTML+=`
-<div onclick="openChat('${u.name}')">
-👤 ${u.name} ${online?"🟢":"⚫"}
-</div>
-`;
+box.innerHTML+=`<div onclick="openChat('${u.name}')">👤 ${u.name} ${online?"🟢":"⚫"}</div>`;
 }
 });
-
 });
 }
 
-/* CHAT */
 function chatId(a,b){return[a,b].sort().join("_");}
 
 function openChat(u){
@@ -300,70 +253,47 @@ loadMessages();
 }
 
 function sendMsg(){
-
 const text=document.getElementById("msg").value;
 if(!text||!selected) return;
-
-db.collection("chats")
-.doc(chatId(me,selected))
-.collection("messages")
-.add({
-text,
-from:me,
-time:Date.now()
+db.collection("chats").doc(chatId(me,selected))
+.collection("messages").add({
+text,from:me,time:Date.now()
 });
-
 document.getElementById("msg").value="";
 }
 
 function loadMessages(){
-
-db.collection("chats")
-.doc(chatId(me,selected))
-.collection("messages")
-.orderBy("time")
+db.collection("chats").doc(chatId(me,selected))
+.collection("messages").orderBy("time")
 .onSnapshot(snap=>{
-
 const box=document.getElementById("chatBox");
 box.innerHTML="";
-
 snap.forEach(d=>{
 const m=d.data();
-
 box.innerHTML+=`
 <div class="msg ${m.from===me?'me':'other'}">
 ${m.text||""}
 ${m.audio?`<audio controls src="${m.audio}"></audio>`:""}
-</div>
-`;
+</div>`;
 });
-
 });
 }
 
-/* ADMIN */
 function loadAdminPosts(){
-
 db.collection("posts").orderBy("time","desc")
 .onSnapshot(snap=>{
-
 const box=document.getElementById("adminPosts");
 box.innerHTML="";
-
 snap.forEach(doc=>{
 const p=doc.data();
-
 box.innerHTML+=`
 <div class="post">
 <b>${p.user}</b>
 <p>${p.text}</p>
-
 <button onclick="deletePost('${doc.id}')">🗑 Supprimer</button>
 <button onclick="banUser('${p.user}')">🚫 Bannir</button>
-</div>
-`;
+</div>`;
 });
-
 });
 }
 
