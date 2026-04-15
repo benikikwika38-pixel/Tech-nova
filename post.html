@@ -2,25 +2,24 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>WhatsApp PRO MAX ULTRA</title>
+<title>WhatsApp ULTRA NEXT LEVEL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
   font-family: Arial;
-  background:#eef1f5;
+  background:#e9edf1;
 }
 
 header{
-  background:#0b57d0;
+  background:#0a5bd3;
   color:white;
   padding:12px;
   text-align:center;
   font-weight:bold;
 }
 
-/* NAV */
 .nav{
   display:flex;
   justify-content:space-around;
@@ -36,33 +35,13 @@ header{
   cursor:pointer;
 }
 
-/* BOX */
 .box{
   background:white;
   margin:10px;
   padding:10px;
   border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* POST */
-.post{
-  background:white;
-  padding:10px;
-  margin-top:10px;
-  border-radius:12px;
-}
-
-/* COMMENT */
-.comment{
-  background:#f1f1f1;
-  padding:5px;
-  margin-top:5px;
-  border-radius:8px;
-  font-size:13px;
-}
-
-/* CHAT */
 .chatBox{
   height:320px;
   overflow:auto;
@@ -72,48 +51,36 @@ header{
 }
 
 .msg{
-  margin:6px;
   padding:8px;
+  margin:5px;
   border-radius:10px;
   max-width:70%;
 }
 
-.me{
-  background:#d0e6ff;
-  margin-left:auto;
-  text-align:right;
+.me{background:#cfe6ff;margin-left:auto;text-align:right;}
+.other{background:#eee;}
+
+.small{
+  font-size:12px;
+  color:gray;
 }
 
-.other{
-  background:#eee;
+.typing{
+  font-size:12px;
+  color:gray;
+  height:20px;
 }
-
-/* AVATAR */
-.avatar{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  object-fit:cover;
-  vertical-align:middle;
-  margin-right:5px;
-}
-
-/* ONLINE */
-.online{color:green;font-size:12px;}
-.offline{color:gray;font-size:12px;}
 </style>
 </head>
 
 <body>
 
-<header>📱 WhatsApp PRO MAX ULTRA 🔥</header>
+<header>📱 WhatsApp ULTRA NEXT LEVEL 🔥</header>
 
 <div class="nav">
-  <button onclick="show('posts')">📢 Posts</button>
   <button onclick="show('chat')">💬 Chat</button>
 </div>
 
-<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
   <input id="email" placeholder="Email">
@@ -123,42 +90,16 @@ header{
 
 <div id="app" style="display:none;">
 
-  <!-- PROFIL -->
   <div class="box">
-    <h3>👤 Profil</h3>
+    <h3>💬 Chat global</h3>
 
-    <input id="username" placeholder="Nom">
-    <input id="bio" placeholder="Bio">
-    <input type="file" id="avatar">
+    <div class="chatBox" id="chatBox"></div>
 
-    <button onclick="saveProfile()">💾 Sauvegarder</button>
-
-    <div id="profile"></div>
+    <div id="typing" class="typing"></div>
   </div>
 
-  <!-- POSTS -->
-  <div id="postsSection">
-
-    <div class="box">
-      <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-      <button onclick="addPost()">📤 Publier</button>
-    </div>
-
-    <div id="feed"></div>
-  </div>
-
-  <!-- CHAT -->
-  <div id="chatSection" style="display:none;">
-
-    <div class="box">
-      <h3>💬 Chat global</h3>
-      <div class="chatBox" id="chatBox"></div>
-    </div>
-
-    <input id="msg" placeholder="Message...">
-    <button onclick="sendMsg()">Envoyer</button>
-
-  </div>
+  <input id="msg" placeholder="Message..." oninput="typing()">
+  <button onclick="sendMsg()">Envoyer</button>
 
 </div>
 
@@ -179,183 +120,117 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me = "";
+let me="";
+let typingTimeout;
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 function login(){
-  const email=document.getElementById("email").value;
-  const password=document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email,password)
+  auth.signInWithEmailAndPassword(
+    document.getElementById("email").value,
+    document.getElementById("password").value
+  )
   .then(u=>{
     me=u.user.email;
 
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
-    loadProfile();
-    loadPosts();
     loadChat();
+    presence();
   })
   .catch(e=>alert(e.message));
 }
 
-/* ================= PROFILE WITH AVATAR ================= */
-function saveProfile(){
-
-  const name=document.getElementById("username").value;
-  const bio=document.getElementById("bio").value;
-  const file=document.getElementById("avatar").files[0];
-
-  const ref=db.collection("users").doc(me);
-
-  const save=(img="")=>{
-    ref.set({
-      name,
-      bio,
-      avatar:img,
-      lastSeen:Date.now()
-    },{merge:true});
-  };
-
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
-    reader.readAsDataURL(file);
-  } else save();
-}
-
-function loadProfile(){
-  db.collection("users").doc(me).onSnapshot(doc=>{
-    if(!doc.exists) return;
-
-    const u=doc.data();
-
-    document.getElementById("profile").innerHTML=`
-      <div class="post">
-        <img class="avatar" src="${u.avatar||''}">
-        <b>${u.name||me}</b>
-        <p>${u.bio||''}</p>
-      </div>
-    `;
-  });
-}
-
-/* ================= POSTS ================= */
-function addPost(){
-  db.collection("posts").add({
-    text:document.getElementById("postText").value,
-    user:me,
-    likes:0,
-    time:Date.now()
-  });
-}
-
-function loadPosts(){
-  db.collection("posts")
-  .orderBy("time","desc")
-  .onSnapshot(snap=>{
-
-    let feed=document.getElementById("feed");
-    feed.innerHTML="";
-
-    snap.forEach(doc=>{
-      let p=doc.data();
-
-      feed.innerHTML+=`
-        <div class="post">
-          <img class="avatar" src="${p.avatar||''}">
-          <b>${p.user}</b>
-          <p>${p.text}</p>
-
-          ❤️ ${p.likes||0}
-          <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
-
-          <input id="c-${doc.id}" placeholder="comment">
-          <button onclick="comment('${doc.id}')">OK</button>
-
-          <div id="comments-${doc.id}"></div>
-        </div>
-      `;
-
-      loadComments(doc.id);
-    });
-
-  });
-}
-
-function like(id,l){
-  db.collection("posts").doc(id).update({
-    likes:l+1
-  });
-}
-
-function comment(id){
-  let input=document.getElementById("c-"+id);
-
-  db.collection("posts").doc(id)
-  .collection("comments").add({
-    text:input.value,
-    user:me
-  });
-
-  input.value="";
-}
-
-function loadComments(id){
-  db.collection("posts").doc(id)
-  .collection("comments")
-  .onSnapshot(s=>{
-    let box=document.getElementById("comments-"+id);
-    box.innerHTML="";
-
-    s.forEach(d=>{
-      box.innerHTML+=`
-        <div class="comment">
-          <b>${d.data().user}</b>: ${d.data().text}
-        </div>
-      `;
-    });
-  });
-}
-
-/* ================= CHAT ================= */
+/* ================= SEND MSG ================= */
 function sendMsg(){
-  let text=document.getElementById("msg").value;
+
+  const text=document.getElementById("msg").value;
+  if(!text) return;
 
   db.collection("chats").add({
     text,
     from:me,
-    time:Date.now()
+    time:Date.now(),
+    seen:false
   });
 
   document.getElementById("msg").value="";
 }
 
+/* ================= CHAT REAL TIME ================= */
 function loadChat(){
   db.collection("chats")
   .orderBy("time")
-  .onSnapshot(s=>{
+  .onSnapshot(snap=>{
+
     let box=document.getElementById("chatBox");
     box.innerHTML="";
 
-    s.forEach(d=>{
-      let m=d.data();
+    snap.forEach(doc=>{
+      let m=doc.data();
+
+      let status = m.seen ? "✔✔ vu" : "✔ envoyé";
 
       box.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
           <b>${m.from}</b><br>
           ${m.text}
+          <div class="small">${status}</div>
         </div>
       `;
+
+      // mark as seen
+      if(m.from !== me){
+        db.collection("chats").doc(doc.id).update({
+          seen:true
+        });
+      }
+
     });
+
   });
 }
 
+/* ================= TYPING ================= */
+function typing(){
+
+  db.collection("typing").doc("global").set({
+    user:me,
+    time:Date.now()
+  });
+
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(()=>{
+    db.collection("typing").doc("global").delete();
+  },1000);
+}
+
+/* show typing */
+db.collection("typing").doc("global")
+.onSnapshot(doc=>{
+  let t=document.getElementById("typing");
+
+  if(doc.exists){
+    t.innerText = "⌨️ " + doc.data().user + " écrit...";
+  } else {
+    t.innerText = "";
+  }
+});
+
+/* ================= PRESENCE ONLINE ================= */
+function presence(){
+  setInterval(()=>{
+    if(me){
+      db.collection("users").doc(me).set({
+        lastSeen:Date.now()
+      },{merge:true});
+    }
+  },3000);
+}
+
 /* NAV */
-function show(page){
-  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
-  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
+function show(){
+  document.getElementById("chatSection").style.display="block";
 }
 
 </script>
