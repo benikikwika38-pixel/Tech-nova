@@ -2,29 +2,31 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>WhatsApp PRO MAX 2</title>
+<title>WhatsApp PRO MAX ULTRA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
   margin:0;
   font-family: Arial;
-  background:#f0f2f5;
+  background:#eef1f5;
 }
 
 header{
-  background:#1877f2;
+  background:#0b57d0;
   color:white;
-  padding:10px;
+  padding:12px;
   text-align:center;
   font-weight:bold;
 }
 
+/* NAV */
 .nav{
   display:flex;
   justify-content:space-around;
   background:white;
   padding:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 .nav button{
@@ -34,60 +36,81 @@ header{
   cursor:pointer;
 }
 
+/* BOX */
 .box{
   background:white;
   margin:10px;
   padding:10px;
-  border-radius:10px;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
 }
 
+/* POST */
 .post{
   background:white;
   padding:10px;
   margin-top:10px;
-  border-radius:10px;
+  border-radius:12px;
 }
 
+/* COMMENT */
 .comment{
-  background:#eee;
+  background:#f1f1f1;
   padding:5px;
   margin-top:5px;
-  border-radius:5px;
+  border-radius:8px;
+  font-size:13px;
 }
 
+/* CHAT */
 .chatBox{
-  height:300px;
+  height:320px;
   overflow:auto;
   background:white;
   padding:10px;
+  border-radius:12px;
 }
 
 .msg{
-  margin:5px;
-  padding:6px;
-  border-radius:8px;
+  margin:6px;
+  padding:8px;
+  border-radius:10px;
+  max-width:70%;
 }
 
-.me{background:#d1e7ff; text-align:right;}
-.other{background:#eee;}
-
-.online{color:green;}
-.offline{color:gray;}
-
-.typing{
-  font-size:12px;
-  color:gray;
+.me{
+  background:#d0e6ff;
+  margin-left:auto;
+  text-align:right;
 }
+
+.other{
+  background:#eee;
+}
+
+/* AVATAR */
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+  vertical-align:middle;
+  margin-right:5px;
+}
+
+/* ONLINE */
+.online{color:green;font-size:12px;}
+.offline{color:gray;font-size:12px;}
 </style>
 </head>
 
 <body>
 
-<header>📘 WhatsApp PRO MAX 2 🔥</header>
+<header>📱 WhatsApp PRO MAX ULTRA 🔥</header>
 
 <div class="nav">
-  <button onclick="show('posts')">📢 Facebook</button>
-  <button onclick="show('chat')">💬 WhatsApp</button>
+  <button onclick="show('posts')">📢 Posts</button>
+  <button onclick="show('chat')">💬 Chat</button>
 </div>
 
 <!-- LOGIN -->
@@ -100,33 +123,36 @@ header{
 
 <div id="app" style="display:none;">
 
-  <!-- PROFILE -->
+  <!-- PROFIL -->
   <div class="box">
-    <h3>Profil</h3>
+    <h3>👤 Profil</h3>
+
     <input id="username" placeholder="Nom">
     <input id="bio" placeholder="Bio">
-    <button onclick="saveProfile()">Sauvegarder</button>
+    <input type="file" id="avatar">
+
+    <button onclick="saveProfile()">💾 Sauvegarder</button>
+
     <div id="profile"></div>
   </div>
 
-  <!-- POSTS FACEBOOK STYLE -->
+  <!-- POSTS -->
   <div id="postsSection">
 
     <div class="box">
       <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-      <button onclick="addPost()">Publier</button>
+      <button onclick="addPost()">📤 Publier</button>
     </div>
 
     <div id="feed"></div>
   </div>
 
-  <!-- CHAT WHATSAPP STYLE -->
+  <!-- CHAT -->
   <div id="chatSection" style="display:none;">
 
     <div class="box">
       <h3>💬 Chat global</h3>
       <div class="chatBox" id="chatBox"></div>
-      <div id="typing" class="typing"></div>
     </div>
 
     <input id="msg" placeholder="Message...">
@@ -153,9 +179,9 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me="";
+let me = "";
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 function login(){
   const email=document.getElementById("email").value;
   const password=document.getElementById("password").value;
@@ -167,35 +193,55 @@ function login(){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
+    loadProfile();
     loadPosts();
     loadChat();
-    loadProfile();
   })
   .catch(e=>alert(e.message));
 }
 
-/* ================= PROFILE ================= */
+/* ================= PROFILE WITH AVATAR ================= */
 function saveProfile(){
-  db.collection("users").doc(me).set({
-    name:document.getElementById("username").value,
-    bio:document.getElementById("bio").value,
-    lastSeen:Date.now()
-  },{merge:true});
+
+  const name=document.getElementById("username").value;
+  const bio=document.getElementById("bio").value;
+  const file=document.getElementById("avatar").files[0];
+
+  const ref=db.collection("users").doc(me);
+
+  const save=(img="")=>{
+    ref.set({
+      name,
+      bio,
+      avatar:img,
+      lastSeen:Date.now()
+    },{merge:true});
+  };
+
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save();
 }
 
 function loadProfile(){
-  db.collection("users").doc(me).onSnapshot(d=>{
-    if(!d.exists) return;
-    const u=d.data();
+  db.collection("users").doc(me).onSnapshot(doc=>{
+    if(!doc.exists) return;
+
+    const u=doc.data();
 
     document.getElementById("profile").innerHTML=`
-      <b>${u.name}</b>
-      <p>${u.bio}</p>
+      <div class="post">
+        <img class="avatar" src="${u.avatar||''}">
+        <b>${u.name||me}</b>
+        <p>${u.bio||''}</p>
+      </div>
     `;
   });
 }
 
-/* ================= POSTS FACEBOOK ================= */
+/* ================= POSTS ================= */
 function addPost(){
   db.collection("posts").add({
     text:document.getElementById("postText").value,
@@ -218,14 +264,15 @@ function loadPosts(){
 
       feed.innerHTML+=`
         <div class="post">
+          <img class="avatar" src="${p.avatar||''}">
           <b>${p.user}</b>
           <p>${p.text}</p>
 
-          ❤️ ${p.likes}
-          <button onclick="like('${doc.id}',${p.likes})">Like</button>
+          ❤️ ${p.likes||0}
+          <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
 
           <input id="c-${doc.id}" placeholder="comment">
-          <button onclick="comment('${doc.id}')">Send</button>
+          <button onclick="comment('${doc.id}')">OK</button>
 
           <div id="comments-${doc.id}"></div>
         </div>
@@ -261,13 +308,18 @@ function loadComments(id){
   .onSnapshot(s=>{
     let box=document.getElementById("comments-"+id);
     box.innerHTML="";
+
     s.forEach(d=>{
-      box.innerHTML+=`<div class="comment"><b>${d.data().user}</b>: ${d.data().text}</div>`;
+      box.innerHTML+=`
+        <div class="comment">
+          <b>${d.data().user}</b>: ${d.data().text}
+        </div>
+      `;
     });
   });
 }
 
-/* ================= CHAT WHATSAPP ================= */
+/* ================= CHAT ================= */
 function sendMsg(){
   let text=document.getElementById("msg").value;
 
@@ -283,25 +335,24 @@ function sendMsg(){
 function loadChat(){
   db.collection("chats")
   .orderBy("time")
-  .onSnapshot(snap=>{
-
+  .onSnapshot(s=>{
     let box=document.getElementById("chatBox");
     box.innerHTML="";
 
-    snap.forEach(d=>{
+    s.forEach(d=>{
       let m=d.data();
 
       box.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
-          <b>${m.from}</b><br>${m.text}
+          <b>${m.from}</b><br>
+          ${m.text}
         </div>
       `;
     });
-
   });
 }
 
-/* ================= NAV ================= */
+/* NAV */
 function show(page){
   document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
   document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
@@ -310,4 +361,4 @@ function show(page){
 </script>
 
 </body>
-  </html>
+</html>
