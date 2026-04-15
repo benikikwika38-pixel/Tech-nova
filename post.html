@@ -77,12 +77,6 @@ header{
 
 .me{ background:#d1e7ff; text-align:right; }
 .other{ background:#eee; }
-
-img.avatar{
-  width:35px;
-  height:35px;
-  border-radius:50%;
-}
 </style>
 </head>
 
@@ -108,19 +102,6 @@ img.avatar{
 
 <!-- APP -->
 <div id="app" style="display:none;">
-
-<!-- 👤 PROFIL AJOUTÉ -->
-<div class="box">
-  <h3>👤 Profil utilisateur</h3>
-
-  <input id="username" placeholder="Nom affiché">
-  <input id="bio" placeholder="Bio">
-  <input type="file" id="avatar" accept="image/*">
-
-  <button onclick="saveProfile()">💾 Sauvegarder profil</button>
-
-  <div id="myProfile"></div>
-</div>
 
 <!-- POSTS -->
 <div id="postsSection">
@@ -152,6 +133,8 @@ img.avatar{
 
 </div>
 
+</div>
+
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -159,7 +142,7 @@ img.avatar{
 
 <script>
 
-/* ================= FIREBASE ================= */
+/* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -177,7 +160,7 @@ const db = firebase.firestore();
 /* ================= VARIABLES ================= */
 let me = "";
 let selected = "";
-let profile = {};
+let isAdmin = false;
 
 /* ================= LOGIN ================= */
 function login(){
@@ -185,110 +168,88 @@ function login(){
   const email = document.getElementById("name").value;
   const password = document.getElementById("password").value;
 
+  // 👑 ADMIN
   if(email === "admin" && password === "jemima"){
+    isAdmin = true;
     me = "ADMIN";
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("app").style.display="block";
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("app").style.display = "block";
+
     loadPosts();
     loadUsers();
-    loadProfile();
+
+    alert("👑 Admin connecté");
     return;
   }
 
-  auth.signInWithEmailAndPassword(email,password)
-  .then(user=>{
+  // 👤 STUDENT
+  auth.signInWithEmailAndPassword(email, password)
+  .then(user => {
+
     me = user.user.email;
 
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("app").style.display="block";
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("app").style.display = "block";
 
     startPresence();
     loadPosts();
     loadUsers();
-    loadProfile();
 
   })
-  .catch(err=>alert(err.message));
+  .catch(err=>{
+    alert("❌ " + err.message);
+  });
 }
 
 /* ================= SIGNUP ================= */
 function signup(){
 
-  const email=document.getElementById("name").value;
-  const password=document.getElementById("password").value;
+  const email = document.getElementById("name").value;
+  const password = document.getElementById("password").value;
 
-  auth.createUserWithEmailAndPassword(email,password)
-  .then(()=>alert("Compte créé"))
-  .catch(err=>alert(err.message));
-}
-
-/* ================= PROFIL ================= */
-function saveProfile(){
-
-  const name=document.getElementById("username").value;
-  const bio=document.getElementById("bio").value;
-  const file=document.getElementById("avatar").files[0];
-
-  const save=(img="")=>{
-
-    profile={name,bio,avatar:img};
-
-    db.collection("users").doc(me).set({
-      name,
-      bio,
-      avatar:img,
-      lastSeen:Date.now()
-    });
-
-    loadProfile();
-  };
-
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
-    reader.readAsDataURL(file);
-  } else save();
-}
-
-function loadProfile(){
-
-  db.collection("users").doc(me).get()
-  .then(doc=>{
-    if(!doc.exists) return;
-
-    const u=doc.data();
-
-    document.getElementById("myProfile").innerHTML=`
-      <div class="post">
-        <img class="avatar" src="${u.avatar||''}">
-        <b>${u.name||u.email}</b>
-        <p>${u.bio||''}</p>
-      </div>
-    `;
+  auth.createUserWithEmailAndPassword(email, password)
+  .then(()=>{
+    alert("✅ Compte créé !");
+  })
+  .catch(err=>{
+    alert("❌ " + err.message);
   });
+}
+
+/* ================= NAV ================= */
+function show(page){
+  document.getElementById("postsSection").style.display = page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display = page==='chat'?'block':'none';
 }
 
 /* ================= POSTS ================= */
 function addPost(){
 
-  const text=document.getElementById("postText").value;
-  const file=document.getElementById("postImage").files[0];
+  const text = document.getElementById("postText").value;
+  const file = document.getElementById("postImage").files[0];
 
-  const save=(img="")=>{
+  if(!text && !file) return;
+
+  const save = (img="")=>{
     db.collection("posts").add({
       text,
-      image:img,
-      user:me,
-      likes:0,
-      time:Date.now()
+      image: img,
+      user: me,
+      likes: 0,
+      time: Date.now(),
+      sponsored: isAdmin
     });
   };
 
   if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
+    const reader = new FileReader();
+    reader.onload = ()=>save(reader.result);
     reader.readAsDataURL(file);
   } else save();
+
+  document.getElementById("postText").value="";
+  document.getElementById("postImage").value="";
 }
 
 function loadPosts(){
@@ -300,16 +261,70 @@ function loadPosts(){
     feed.innerHTML="";
 
     snap.forEach(doc=>{
+
       const p=doc.data();
 
       feed.innerHTML+=`
         <div class="post">
+          ${p.sponsored ? "📢 <b>Sponsorisé</b>" : ""}
           <b>${p.user}</b>
           <p>${p.text||""}</p>
-          ${p.image?`<img src="${p.image}" style="width:100%">`:``}
-          ❤️ ${p.likes||0}
+          ${p.image ? `<img src="${p.image}" style="width:100%">` : ""}
+          
+          <button onclick="like('${doc.id}',${p.likes||0})">❤️ ${p.likes||0}</button>
+
+          ${isAdmin ? `<button onclick="deletePost('${doc.id}')">🗑️</button>` : ""}
+
+          <input id="c-${doc.id}">
+          <button onclick="comment('${doc.id}')">💬</button>
+
+          <div id="comments-${doc.id}"></div>
         </div>
       `;
+
+      loadComments(doc.id);
+    });
+
+  });
+}
+
+function like(id,likes){
+  db.collection("posts").doc(id).update({likes:likes+1});
+}
+
+function deletePost(id){
+  if(isAdmin){
+    db.collection("posts").doc(id).delete();
+  }
+}
+
+/* ================= COMMENTS ================= */
+function comment(id){
+  const input=document.getElementById("c-"+id);
+
+  db.collection("posts").doc(id)
+  .collection("comments").add({
+    text:input.value,
+    user:me,
+    time:Date.now()
+  });
+
+  input.value="";
+}
+
+function loadComments(id){
+
+  db.collection("posts").doc(id)
+  .collection("comments")
+  .onSnapshot(snap=>{
+
+    const box=document.getElementById("comments-"+id);
+    if(!box) return;
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      const c=d.data();
+      box.innerHTML+=`<div class="comment"><b>${c.user}</b>: ${c.text}</div>`;
     });
 
   });
@@ -325,14 +340,11 @@ function loadUsers(){
 
     snap.forEach(d=>{
       const u=d.data();
-      const online=Date.now()-u.lastSeen<5000;
 
-      box.innerHTML+=`
-        <div>
-          <img class="avatar" src="${u.avatar||''}">
-          👤 ${u.name||u.email} ${online?"🟢":"⚫"}
-        </div>
-      `;
+      if(u.name!==me){
+        const online = Date.now()-u.lastSeen<5000;
+        box.innerHTML+=`<div>👤 ${u.name} ${online?"🟢":"⚫"}</div>`;
+      }
     });
 
   });
@@ -341,14 +353,12 @@ function loadUsers(){
 function startPresence(){
 
   setInterval(()=>{
-
     if(me){
       db.collection("users").doc(me).set({
         name:me,
         lastSeen:Date.now()
-      }).catch(()=>{});
+      });
     }
-
   },3000);
 }
 
@@ -358,7 +368,8 @@ function sendMsg(){
   const text=document.getElementById("msg").value;
   if(!text||!selected) return;
 
-  db.collection("chats").add({
+  db.collection("chats").doc([me,selected].sort().join("_"))
+  .collection("messages").add({
     text,
     from:me,
     time:Date.now()
@@ -367,10 +378,31 @@ function sendMsg(){
   document.getElementById("msg").value="";
 }
 
-/* ================= NAV ================= */
-function show(page){
-  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
-  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
+function loadMessages(){
+
+  db.collection("chats").doc([me,selected].sort().join("_"))
+  .collection("messages").orderBy("time")
+  .onSnapshot(snap=>{
+
+    const box=document.getElementById("chatBox");
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      const m=d.data();
+
+      box.innerHTML+=`
+        <div class="msg ${m.from===me?'me':'other'}">
+          ${m.text||""}
+        </div>
+      `;
+    });
+
+  });
+}
+
+function openChat(u){
+  selected=u;
+  loadMessages();
 }
 
 </script>
