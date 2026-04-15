@@ -152,14 +152,12 @@ img.avatar{
 
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
 
-/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -178,7 +176,7 @@ let me = "";
 let selected = "";
 let isAdmin = false;
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 function login(){
 
   const email = document.getElementById("name").value;
@@ -214,7 +212,7 @@ function login(){
   .catch(err=>alert(err.message));
 }
 
-/* ================= SIGNUP ================= */
+/* SIGNUP */
 function signup(){
   const email=document.getElementById("name").value;
   const password=document.getElementById("password").value;
@@ -224,7 +222,7 @@ function signup(){
   .catch(err=>alert(err.message));
 }
 
-/* ================= PROFILE FIX ================= */
+/* ================= FIX PROFIL (IMPORTANT) ================= */
 function saveProfile(){
 
   const name=document.getElementById("username").value;
@@ -238,13 +236,6 @@ function saveProfile(){
       bio,
       avatar:img,
       lastSeen:Date.now()
-    })
-    .then(()=>{
-      loadProfile();
-      loadUsers();
-    })
-    .catch(err=>{
-      alert(err.message);
     });
 
   };
@@ -256,17 +247,35 @@ function saveProfile(){
   } else save("");
 }
 
-/* 🔥 FIX : profil ne disparaît plus */
+/* 🔥 FIX PROFIL STABLE */
 function loadProfile(){
 
   if(!me) return;
 
-  db.collection("users").doc(me).onSnapshot(doc=>{
+  const ref = db.collection("users").doc(me);
+
+  // création auto si inexistant
+  ref.get().then(doc=>{
+    if(!doc.exists){
+      ref.set({
+        name: me,
+        bio: "",
+        avatar: "",
+        lastSeen: Date.now()
+      });
+    }
+  });
+
+  // affichage LIVE
+  ref.onSnapshot(doc=>{
     if(!doc.exists) return;
 
-    const u=doc.data();
+    const u = doc.data();
 
-    document.getElementById("myProfile").innerHTML=`
+    const box = document.getElementById("myProfile");
+    if(!box) return;
+
+    box.innerHTML = `
       <div class="post">
         <img class="avatar" src="${u.avatar||''}">
         <b>${u.name||me}</b>
@@ -276,32 +285,20 @@ function loadProfile(){
   });
 }
 
-/* ================= POSTS ================= */
+/* POSTS */
 function addPost(){
 
   const text=document.getElementById("postText").value;
   const file=document.getElementById("postImage").files[0];
 
-  if(!text && !file){
-    alert("Écris quelque chose !");
-    return;
-  }
-
   const save=(img="")=>{
-
     db.collection("posts").add({
       text,
       image:img,
       user:me,
       likes:0,
       time:Date.now()
-    })
-    .then(()=>{
-      document.getElementById("postText").value="";
-      document.getElementById("postImage").value="";
-    })
-    .catch(err=>alert(err.message));
-
+    });
   };
 
   if(file){
@@ -311,99 +308,7 @@ function addPost(){
   } else save("");
 }
 
-/* 🗑️ ADMIN DELETE POST */
-function deletePost(id){
-
-  if(!isAdmin){
-    alert("Accès refusé");
-    return;
-  }
-
-  db.collection("posts").doc(id).delete();
-}
-
-/* ================= LOAD POSTS ================= */
-function loadPosts(){
-
-  db.collection("posts").orderBy("time","desc")
-  .onSnapshot(snap=>{
-
-    const feed=document.getElementById("feed");
-    feed.innerHTML="";
-
-    snap.forEach(doc=>{
-      const p=doc.data();
-
-      feed.innerHTML+=`
-        <div class="post">
-
-          ${isAdmin ? `<button onclick="deletePost('${doc.id}')">🗑️ Supprimer</button>` : ""}
-
-          <b>${p.user}</b>
-          <p>${p.text}</p>
-
-          ${p.image?`<img src="${p.image}" style="width:100%">`:``}
-
-          ❤️ ${p.likes||0}
-          <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
-
-          <input id="c-${doc.id}">
-          <button onclick="comment('${doc.id}')">💬</button>
-
-          <div id="comments-${doc.id}"></div>
-        </div>
-      `;
-
-      loadComments(doc.id);
-    });
-
-  });
-}
-
-function like(id,l){
-  db.collection("posts").doc(id).update({likes:l+1});
-}
-
-/* ================= COMMENTS ================= */
-function comment(id){
-
-  const input=document.getElementById("c-"+id);
-  if(!input || !input.value) return;
-
-  db.collection("posts").doc(id)
-  .collection("comments").add({
-    text:input.value,
-    user:me,
-    time:Date.now()
-  });
-
-  input.value="";
-}
-
-function loadComments(id){
-
-  db.collection("posts").doc(id)
-  .collection("comments")
-  .onSnapshot(snap=>{
-
-    const box=document.getElementById("comments-"+id);
-    if(!box) return;
-
-    box.innerHTML="";
-
-    snap.forEach(d=>{
-      const c=d.data();
-      box.innerHTML+=`
-        <div class="comment">
-          <b>${c.user}</b>: ${c.text}
-        </div>
-      `;
-    });
-
-  });
-}
-
-/* ================= USERS ================= */
+/* USERS */
 function loadUsers(){
 
   db.collection("users").onSnapshot(snap=>{
@@ -426,22 +331,36 @@ function loadUsers(){
   });
 }
 
-function startPresence(){
+/* CHAT */
+function sendMsg(){
 
+  const text=document.getElementById("msg").value;
+  if(!text) return;
+
+  db.collection("chats").add({
+    text,
+    from:me,
+    time:Date.now()
+  });
+
+  document.getElementById("msg").value="";
+}
+
+/* NAV */
+function show(page){
+  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
+  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
+}
+
+function startPresence(){
   setInterval(()=>{
     if(me){
       db.collection("users").doc(me).set({
         name:me,
         lastSeen:Date.now()
-      }).catch(()=>{});
+      });
     }
   },3000);
-}
-
-/* ================= NAV ================= */
-function show(page){
-  document.getElementById("postsSection").style.display=page==='posts'?'block':'none';
-  document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
 </script>
