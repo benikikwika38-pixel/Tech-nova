@@ -25,14 +25,6 @@ header{
   justify-content:space-around;
   background:white;
   padding:10px;
-  box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
-
-.nav button{
-  border:none;
-  background:none;
-  font-weight:bold;
-  cursor:pointer;
 }
 
 .box{
@@ -65,10 +57,10 @@ header{
   color:gray;
 }
 
-.typing{
-  font-size:12px;
-  color:gray;
-  height:20px;
+.user{
+  padding:8px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -76,10 +68,6 @@ header{
 <body>
 
 <header>📱 WhatsApp ULTRA NEXT LEVEL 🔥</header>
-
-<div class="nav">
-  <button onclick="show('chat')">💬 Chat</button>
-</div>
 
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
@@ -90,15 +78,19 @@ header{
 
 <div id="app" style="display:none;">
 
+  <!-- USERS -->
   <div class="box">
-    <h3>💬 Chat global</h3>
-
-    <div class="chatBox" id="chatBox"></div>
-
-    <div id="typing" class="typing"></div>
+    <h3>👥 Utilisateurs</h3>
+    <div id="users"></div>
   </div>
 
-  <input id="msg" placeholder="Message..." oninput="typing()">
+  <!-- CHAT -->
+  <div class="box">
+    <h3>💬 Chat privé</h3>
+    <div class="chatBox" id="chatBox"></div>
+  </div>
+
+  <input id="msg" placeholder="Message...">
   <button onclick="sendMsg()">Envoyer</button>
 
 </div>
@@ -121,9 +113,9 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let me="";
-let typingTimeout;
+let chatWith=""; // 👈 utilisateur sélectionné
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 function login(){
   auth.signInWithEmailAndPassword(
     document.getElementById("email").value,
@@ -135,14 +127,45 @@ function login(){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
-    loadChat();
+    loadUsers();
     presence();
   })
   .catch(e=>alert(e.message));
 }
 
-/* ================= SEND MSG ================= */
+/* USERS LIST */
+function loadUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    let box=document.getElementById("users");
+    box.innerHTML="";
+
+    snap.forEach(doc=>{
+      let u=doc.id;
+
+      if(u===me) return;
+
+      box.innerHTML+=`
+        <div class="user" onclick="selectUser('${u}')">
+          👤 ${u}
+        </div>
+      `;
+    });
+  });
+}
+
+/* SELECT USER */
+function selectUser(user){
+  chatWith=user;
+  loadChat();
+}
+
+/* SEND MSG (PRIVÉ) */
 function sendMsg(){
+
+  if(!chatWith){
+    alert("Choisis un utilisateur !");
+    return;
+  }
 
   const text=document.getElementById("msg").value;
   if(!text) return;
@@ -150,6 +173,7 @@ function sendMsg(){
   db.collection("chats").add({
     text,
     from:me,
+    to:chatWith,
     time:Date.now(),
     seen:false
   });
@@ -157,8 +181,9 @@ function sendMsg(){
   document.getElementById("msg").value="";
 }
 
-/* ================= CHAT REAL TIME ================= */
+/* LOAD CHAT PRIVÉ */
 function loadChat(){
+
   db.collection("chats")
   .orderBy("time")
   .onSnapshot(snap=>{
@@ -169,21 +194,26 @@ function loadChat(){
     snap.forEach(doc=>{
       let m=doc.data();
 
-      let status = m.seen ? "✔✔ vu" : "✔ envoyé";
+      // 🔥 CONDITION PRIVÉ
+      if(
+        (m.from===me && m.to===chatWith) ||
+        (m.from===chatWith && m.to===me)
+      ){
 
-      box.innerHTML+=`
-        <div class="msg ${m.from===me?'me':'other'}">
-          <b>${m.from}</b><br>
-          ${m.text}
-          <div class="small">${status}</div>
-        </div>
-      `;
+        let status = m.seen ? "✔✔ vu" : "✔ envoyé";
 
-      // mark as seen
-      if(m.from !== me){
-        db.collection("chats").doc(doc.id).update({
-          seen:true
-        });
+        box.innerHTML+=`
+          <div class="msg ${m.from===me?'me':'other'}">
+            ${m.text}
+            <div class="small">${status}</div>
+          </div>
+        `;
+
+        // mark seen
+        if(m.to===me){
+          db.collection("chats").doc(doc.id).update({seen:true});
+        }
+
       }
 
     });
@@ -191,33 +221,7 @@ function loadChat(){
   });
 }
 
-/* ================= TYPING ================= */
-function typing(){
-
-  db.collection("typing").doc("global").set({
-    user:me,
-    time:Date.now()
-  });
-
-  clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{
-    db.collection("typing").doc("global").delete();
-  },1000);
-}
-
-/* show typing */
-db.collection("typing").doc("global")
-.onSnapshot(doc=>{
-  let t=document.getElementById("typing");
-
-  if(doc.exists){
-    t.innerText = "⌨️ " + doc.data().user + " écrit...";
-  } else {
-    t.innerText = "";
-  }
-});
-
-/* ================= PRESENCE ONLINE ================= */
+/* ONLINE STATUS */
 function presence(){
   setInterval(()=>{
     if(me){
@@ -228,12 +232,7 @@ function presence(){
   },3000);
 }
 
-/* NAV */
-function show(){
-  document.getElementById("chatSection").style.display="block";
-}
-
 </script>
 
 </body>
-  </html>
+</html>
