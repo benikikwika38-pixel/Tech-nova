@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>TechNova WhatsApp PRO MAX</title>
+<title>WhatsApp PRO MAX 2</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -36,8 +36,8 @@ header{
 
 .box{
   background:white;
-  padding:10px;
   margin:10px;
+  padding:10px;
   border-radius:10px;
 }
 
@@ -55,62 +55,83 @@ header{
   border-radius:5px;
 }
 
-img.avatar{
-  width:35px;
-  height:35px;
-  border-radius:50%;
+.chatBox{
+  height:300px;
+  overflow:auto;
+  background:white;
+  padding:10px;
+}
+
+.msg{
+  margin:5px;
+  padding:6px;
+  border-radius:8px;
+}
+
+.me{background:#d1e7ff; text-align:right;}
+.other{background:#eee;}
+
+.online{color:green;}
+.offline{color:gray;}
+
+.typing{
+  font-size:12px;
+  color:gray;
 }
 </style>
 </head>
 
 <body>
 
-<header>📘 WhatsApp PRO MAX 🔥</header>
+<header>📘 WhatsApp PRO MAX 2 🔥</header>
 
 <div class="nav">
-  <button onclick="show('posts')">📢 Posts</button>
-  <button onclick="show('chat')">💬 Chat</button>
+  <button onclick="show('posts')">📢 Facebook</button>
+  <button onclick="show('chat')">💬 WhatsApp</button>
 </div>
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
-  <input id="name" placeholder="Email">
+  <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Mot de passe">
   <button onclick="login()">Entrer</button>
 </div>
 
 <div id="app" style="display:none;">
 
-  <!-- PROFIL -->
+  <!-- PROFILE -->
   <div class="box">
     <h3>Profil</h3>
     <input id="username" placeholder="Nom">
     <input id="bio" placeholder="Bio">
-    <input type="file" id="avatar">
     <button onclick="saveProfile()">Sauvegarder</button>
-    <div id="myProfile"></div>
+    <div id="profile"></div>
   </div>
 
-  <!-- POSTS -->
+  <!-- POSTS FACEBOOK STYLE -->
   <div id="postsSection">
+
     <div class="box">
       <textarea id="postText" placeholder="Exprime-toi..."></textarea>
-      <input type="file" id="postImage">
       <button onclick="addPost()">Publier</button>
     </div>
 
     <div id="feed"></div>
   </div>
 
-  <!-- CHAT -->
+  <!-- CHAT WHATSAPP STYLE -->
   <div id="chatSection" style="display:none;">
+
     <div class="box">
-      <h3>Chat</h3>
-      <div id="chatBox"></div>
+      <h3>💬 Chat global</h3>
+      <div class="chatBox" id="chatBox"></div>
+      <div id="typing" class="typing"></div>
     </div>
 
-    <input id="msg" placeholder="Message">
+    <input id="msg" placeholder="Message...">
     <button onclick="sendMsg()">Envoyer</button>
+
   </div>
 
 </div>
@@ -125,9 +146,6 @@ const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
   projectId: "technova-academy",
-  storageBucket: "technova-academy.appspot.com",
-  messagingSenderId: "321716769948",
-  appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -135,114 +153,79 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me = "";
+let me="";
 
 /* ================= LOGIN ================= */
 function login(){
-  const email = document.getElementById("name").value;
-  const password = document.getElementById("password").value;
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
 
   auth.signInWithEmailAndPassword(email,password)
-  .then(user=>{
-    me = user.user.email;
+  .then(u=>{
+    me=u.user.email;
 
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
     loadPosts();
+    loadChat();
     loadProfile();
   })
-  .catch(err=>alert(err.message));
+  .catch(e=>alert(e.message));
 }
 
 /* ================= PROFILE ================= */
 function saveProfile(){
-  const name=document.getElementById("username").value;
-  const bio=document.getElementById("bio").value;
-  const file=document.getElementById("avatar").files[0];
-
-  const ref = db.collection("users").doc(me);
-
-  const save = (img="")=>{
-    ref.set({
-      name,
-      bio,
-      avatar:img,
-      lastSeen:Date.now()
-    }, {merge:true});
-  };
-
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
-    reader.readAsDataURL(file);
-  } else save();
+  db.collection("users").doc(me).set({
+    name:document.getElementById("username").value,
+    bio:document.getElementById("bio").value,
+    lastSeen:Date.now()
+  },{merge:true});
 }
 
 function loadProfile(){
-  db.collection("users").doc(me).onSnapshot(doc=>{
-    if(!doc.exists) return;
-    const u = doc.data();
+  db.collection("users").doc(me).onSnapshot(d=>{
+    if(!d.exists) return;
+    const u=d.data();
 
-    document.getElementById("myProfile").innerHTML=`
-      <div class="post">
-        <img class="avatar" src="${u.avatar||''}">
-        <b>${u.name||me}</b>
-        <p>${u.bio||''}</p>
-      </div>
+    document.getElementById("profile").innerHTML=`
+      <b>${u.name}</b>
+      <p>${u.bio}</p>
     `;
   });
 }
 
-/* ================= POSTS + FIX LOADPOSTS ================= */
+/* ================= POSTS FACEBOOK ================= */
 function addPost(){
-  const text=document.getElementById("postText").value;
-  const file=document.getElementById("postImage").files[0];
-
-  const save=(img="")=>{
-    db.collection("posts").add({
-      text,
-      image:img,
-      user:me,
-      likes:0,
-      time:Date.now()
-    });
-  };
-
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
-    reader.readAsDataURL(file);
-  } else save("");
+  db.collection("posts").add({
+    text:document.getElementById("postText").value,
+    user:me,
+    likes:0,
+    time:Date.now()
+  });
 }
 
-/* ✅ FIX IMPORTANT : loadPosts rétabli */
 function loadPosts(){
-
   db.collection("posts")
   .orderBy("time","desc")
   .onSnapshot(snap=>{
 
-    const feed=document.getElementById("feed");
+    let feed=document.getElementById("feed");
     feed.innerHTML="";
 
     snap.forEach(doc=>{
-      const p = doc.data();
+      let p=doc.data();
 
       feed.innerHTML+=`
         <div class="post">
           <b>${p.user}</b>
           <p>${p.text}</p>
 
-          ${p.image ? `<img src="${p.image}" style="width:100%">` : ""}
+          ❤️ ${p.likes}
+          <button onclick="like('${doc.id}',${p.likes})">Like</button>
 
-          <div>
-            ❤️ ${p.likes||0}
-            <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
-          </div>
-
-          <input id="c-${doc.id}" placeholder="commentaire">
-          <button onclick="comment('${doc.id}')">Envoyer</button>
+          <input id="c-${doc.id}" placeholder="comment">
+          <button onclick="comment('${doc.id}')">Send</button>
 
           <div id="comments-${doc.id}"></div>
         </div>
@@ -260,16 +243,13 @@ function like(id,l){
   });
 }
 
-/* ================= COMMENTS ================= */
 function comment(id){
-  const input=document.getElementById("c-"+id);
-  if(!input.value) return;
+  let input=document.getElementById("c-"+id);
 
   db.collection("posts").doc(id)
   .collection("comments").add({
     text:input.value,
-    user:me,
-    time:Date.now()
+    user:me
   });
 
   input.value="";
@@ -278,25 +258,18 @@ function comment(id){
 function loadComments(id){
   db.collection("posts").doc(id)
   .collection("comments")
-  .onSnapshot(snap=>{
-    const box=document.getElementById("comments-"+id);
-    if(!box) return;
-
+  .onSnapshot(s=>{
+    let box=document.getElementById("comments-"+id);
     box.innerHTML="";
-    snap.forEach(d=>{
-      box.innerHTML+=`
-        <div class="comment">
-          <b>${d.data().user}</b>: ${d.data().text}
-        </div>
-      `;
+    s.forEach(d=>{
+      box.innerHTML+=`<div class="comment"><b>${d.data().user}</b>: ${d.data().text}</div>`;
     });
   });
 }
 
-/* ================= CHAT ================= */
+/* ================= CHAT WHATSAPP ================= */
 function sendMsg(){
-  const text=document.getElementById("msg").value;
-  if(!text) return;
+  let text=document.getElementById("msg").value;
 
   db.collection("chats").add({
     text,
@@ -305,6 +278,27 @@ function sendMsg(){
   });
 
   document.getElementById("msg").value="";
+}
+
+function loadChat(){
+  db.collection("chats")
+  .orderBy("time")
+  .onSnapshot(snap=>{
+
+    let box=document.getElementById("chatBox");
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      let m=d.data();
+
+      box.innerHTML+=`
+        <div class="msg ${m.from===me?'me':'other'}">
+          <b>${m.from}</b><br>${m.text}
+        </div>
+      `;
+    });
+
+  });
 }
 
 /* ================= NAV ================= */
@@ -316,4 +310,4 @@ function show(page){
 </script>
 
 </body>
-</html>
+  </html>
