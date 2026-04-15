@@ -174,7 +174,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ================= VARIABLES ================= */
 let me = "";
 let selected = "";
 let isAdmin = false;
@@ -225,7 +224,7 @@ function signup(){
   .catch(err=>alert(err.message));
 }
 
-/* ================= PROFILE ================= */
+/* ================= PROFILE FIX ================= */
 function saveProfile(){
 
   const name=document.getElementById("username").value;
@@ -242,9 +241,10 @@ function saveProfile(){
     })
     .then(()=>{
       loadProfile();
+      loadUsers();
     })
     .catch(err=>{
-      alert("Erreur profil: " + err.message);
+      alert(err.message);
     });
 
   };
@@ -253,15 +253,15 @@ function saveProfile(){
     const reader=new FileReader();
     reader.onload=()=>save(reader.result);
     reader.readAsDataURL(file);
-  } else save();
+  } else save("");
 }
 
+/* 🔥 FIX : profil ne disparaît plus */
 function loadProfile(){
 
   if(!me) return;
 
-  db.collection("users").doc(me).get()
-  .then(doc=>{
+  db.collection("users").doc(me).onSnapshot(doc=>{
     if(!doc.exists) return;
 
     const u=doc.data();
@@ -269,14 +269,14 @@ function loadProfile(){
     document.getElementById("myProfile").innerHTML=`
       <div class="post">
         <img class="avatar" src="${u.avatar||''}">
-        <b>${u.name||u.email||me}</b>
+        <b>${u.name||me}</b>
         <p>${u.bio||''}</p>
       </div>
     `;
   });
 }
 
-/* ================= POSTS FIXED ================= */
+/* ================= POSTS ================= */
 function addPost(){
 
   const text=document.getElementById("postText").value;
@@ -290,20 +290,17 @@ function addPost(){
   const save=(img="")=>{
 
     db.collection("posts").add({
-      text:text||"",
-      image:img||"",
-      user:me||"unknown",
+      text,
+      image:img,
+      user:me,
       likes:0,
       time:Date.now()
     })
     .then(()=>{
       document.getElementById("postText").value="";
       document.getElementById("postImage").value="";
-      console.log("Post publié ✅");
     })
-    .catch(err=>{
-      alert("Erreur publication: " + err.message);
-    });
+    .catch(err=>alert(err.message));
 
   };
 
@@ -314,6 +311,18 @@ function addPost(){
   } else save("");
 }
 
+/* 🗑️ ADMIN DELETE POST */
+function deletePost(id){
+
+  if(!isAdmin){
+    alert("Accès refusé");
+    return;
+  }
+
+  db.collection("posts").doc(id).delete();
+}
+
+/* ================= LOAD POSTS ================= */
 function loadPosts(){
 
   db.collection("posts").orderBy("time","desc")
@@ -328,15 +337,17 @@ function loadPosts(){
       feed.innerHTML+=`
         <div class="post">
 
+          ${isAdmin ? `<button onclick="deletePost('${doc.id}')">🗑️ Supprimer</button>` : ""}
+
           <b>${p.user}</b>
-          <p>${p.text||""}</p>
+          <p>${p.text}</p>
 
           ${p.image?`<img src="${p.image}" style="width:100%">`:``}
 
           ❤️ ${p.likes||0}
           <button onclick="like('${doc.id}',${p.likes||0})">Like</button>
 
-          <input id="c-${doc.id}" placeholder="comment...">
+          <input id="c-${doc.id}">
           <button onclick="comment('${doc.id}')">💬</button>
 
           <div id="comments-${doc.id}"></div>
@@ -349,14 +360,11 @@ function loadPosts(){
   });
 }
 
-/* ================= LIKE ================= */
-function like(id,likes){
-  db.collection("posts").doc(id).update({
-    likes:likes+1
-  });
+function like(id,l){
+  db.collection("posts").doc(id).update({likes:l+1});
 }
 
-/* ================= COMMENT ================= */
+/* ================= COMMENTS ================= */
 function comment(id){
 
   const input=document.getElementById("c-"+id);
@@ -385,7 +393,6 @@ function loadComments(id){
 
     snap.forEach(d=>{
       const c=d.data();
-
       box.innerHTML+=`
         <div class="comment">
           <b>${c.user}</b>: ${c.text}
@@ -422,14 +429,12 @@ function loadUsers(){
 function startPresence(){
 
   setInterval(()=>{
-
     if(me){
       db.collection("users").doc(me).set({
         name:me,
         lastSeen:Date.now()
       }).catch(()=>{});
     }
-
   },3000);
 }
 
@@ -442,4 +447,4 @@ function show(page){
 </script>
 
 </body>
-  </html>
+</html>
