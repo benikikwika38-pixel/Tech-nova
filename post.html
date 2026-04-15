@@ -97,6 +97,7 @@ img.avatar{
 
 <div class="container">
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>🔐 Connexion TechNova</h3>
   <input id="name" placeholder="Email ou admin">
@@ -105,8 +106,10 @@ img.avatar{
   <button onclick="signup()">Créer compte</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
+<!-- PROFIL -->
 <div class="box">
   <h3>👤 Profil utilisateur</h3>
 
@@ -119,6 +122,7 @@ img.avatar{
   <div id="myProfile"></div>
 </div>
 
+<!-- POSTS -->
 <div id="postsSection">
 
   <div class="box">
@@ -131,6 +135,7 @@ img.avatar{
 
 </div>
 
+<!-- CHAT -->
 <div id="chatSection" style="display:none;">
 
   <div class="box">
@@ -168,11 +173,12 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let me = "";
-let isAdmin = false;
 let selectedUser = "";
+let isAdmin = false;
 
 /* LOGIN */
 function login(){
+
   const email = document.getElementById("name").value;
   const password = document.getElementById("password").value;
 
@@ -214,33 +220,31 @@ function signup(){
   .catch(err=>alert(err.message));
 }
 
-/* PROFILE (inchangé) */
+/* ================= PROFILE ================= */
 function saveProfile(){
-  const name = document.getElementById("username").value;
-  const bio = document.getElementById("bio").value;
-  const file = document.getElementById("avatar").files[0];
+  const name=document.getElementById("username").value;
+  const bio=document.getElementById("bio").value;
+  const file=document.getElementById("avatar").files[0];
 
-  const ref = db.collection("users").doc(me);
+  const ref=db.collection("users").doc(me);
 
-  ref.get().then(doc => {
-    const old = doc.exists ? doc.data() : {};
+  ref.get().then(doc=>{
+    const old=doc.exists?doc.data():{};
 
-    const save = (img = old.avatar || "") => {
+    const save=(img=old.avatar||"")=>{
       ref.set({
-        name: name || old.name || me,
-        bio: bio || old.bio || "",
-        avatar: img,
-        lastSeen: Date.now()
-      }, { merge: true });
+        name:name||old.name||me,
+        bio:bio||old.bio||"",
+        avatar:img,
+        lastSeen:Date.now()
+      },{merge:true});
     };
 
     if(file){
-      const reader = new FileReader();
-      reader.onload = () => save(reader.result);
+      const reader=new FileReader();
+      reader.onload=()=>save(reader.result);
       reader.readAsDataURL(file);
-    } else {
-      save();
-    }
+    } else save();
   });
 }
 
@@ -250,9 +254,9 @@ function loadProfile(){
   db.collection("users").doc(me).onSnapshot(doc=>{
     if(!doc.exists) return;
 
-    const u = doc.data();
+    const u=doc.data();
 
-    document.getElementById("myProfile").innerHTML = `
+    document.getElementById("myProfile").innerHTML=`
       <div class="post">
         <img class="avatar" src="${u.avatar||''}">
         <b>${u.name||me}</b>
@@ -262,7 +266,7 @@ function loadProfile(){
   });
 }
 
-/* POSTS (inchangé) */
+/* ================= POSTS FIX ================= */
 function addPost(){
   const text=document.getElementById("postText").value;
   const file=document.getElementById("postImage").files[0];
@@ -274,6 +278,9 @@ function addPost(){
       user:me,
       likes:0,
       time:Date.now()
+    }).then(()=>{
+      document.getElementById("postText").value="";
+      document.getElementById("postImage").value="";
     });
   };
 
@@ -284,7 +291,88 @@ function addPost(){
   } else save("");
 }
 
-/* 🔥 USERS (CLIC) */
+/* 🔥 POSTS FIX (ERREUR RÉSOLUE) */
+function loadPosts(){
+
+  db.collection("posts").orderBy("time","desc")
+  .onSnapshot(snap=>{
+
+    const feed=document.getElementById("feed");
+    feed.innerHTML="";
+
+    snap.forEach(doc=>{
+      const p=doc.data();
+
+      feed.innerHTML+=`
+        <div class="post">
+
+          <b>${p.user}</b>
+          <p>${p.text||""}</p>
+
+          ${p.image?`<img src="${p.image}" style="width:100%">`:``}
+
+          ❤️ ${p.likes||0}
+          <button onclick="likePost('${doc.id}',${p.likes||0})">Like</button>
+
+          <input id="c-${doc.id}" placeholder="comment...">
+          <button onclick="commentPost('${doc.id}')">💬</button>
+
+          <div id="comments-${doc.id}"></div>
+        </div>
+      `;
+
+      loadComments(doc.id);
+    });
+
+  });
+}
+
+function likePost(id,likes){
+  db.collection("posts").doc(id).update({
+    likes:likes+1
+  });
+}
+
+function commentPost(id){
+
+  const input=document.getElementById("c-"+id);
+  if(!input || !input.value) return;
+
+  db.collection("posts").doc(id)
+  .collection("comments").add({
+    text:input.value,
+    user:me,
+    time:Date.now()
+  });
+
+  input.value="";
+}
+
+function loadComments(id){
+
+  db.collection("posts").doc(id)
+  .collection("comments")
+  .onSnapshot(snap=>{
+
+    const box=document.getElementById("comments-"+id);
+    if(!box) return;
+
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      const c=d.data();
+
+      box.innerHTML+=`
+        <div class="comment">
+          <b>${c.user}</b>: ${c.text}
+        </div>
+      `;
+    });
+
+  });
+}
+
+/* USERS */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     const box=document.getElementById("users");
@@ -299,7 +387,7 @@ function loadUsers(){
       const online=Date.now()-u.lastSeen<5000;
 
       box.innerHTML+=`
-        <div onclick="selectUser('${id}')" style="cursor:pointer;">
+        <div>
           <img class="avatar" src="${u.avatar||''}">
           👤 ${u.name||id} ${online?"🟢":"⚫"}
         </div>
@@ -308,61 +396,18 @@ function loadUsers(){
   });
 }
 
-/* SELECT USER */
-function selectUser(id){
-  selectedUser=id;
-  document.getElementById("chatBox").innerHTML="";
-  loadMessages();
-}
-
-/* SEND MESSAGE */
+/* CHAT */
 function sendMsg(){
   const text=document.getElementById("msg").value;
-  if(!text || !selectedUser) return;
+  if(!text) return;
 
-  db.collection("messages").add({
+  db.collection("chats").add({
     text,
     from:me,
-    to:selectedUser,
-    time:Date.now(),
-    seen:false
+    time:Date.now()
   });
 
   document.getElementById("msg").value="";
-}
-
-/* LOAD MESSAGES */
-function loadMessages(){
-  db.collection("messages").orderBy("time")
-  .onSnapshot(snap=>{
-    const box=document.getElementById("chatBox");
-    box.innerHTML="";
-
-    snap.forEach(doc=>{
-      const m=doc.data();
-
-      if(
-        (m.from===me && m.to===selectedUser) ||
-        (m.from===selectedUser && m.to===me)
-      ){
-        const isMe = m.from===me;
-
-        if(!isMe && !m.seen){
-          db.collection("messages").doc(doc.id).update({seen:true});
-        }
-
-        box.innerHTML+=`
-          <div class="msg ${isMe?"me":"other"}">
-            ${m.text}
-            <br>
-            <small>${isMe ? (m.seen ? "✓✓ vu" : "✓ envoyé") : ""}</small>
-          </div>
-        `;
-      }
-    });
-
-    box.scrollTop = box.scrollHeight;
-  });
 }
 
 /* NAV */
@@ -371,12 +416,13 @@ function show(page){
   document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
+/* PRESENCE */
 function startPresence(){
   setInterval(()=>{
     if(me){
       db.collection("users").doc(me).set({
-        lastSeen: Date.now()
-      }, { merge: true });
+        lastSeen:Date.now()
+      },{merge:true});
     }
   },3000);
 }
