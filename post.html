@@ -2,50 +2,98 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>TechNova WhatsApp PRO MAX 🔥</title>
+<title>TechNova SOCIAL + CHAT PRO MAX 🔥</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{margin:0;font-family:Arial;background:#f0f2f5;}
-header{background:#128C7E;color:white;padding:10px;text-align:center;font-weight:bold;}
+header{background:#1877f2;color:white;padding:10px;text-align:center;font-weight:bold;}
+
+.nav{
+  display:flex;
+  justify-content:space-around;
+  background:white;
+  padding:10px;
+}
+
 .container{max-width:700px;margin:auto;padding:10px;}
 
-.box{background:white;padding:10px;margin-top:10px;border-radius:10px;}
+.box,.post{
+  background:white;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+}
 
-.user{display:flex;align-items:center;justify-content:space-between;
-padding:8px;border-bottom:1px solid #ddd;cursor:pointer;}
+img.avatar{width:35px;height:35px;border-radius:50%;}
 
-.chatBox{height:350px;overflow:auto;background:white;padding:10px;border-radius:10px;}
+.chatBox{
+  height:300px;
+  overflow:auto;
+  background:white;
+  padding:10px;
+}
 
 .msg{padding:8px;margin:5px;border-radius:8px;max-width:70%;}
 .me{background:#dcf8c6;margin-left:auto;text-align:right;}
 .other{background:#eee;}
 
-.small{font-size:12px;color:gray;}
 .online{color:green;font-weight:bold;}
 .offline{color:gray;}
+
+.small{font-size:11px;color:gray;}
 </style>
 </head>
 
 <body>
 
-<header>💬 WhatsApp PRO MAX - TechNova 🔥</header>
+<header>🔥 TechNova SOCIAL + CHAT PRO MAX</header>
+
+<div class="nav">
+  <button onclick="show('posts')">📢 Posts</button>
+  <button onclick="show('chat')">💬 Chat</button>
+</div>
 
 <div class="container">
 
-<!-- USERS -->
+<!-- PROFILE -->
 <div class="box">
-  <h3>👥 Étudiants</h3>
-  <div id="users"></div>
+  <h3>👤 Profil</h3>
+  <input id="username" placeholder="Nom">
+  <input id="bio" placeholder="Bio">
+  <input type="file" id="avatar">
+  <button onclick="saveProfile()">💾 Sauver profil</button>
+  <div id="myProfile"></div>
+</div>
+
+<!-- POSTS -->
+<div id="postsSection">
+
+  <div class="box">
+    <textarea id="postText" placeholder="Exprime-toi..."></textarea>
+    <input type="file" id="postImage">
+    <button onclick="addPost()">📤 Publier</button>
+  </div>
+
+  <div id="feed"></div>
 </div>
 
 <!-- CHAT -->
-<div class="box">
-  <h3 id="chatTitle">Choisis un utilisateur</h3>
-  <div class="chatBox" id="chatBox"></div>
+<div id="chatSection" style="display:none;">
 
-  <input id="msg" placeholder="Message...">
-  <button onclick="sendMsg()">Envoyer</button>
+  <div class="box">
+    <h3>👥 Users</h3>
+    <div id="users"></div>
+  </div>
+
+  <div class="box">
+    <h3 id="chatTitle">Chat</h3>
+    <div class="chatBox" id="chatBox"></div>
+
+    <input id="msg" placeholder="Message">
+    <button onclick="sendMsg()">Envoyer</button>
+  </div>
+
 </div>
 
 </div>
@@ -56,42 +104,94 @@ padding:8px;border-bottom:1px solid #ddd;cursor:pointer;}
 
 <script>
 
-const firebaseConfig = {
+firebase.initializeApp({
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
   projectId: "technova-academy",
-};
+});
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me = "USER_" + Math.random().toString(36).substr(2,5);
+let me = "user_" + Math.random().toString(36).substr(2,5);
 let selectedUser = null;
 
-/* ========== USERS ========== */
-function loadUsers(){
+/* ================= PROFILE ================= */
+function saveProfile(){
 
-  db.collection("users").onSnapshot(snap=>{
+  const name = document.getElementById("username").value;
+  const bio = document.getElementById("bio").value;
+  const file = document.getElementById("avatar").files[0];
 
-    const box = document.getElementById("users");
-    box.innerHTML = "";
+  const ref = db.collection("users").doc(me);
+
+  const save = (img="")=>{
+    ref.set({
+      name,
+      bio,
+      avatar:img,
+      lastSeen:Date.now()
+    },{merge:true});
+  };
+
+  if(file){
+    const reader = new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save();
+}
+
+db.collection("users").doc(me).onSnapshot(doc=>{
+  if(!doc.exists) return;
+  const u=doc.data();
+  document.getElementById("myProfile").innerHTML=`
+    <div class="post">
+      <img class="avatar" src="${u.avatar||''}">
+      <b>${u.name||me}</b>
+      <p>${u.bio||''}</p>
+    </div>
+  `;
+});
+
+/* ================= POSTS ================= */
+function addPost(){
+
+  const text=document.getElementById("postText").value;
+  const file=document.getElementById("postImage").files[0];
+
+  const save=(img="")=>{
+    db.collection("posts").add({
+      text,
+      image:img,
+      user:me,
+      likes:0,
+      time:Date.now()
+    });
+  };
+
+  if(file){
+    const reader=new FileReader();
+    reader.onload=()=>save(reader.result);
+    reader.readAsDataURL(file);
+  } else save("");
+}
+
+function loadPosts(){
+
+  db.collection("posts").orderBy("time","desc")
+  .onSnapshot(snap=>{
+
+    const feed=document.getElementById("feed");
+    feed.innerHTML="";
 
     snap.forEach(doc=>{
-      const u = doc.data();
-      const id = doc.id;
+      const p=doc.data();
 
-      const online = u.lastSeen && (Date.now() - u.lastSeen < 5000);
-
-      box.innerHTML += `
-        <div class="user" onclick="openChat('${id}')">
-          <div>
-            👤 ${u.name || id}
-          </div>
-          <div class="${online?'online':'offline'}">
-            ${online?'🟢':'⚫'}
-          </div>
+      feed.innerHTML+=`
+        <div class="post">
+          <b>${p.user}</b>
+          <p>${p.text}</p>
+          ${p.image?`<img src="${p.image}" style="width:100%">`:``}
+          ❤️ ${p.likes||0}
         </div>
       `;
     });
@@ -99,92 +199,108 @@ function loadUsers(){
   });
 }
 
-/* ========== OPEN CHAT ========== */
-function openChat(userId){
-  selectedUser = userId;
-  document.getElementById("chatTitle").innerText = "Chat avec " + userId;
+/* ================= USERS ================= */
+function loadUsers(){
+
+  db.collection("users").onSnapshot(snap=>{
+    const box=document.getElementById("users");
+    box.innerHTML="";
+
+    snap.forEach(d=>{
+      const u=d.data();
+      const online = Date.now()-u.lastSeen<5000;
+
+      box.innerHTML+=`
+        <div onclick="openChat('${d.id}')">
+          <img class="avatar" src="${u.avatar||''}">
+          👤 ${u.name||d.id}
+          ${online?"🟢":"⚫"}
+        </div>
+      `;
+    });
+  });
+}
+
+/* ================= CHAT ================= */
+function openChat(id){
+  selectedUser=id;
+  document.getElementById("chatTitle").innerText="Chat avec "+id;
   loadMessages();
 }
 
-/* ========== SEND MSG ========== */
 function sendMsg(){
 
-  const text = document.getElementById("msg").value;
-  if(!text || !selectedUser) return;
+  const text=document.getElementById("msg").value;
+  if(!text||!selectedUser) return;
 
   db.collection("messages").add({
-    from: me,
-    to: selectedUser,
+    from:me,
+    to:selectedUser,
     text,
-    time: Date.now(),
-    seen: false
+    time:Date.now(),
+    seen:false
   });
 
   document.getElementById("msg").value="";
 }
 
-/* ========== LOAD CHAT ========== */
 function loadMessages(){
 
-  db.collection("messages")
-  .orderBy("time")
+  db.collection("messages").orderBy("time")
   .onSnapshot(snap=>{
 
-    const box = document.getElementById("chatBox");
-    box.innerHTML = "";
+    const box=document.getElementById("chatBox");
+    box.innerHTML="";
 
-    snap.forEach(doc=>{
-      const m = doc.data();
+    snap.forEach(d=>{
+      const m=d.data();
 
-      const isMine =
-        (m.from === me && m.to === selectedUser) ||
-        (m.from === selectedUser && m.to === me);
+      const ok =
+        (m.from==me && m.to==selectedUser) ||
+        (m.from==selectedUser && m.to==me);
 
-      if(!isMine) return;
+      if(!ok) return;
 
-      box.innerHTML += `
-        <div class="msg ${m.from===me?'me':'other'}">
+      box.innerHTML+=`
+        <div class="msg ${m.from==me?'me':'other'}">
           ${m.text}
-          <div class="small">
-            ${m.from===me ? (m.seen ? "✔✔ vu" : "✔ envoyé") : ""}
-          </div>
+          <div class="small">${m.seen?"✔✔ vu":"✔ envoyé"}</div>
         </div>
       `;
     });
 
-    box.scrollTop = box.scrollHeight;
-
   });
 }
 
-/* ========== PRESENCE + SEEN ========== */
+/* ================= PRESENCE + SEEN ================= */
 setInterval(()=>{
 
-  // update online
   db.collection("users").doc(me).set({
-    name: me,
-    lastSeen: Date.now()
-  }, {merge:true});
+    lastSeen:Date.now()
+  },{merge:true});
 
-  // mark seen messages
   if(selectedUser){
     db.collection("messages")
     .where("from","==",selectedUser)
     .where("to","==",me)
     .get()
-    .then(snap=>{
-      snap.forEach(d=>{
-        d.ref.update({seen:true});
-      });
+    .then(s=>{
+      s.forEach(d=>d.ref.update({seen:true}));
     });
   }
 
 },3000);
 
 /* INIT */
+loadPosts();
 loadUsers();
+
+function show(p){
+  document.getElementById("postsSection").style.display=p=='posts'?'block':'none';
+  document.getElementById("chatSection").style.display=p=='chat'?'block':'none';
+}
 
 </script>
 
 </body>
-</html>
+  </html>
