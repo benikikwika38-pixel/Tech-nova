@@ -258,7 +258,7 @@ function saveProfile(){
 
 }
 
-/* LOAD PROFILE */
+/* PROFILE DISPLAY */
 function loadProfile(){
 
   if(!me) return;
@@ -345,13 +345,13 @@ function show(page){
   document.getElementById("chatSection").style.display=page==='chat'?'block':'none';
 }
 
-/* 🔥 FIX IMPORTANT ICI */
+/* ✅ FIX ICI */
 function startPresence(){
   setInterval(()=>{
     if(me){
       db.collection("users").doc(me).set({
         lastSeen: Date.now()
-      }, { merge: true }); // ✅ FIX FINAL
+      }, { merge: true }); // 🔥 correction
     }
   },3000);
 }
@@ -359,4 +359,4 @@ function startPresence(){
 </script>
 
 </body>
-</html>
+  </html>
