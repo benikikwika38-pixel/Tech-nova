@@ -222,60 +222,53 @@ function signup(){
   .catch(err=>alert(err.message));
 }
 
-/* ================= FIX PROFIL (IMPORTANT) ================= */
+/* ================= FIX PROFIL ONLY ================= */
 function saveProfile(){
 
-  const name=document.getElementById("username").value;
-  const bio=document.getElementById("bio").value;
-  const file=document.getElementById("avatar").files[0];
+  const name = document.getElementById("username").value;
+  const bio = document.getElementById("bio").value;
+  const file = document.getElementById("avatar").files[0];
 
-  const save=(img="")=>{
+  const ref = db.collection("users").doc(me);
 
-    db.collection("users").doc(me).set({
-      name,
-      bio,
-      avatar:img,
-      lastSeen:Date.now()
-    });
+  ref.get().then(doc => {
 
-  };
+    const old = doc.exists ? doc.data() : {};
 
-  if(file){
-    const reader=new FileReader();
-    reader.onload=()=>save(reader.result);
-    reader.readAsDataURL(file);
-  } else save("");
+    const save = (img = old.avatar || "") => {
+
+      ref.set({
+        name: name || old.name || me,
+        bio: bio || old.bio || "",
+        avatar: img,
+        lastSeen: Date.now()
+      }, { merge: true });
+
+    };
+
+    if(file){
+      const reader = new FileReader();
+      reader.onload = () => save(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      save();
+    }
+
+  });
+
 }
 
-/* 🔥 FIX PROFIL STABLE */
+/* PROFILE DISPLAY */
 function loadProfile(){
 
   if(!me) return;
 
-  const ref = db.collection("users").doc(me);
-
-  // création auto si inexistant
-  ref.get().then(doc=>{
-    if(!doc.exists){
-      ref.set({
-        name: me,
-        bio: "",
-        avatar: "",
-        lastSeen: Date.now()
-      });
-    }
-  });
-
-  // affichage LIVE
-  ref.onSnapshot(doc=>{
+  db.collection("users").doc(me).onSnapshot(doc=>{
     if(!doc.exists) return;
 
     const u = doc.data();
 
-    const box = document.getElementById("myProfile");
-    if(!box) return;
-
-    box.innerHTML = `
+    document.getElementById("myProfile").innerHTML = `
       <div class="post">
         <img class="avatar" src="${u.avatar||''}">
         <b>${u.name||me}</b>
