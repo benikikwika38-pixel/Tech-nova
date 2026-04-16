@@ -69,7 +69,15 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 
   <input id="msg" placeholder="Message..." oninput="typing()">
   <button onclick="sendMsg()">Envoyer</button>
-  <button onclick="recordAudio()">🎤</button>
+
+  <!-- 🎤 bouton vocal PRO -->
+  <button 
+    onmousedown="startRecord()" 
+    onmouseup="stopRecord()"
+    ontouchstart="startRecord()" 
+    ontouchend="stopRecord()">
+    🎤 Maintenir pour parler
+  </button>
 
 </div>
 
@@ -92,15 +100,16 @@ const db = firebase.firestore();
 
 let me="";
 let currentChatUser="";
-let recorder, audioChunks=[];
 
 /* LOGIN */
 function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
+
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
+
     loadUsers();
     presence();
   })
@@ -132,9 +141,9 @@ function loadUsers(){
 
     snap.forEach(doc=>{
       let u=doc.data();
-      if(u.email!==me){
 
-        const online = Date.now()-u.lastSeen<5000;
+      if(u.email!==me){
+        let online = Date.now()-u.lastSeen<5000;
 
         box.innerHTML+=`
           <div onclick="openChat('${u.email}')">
@@ -169,37 +178,6 @@ function sendMsg(){
   });
 
   msg.value="";
-}
-
-/* AUDIO 🎤 */
-async function recordAudio(){
-
-  const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-  recorder = new MediaRecorder(stream);
-
-  recorder.ondataavailable=e=>audioChunks.push(e.data);
-
-  recorder.onstop=()=>{
-    const blob = new Blob(audioChunks);
-    const reader = new FileReader();
-
-    reader.onload=()=>{
-      let id=[me,currentChatUser].sort().join("_");
-
-      db.collection("chats").doc(id).collection("messages").add({
-        audio:reader.result,
-        from:me,
-        time:Date.now()
-      });
-    };
-
-    reader.readAsDataURL(blob);
-    audioChunks=[];
-  };
-
-  recorder.start();
-
-  setTimeout(()=>recorder.stop(),3000); // 3 sec
 }
 
 /* LOAD CHAT */
@@ -244,13 +222,46 @@ function loadChat(){
   });
 }
 
+/* 🎤 AUDIO */
+let recorder,stream,audioChunks=[];
+
+async function startRecord(){
+  stream = await navigator.mediaDevices.getUserMedia({audio:true});
+  recorder = new MediaRecorder(stream);
+  audioChunks=[];
+  recorder.ondataavailable=e=>audioChunks.push(e.data);
+  recorder.start();
+}
+
+function stopRecord(){
+  recorder.stop();
+
+  recorder.onstop=()=>{
+    const blob=new Blob(audioChunks);
+    const reader=new FileReader();
+
+    reader.onload=()=>{
+      let id=[me,currentChatUser].sort().join("_");
+
+      db.collection("chats").doc(id).collection("messages").add({
+        audio:reader.result,
+        from:me,
+        time:Date.now(),
+        seen:false
+      });
+    };
+
+    reader.readAsDataURL(blob);
+  };
+
+  stream.getTracks().forEach(t=>t.stop());
+}
+
 /* TYPING */
 function typing(){
   let id=[me,currentChatUser].sort().join("_");
 
-  db.collection("typing").doc(id).set({
-    user:me
-  });
+  db.collection("typing").doc(id).set({user:me});
 
   setTimeout(()=>{
     db.collection("typing").doc(id).delete();
@@ -280,4 +291,4 @@ function presence(){
 </script>
 
 </body>
-</html>
+  </html>
