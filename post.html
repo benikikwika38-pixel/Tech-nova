@@ -6,26 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family: Arial;
-  background:#e9edf1;
-}
+body{margin:0;font-family:Arial;background:#e9edf1;}
+header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight:bold;}
 
-header{
-  background:#0a5bd3;
-  color:white;
-  padding:12px;
-  text-align:center;
-  font-weight:bold;
-}
-
-.box{
-  background:white;
-  margin:10px;
-  padding:10px;
-  border-radius:12px;
-}
+.box{background:white;margin:10px;padding:10px;border-radius:12px;}
 
 .chatBox{
   height:320px;
@@ -35,19 +19,16 @@ header{
   border-radius:12px;
 }
 
-.msg{
-  padding:8px;
-  margin:5px;
-  border-radius:10px;
-  max-width:70%;
-}
-
-.me{background:#cfe6ff;margin-left:auto;text-align:right;}
+.msg{padding:8px;margin:5px;border-radius:10px;max-width:70%;display:flex;gap:5px;}
+.me{background:#cfe6ff;margin-left:auto;}
 .other{background:#eee;}
 
-.small{
-  font-size:12px;
-  color:gray;
+.small{font-size:12px;color:gray;}
+
+.avatar{
+  width:30px;
+  height:30px;
+  border-radius:50%;
 }
 </style>
 </head>
@@ -69,6 +50,14 @@ header{
 <!-- APP -->
 <div id="app" style="display:none;">
 
+  <!-- 🔥 PROFIL -->
+  <div class="box">
+    <h3>👤 Profil</h3>
+    <input id="avatarInput" type="file">
+    <button onclick="saveAvatar()">Changer photo</button>
+    <div id="myAvatar"></div>
+  </div>
+
   <div class="box">
     <h3>👥 Utilisateurs</h3>
     <div id="users"></div>
@@ -77,9 +66,10 @@ header{
   <div class="box">
     <h3>💬 Chat privé</h3>
     <div class="chatBox" id="chatBox"></div>
+    <div id="typing" class="small"></div>
   </div>
 
-  <input id="msg" placeholder="Message...">
+  <input id="msg" placeholder="Message..." oninput="typing()">
   <button onclick="sendMsg()">Envoyer</button>
 
 </div>
@@ -106,10 +96,7 @@ let currentChatUser="";
 
 /* LOGIN */
 function login(){
-  auth.signInWithEmailAndPassword(
-    email.value,
-    password.value
-  )
+  auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
 
@@ -117,32 +104,55 @@ function login(){
     document.getElementById("app").style.display="block";
 
     loadUsers();
+    loadProfile();
     presence();
   })
   .catch(e=>alert(e.message));
 }
 
-/* SIGNUP (🔥 FIX IMPORTANT) */
+/* SIGNUP */
 function signup(){
-  auth.createUserWithEmailAndPassword(
-    email.value,
-    password.value
-  )
+  auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
 
-    // 🔥 créer user dans Firestore
     db.collection("users").doc(me).set({
       email: me,
+      avatar:"",
       lastSeen: Date.now()
     });
 
-    alert("Compte créé, connecte-toi maintenant");
+    alert("Compte créé");
   })
   .catch(e=>alert(e.message));
 }
 
-/* USERS LIST */
+/* 🔥 PROFILE PHOTO */
+function saveAvatar(){
+  const file=document.getElementById("avatarInput").files[0];
+  if(!file) return;
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    db.collection("users").doc(me).set({
+      avatar:reader.result
+    },{merge:true});
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadProfile(){
+  db.collection("users").doc(me).onSnapshot(doc=>{
+    if(!doc.exists) return;
+    let u=doc.data();
+
+    document.getElementById("myAvatar").innerHTML=`
+      <img class="avatar" src="${u.avatar||''}">
+    `;
+  });
+}
+
+/* USERS LIST + 🟢 ONLINE */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     let box=document.getElementById("users");
@@ -150,11 +160,12 @@ function loadUsers(){
 
     snap.forEach(doc=>{
       let u=doc.data();
+      let online = Date.now()-u.lastSeen < 5000;
 
       if(u.email !== me){
         box.innerHTML+=`
           <div onclick="openChat('${u.email}')">
-            👤 ${u.email}
+            👤 ${u.email} ${online?"🟢":"⚫"}
           </div>
         `;
       }
@@ -162,7 +173,7 @@ function loadUsers(){
   });
 }
 
-/* OPEN PRIVATE CHAT */
+/* OPEN CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
@@ -172,10 +183,10 @@ function openChat(user){
 function sendMsg(){
   if(!currentChatUser) return alert("Choisis un utilisateur");
 
-  let text=document.getElementById("msg").value;
+  let text=msg.value;
   if(!text) return;
 
-  let id = [me,currentChatUser].sort().join("_");
+  let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
     text,
@@ -184,46 +195,72 @@ function sendMsg(){
     seen:false
   });
 
-  document.getElementById("msg").value="";
+  msg.value="";
 }
 
-/* LOAD CHAT */
+/* LOAD CHAT + PHOTO */
 function loadChat(){
 
-  let id = [me,currentChatUser].sort().join("_");
+  let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id)
   .collection("messages")
   .orderBy("time")
-  .onSnapshot(snap=>{
+  .onSnapshot(async snap=>{
 
     let box=document.getElementById("chatBox");
     box.innerHTML="";
 
-    snap.forEach(doc=>{
-      let m=doc.data();
+    for(const docu of snap.docs){
+      let m=docu.data();
 
-      let status = m.seen ? "✔✔" : "✔";
+      let userDoc=await db.collection("users").doc(m.from).get();
+      let avatar=userDoc.data()?.avatar||"";
+
+      let status=m.seen?"✔✔":"✔";
 
       box.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
-          ${m.text}
-          <div class="small">${status}</div>
+          <img class="avatar" src="${avatar}">
+          <div>
+            ${m.text}
+            <div class="small">${status}</div>
+          </div>
         </div>
       `;
 
-      if(m.from !== me){
+      if(m.from!==me){
         db.collection("chats").doc(id)
-        .collection("messages").doc(doc.id)
+        .collection("messages").doc(docu.id)
         .update({seen:true});
       }
-
-    });
-
+    }
   });
 }
 
-/* ONLINE STATUS */
+/* 🔥 TYPING */
+function typing(){
+  let id=[me,currentChatUser].sort().join("_");
+
+  db.collection("typing").doc(id).set({
+    user:me
+  });
+
+  setTimeout(()=>{
+    db.collection("typing").doc(id).delete();
+  },1000);
+}
+
+db.collection("typing").onSnapshot(snap=>{
+  snap.forEach(doc=>{
+    let t=doc.data();
+    if(t.user!==me){
+      document.getElementById("typing").innerText="✍️ écrit...";
+    }
+  });
+});
+
+/* ONLINE */
 function presence(){
   setInterval(()=>{
     if(me){
@@ -237,4 +274,4 @@ function presence(){
 </script>
 
 </body>
-  </html>
+</html>
