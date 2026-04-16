@@ -2,14 +2,30 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>WhatsApp ULTRA NEXT LEVEL</title>
+<title>RS TECHNOVA ACADEMY</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#e9edf1;}
-header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight:bold;}
+body{
+  margin:0;
+  font-family: Arial;
+  background:#e9edf1;
+}
 
-.box{background:white;margin:10px;padding:10px;border-radius:12px;}
+header{
+  background:#0a5bd3;
+  color:white;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
+
+.box{
+  background:white;
+  margin:10px;
+  padding:10px;
+  border-radius:12px;
+}
 
 .chatBox{
   height:320px;
@@ -24,36 +40,33 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
   margin:5px;
   border-radius:10px;
   max-width:70%;
-  display:flex;
-  gap:5px;
 }
 
-.me{background:#cfe6ff;margin-left:auto;}
+.me{background:#cfe6ff;margin-left:auto;text-align:right;}
 .other{background:#eee;}
 
-.avatar{
-  width:30px;
-  height:30px;
-  border-radius:50%;
+.small{
+  font-size:12px;
+  color:gray;
 }
-
-.small{font-size:12px;color:gray;}
-#typing{font-size:12px;color:gray;margin-left:10px;}
 </style>
 </head>
 
 <body>
 
-<header>📱 WhatsApp ULTRA NEXT LEVEL 🔥</header>
+<header>RS TECHNOVA ACADEMY🔥</header>
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
   <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Mot de passe"><br><br>
+  <input id="password" type="password" placeholder="Mot de passe">
+  <br><br>
   <button onclick="login()">Entrer</button>
   <button onclick="signup()">Créer compte</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
 
   <div class="box">
@@ -64,20 +77,10 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
   <div class="box">
     <h3>💬 Chat privé</h3>
     <div class="chatBox" id="chatBox"></div>
-    <div id="typing"></div>
   </div>
 
-  <input id="msg" placeholder="Message..." oninput="typing()">
+  <input id="msg" placeholder="Message...">
   <button onclick="sendMsg()">Envoyer</button>
-
-  <!-- 🎤 bouton vocal PRO -->
-  <button 
-    onmousedown="startRecord()" 
-    onmouseup="stopRecord()"
-    ontouchstart="startRecord()" 
-    ontouchend="stopRecord()">
-    🎤 Maintenir pour parler
-  </button>
 
 </div>
 
@@ -103,7 +106,10 @@ let currentChatUser="";
 
 /* LOGIN */
 function login(){
-  auth.signInWithEmailAndPassword(email.value,password.value)
+  auth.signInWithEmailAndPassword(
+    email.value,
+    password.value
+  )
   .then(u=>{
     me=u.user.email;
 
@@ -116,24 +122,27 @@ function login(){
   .catch(e=>alert(e.message));
 }
 
-/* SIGNUP */
+/* SIGNUP (🔥 FIX IMPORTANT) */
 function signup(){
-  auth.createUserWithEmailAndPassword(email.value,password.value)
+  auth.createUserWithEmailAndPassword(
+    email.value,
+    password.value
+  )
   .then(u=>{
     me=u.user.email;
 
+    // 🔥 créer user dans Firestore
     db.collection("users").doc(me).set({
-      email:me,
-      avatar:"https://i.pravatar.cc/150?u="+me,
-      lastSeen:Date.now()
+      email: me,
+      lastSeen: Date.now()
     });
 
-    alert("Compte créé");
+    alert("Compte créé, connecte-toi maintenant");
   })
   .catch(e=>alert(e.message));
 }
 
-/* USERS */
+/* USERS LIST */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     let box=document.getElementById("users");
@@ -142,12 +151,10 @@ function loadUsers(){
     snap.forEach(doc=>{
       let u=doc.data();
 
-      if(u.email!==me){
-        let online = Date.now()-u.lastSeen<5000;
-
+      if(u.email !== me){
         box.innerHTML+=`
           <div onclick="openChat('${u.email}')">
-            👤 ${u.email} ${online?"🟢":"⚫"}
+            👤 ${u.email}
           </div>
         `;
       }
@@ -155,20 +162,20 @@ function loadUsers(){
   });
 }
 
-/* OPEN CHAT */
+/* OPEN PRIVATE CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
 }
 
-/* SEND TEXT */
+/* SEND MESSAGE */
 function sendMsg(){
   if(!currentChatUser) return alert("Choisis un utilisateur");
 
-  let text=msg.value;
+  let text=document.getElementById("msg").value;
   if(!text) return;
 
-  let id=[me,currentChatUser].sort().join("_");
+  let id = [me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
     text,
@@ -177,107 +184,46 @@ function sendMsg(){
     seen:false
   });
 
-  msg.value="";
+  document.getElementById("msg").value="";
 }
 
 /* LOAD CHAT */
 function loadChat(){
 
-  let id=[me,currentChatUser].sort().join("_");
+  let id = [me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id)
   .collection("messages")
   .orderBy("time")
-  .onSnapshot(async snap=>{
+  .onSnapshot(snap=>{
 
     let box=document.getElementById("chatBox");
     box.innerHTML="";
 
-    for(const docu of snap.docs){
-      let m=docu.data();
+    snap.forEach(doc=>{
+      let m=doc.data();
 
-      let userData = await db.collection("users").doc(m.from).get();
-      let avatar = userData.data()?.avatar || "";
-
-      let content = m.text ? m.text :
-        `<audio controls src="${m.audio}"></audio>`;
+      let status = m.seen ? "✔✔" : "✔";
 
       box.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
-          <img class="avatar" src="${avatar}">
-          <div>
-            ${content}
-            <div class="small">${m.seen?"✔✔":"✔"}</div>
-          </div>
+          ${m.text}
+          <div class="small">${status}</div>
         </div>
       `;
 
-      if(m.from!==me){
+      if(m.from !== me){
         db.collection("chats").doc(id)
-        .collection("messages").doc(docu.id)
+        .collection("messages").doc(doc.id)
         .update({seen:true});
       }
-    }
+
+    });
 
   });
 }
 
-/* 🎤 AUDIO */
-let recorder,stream,audioChunks=[];
-
-async function startRecord(){
-  stream = await navigator.mediaDevices.getUserMedia({audio:true});
-  recorder = new MediaRecorder(stream);
-  audioChunks=[];
-  recorder.ondataavailable=e=>audioChunks.push(e.data);
-  recorder.start();
-}
-
-function stopRecord(){
-  recorder.stop();
-
-  recorder.onstop=()=>{
-    const blob=new Blob(audioChunks);
-    const reader=new FileReader();
-
-    reader.onload=()=>{
-      let id=[me,currentChatUser].sort().join("_");
-
-      db.collection("chats").doc(id).collection("messages").add({
-        audio:reader.result,
-        from:me,
-        time:Date.now(),
-        seen:false
-      });
-    };
-
-    reader.readAsDataURL(blob);
-  };
-
-  stream.getTracks().forEach(t=>t.stop());
-}
-
-/* TYPING */
-function typing(){
-  let id=[me,currentChatUser].sort().join("_");
-
-  db.collection("typing").doc(id).set({user:me});
-
-  setTimeout(()=>{
-    db.collection("typing").doc(id).delete();
-  },1000);
-}
-
-db.collection("typing").onSnapshot(snap=>{
-  snap.forEach(doc=>{
-    let t=doc.data();
-    if(t.user!==me){
-      document.getElementById("typing").innerText="✍️ en train d'écrire...";
-    }
-  });
-});
-
-/* ONLINE */
+/* ONLINE STATUS */
 function presence(){
   setInterval(()=>{
     if(me){
