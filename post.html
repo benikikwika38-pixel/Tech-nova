@@ -2,30 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>RS TECHNOVA ACADEMY</title>
+<title>WhatsApp ULTRA NEXT LEVEL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{
-  margin:0;
-  font-family: Arial;
-  background:#e9edf1;
-}
+body{margin:0;font-family:Arial;background:#e9edf1;}
+header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight:bold;}
 
-header{
-  background:#0a5bd3;
-  color:white;
-  padding:12px;
-  text-align:center;
-  font-weight:bold;
-}
-
-.box{
-  background:white;
-  margin:10px;
-  padding:10px;
-  border-radius:12px;
-}
+.box{background:white;margin:10px;padding:10px;border-radius:12px;}
 
 .chatBox{
   height:320px;
@@ -40,33 +24,36 @@ header{
   margin:5px;
   border-radius:10px;
   max-width:70%;
+  display:flex;
+  gap:5px;
 }
 
-.me{background:#cfe6ff;margin-left:auto;text-align:right;}
+.me{background:#cfe6ff;margin-left:auto;}
 .other{background:#eee;}
 
-.small{
-  font-size:12px;
-  color:gray;
+.avatar{
+  width:30px;
+  height:30px;
+  border-radius:50%;
 }
+
+.small{font-size:12px;color:gray;}
+#typing{font-size:12px;color:gray;margin-left:10px;}
 </style>
 </head>
 
 <body>
 
-<header>RS TECHNOVA ACADEMY🔥</header>
+<header>📱 WhatsApp ULTRA NEXT LEVEL 🔥</header>
 
-<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
   <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Mot de passe">
-  <br><br>
+  <input id="password" type="password" placeholder="Mot de passe"><br><br>
   <button onclick="login()">Entrer</button>
   <button onclick="signup()">Créer compte</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
   <div class="box">
@@ -77,10 +64,12 @@ header{
   <div class="box">
     <h3>💬 Chat privé</h3>
     <div class="chatBox" id="chatBox"></div>
+    <div id="typing"></div>
   </div>
 
-  <input id="msg" placeholder="Message...">
+  <input id="msg" placeholder="Message..." oninput="typing()">
   <button onclick="sendMsg()">Envoyer</button>
+  <button onclick="recordAudio()">🎤</button>
 
 </div>
 
@@ -103,46 +92,39 @@ const db = firebase.firestore();
 
 let me="";
 let currentChatUser="";
+let recorder, audioChunks=[];
 
 /* LOGIN */
 function login(){
-  auth.signInWithEmailAndPassword(
-    email.value,
-    password.value
-  )
+  auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
-
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
-
     loadUsers();
     presence();
   })
   .catch(e=>alert(e.message));
 }
 
-/* SIGNUP (🔥 FIX IMPORTANT) */
+/* SIGNUP */
 function signup(){
-  auth.createUserWithEmailAndPassword(
-    email.value,
-    password.value
-  )
+  auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
 
-    // 🔥 créer user dans Firestore
     db.collection("users").doc(me).set({
-      email: me,
-      lastSeen: Date.now()
+      email:me,
+      avatar:"https://i.pravatar.cc/150?u="+me,
+      lastSeen:Date.now()
     });
 
-    alert("Compte créé, connecte-toi maintenant");
+    alert("Compte créé");
   })
   .catch(e=>alert(e.message));
 }
 
-/* USERS LIST */
+/* USERS */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
     let box=document.getElementById("users");
@@ -150,11 +132,13 @@ function loadUsers(){
 
     snap.forEach(doc=>{
       let u=doc.data();
+      if(u.email!==me){
 
-      if(u.email !== me){
+        const online = Date.now()-u.lastSeen<5000;
+
         box.innerHTML+=`
           <div onclick="openChat('${u.email}')">
-            👤 ${u.email}
+            👤 ${u.email} ${online?"🟢":"⚫"}
           </div>
         `;
       }
@@ -162,20 +146,20 @@ function loadUsers(){
   });
 }
 
-/* OPEN PRIVATE CHAT */
+/* OPEN CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
 }
 
-/* SEND MESSAGE */
+/* SEND TEXT */
 function sendMsg(){
   if(!currentChatUser) return alert("Choisis un utilisateur");
 
-  let text=document.getElementById("msg").value;
+  let text=msg.value;
   if(!text) return;
 
-  let id = [me,currentChatUser].sort().join("_");
+  let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
     text,
@@ -184,46 +168,105 @@ function sendMsg(){
     seen:false
   });
 
-  document.getElementById("msg").value="";
+  msg.value="";
+}
+
+/* AUDIO 🎤 */
+async function recordAudio(){
+
+  const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+  recorder = new MediaRecorder(stream);
+
+  recorder.ondataavailable=e=>audioChunks.push(e.data);
+
+  recorder.onstop=()=>{
+    const blob = new Blob(audioChunks);
+    const reader = new FileReader();
+
+    reader.onload=()=>{
+      let id=[me,currentChatUser].sort().join("_");
+
+      db.collection("chats").doc(id).collection("messages").add({
+        audio:reader.result,
+        from:me,
+        time:Date.now()
+      });
+    };
+
+    reader.readAsDataURL(blob);
+    audioChunks=[];
+  };
+
+  recorder.start();
+
+  setTimeout(()=>recorder.stop(),3000); // 3 sec
 }
 
 /* LOAD CHAT */
 function loadChat(){
 
-  let id = [me,currentChatUser].sort().join("_");
+  let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id)
   .collection("messages")
   .orderBy("time")
-  .onSnapshot(snap=>{
+  .onSnapshot(async snap=>{
 
     let box=document.getElementById("chatBox");
     box.innerHTML="";
 
-    snap.forEach(doc=>{
-      let m=doc.data();
+    for(const docu of snap.docs){
+      let m=docu.data();
 
-      let status = m.seen ? "✔✔" : "✔";
+      let userData = await db.collection("users").doc(m.from).get();
+      let avatar = userData.data()?.avatar || "";
+
+      let content = m.text ? m.text :
+        `<audio controls src="${m.audio}"></audio>`;
 
       box.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
-          ${m.text}
-          <div class="small">${status}</div>
+          <img class="avatar" src="${avatar}">
+          <div>
+            ${content}
+            <div class="small">${m.seen?"✔✔":"✔"}</div>
+          </div>
         </div>
       `;
 
-      if(m.from !== me){
+      if(m.from!==me){
         db.collection("chats").doc(id)
-        .collection("messages").doc(doc.id)
+        .collection("messages").doc(docu.id)
         .update({seen:true});
       }
-
-    });
+    }
 
   });
 }
 
-/* ONLINE STATUS */
+/* TYPING */
+function typing(){
+  let id=[me,currentChatUser].sort().join("_");
+
+  db.collection("typing").doc(id).set({
+    user:me
+  });
+
+  setTimeout(()=>{
+    db.collection("typing").doc(id).delete();
+  },1000);
+}
+
+db.collection("typing").onSnapshot(snap=>{
+  snap.forEach(doc=>{
+    let t=doc.data();
+    if(t.user!==me){
+      document.getElementById("typing").innerText="✍️ en train d'écrire...";
+    }
+  });
+});
+
+/* ONLINE */
 function presence(){
   setInterval(()=>{
     if(me){
