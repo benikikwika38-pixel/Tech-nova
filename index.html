@@ -7,14 +7,15 @@
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
 body{
 font-family:'Georgia',serif;
-background:#f4f4f9;
-margin:0;
+background-color:#f4f4f9;
 color:#222;
+margin:0;
+padding:0;
 }
 
 /* CODE GATE */
@@ -68,21 +69,64 @@ background:#2c3e50;
 color:white;
 text-align:center;
 padding:50px 20px;
+position:relative;
+}
+
+.menu{
+position:absolute;
+top:20px;
+right:25px;
+font-size:28px;
+cursor:pointer;
+}
+
+nav{
+display:none;
+background:#2c3e50;
+position:absolute;
+top:80px;
+right:20px;
+border-radius:8px;
+overflow:hidden;
+}
+
+nav a{
+display:block;
+color:white;
+padding:12px 20px;
+text-decoration:none;
+border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+nav a:hover{
+background:#34495e;
+}
+
+/* SECTIONS */
+section{
+max-width:900px;
+margin:40px auto;
+padding:20px;
+background:white;
+border-radius:10px;
+box-shadow:0 6px 15px rgba(0,0,0,0.1);
 }
 
 button{
 padding:12px 25px;
-background:#2980b9;
-color:white;
 border:none;
 border-radius:8px;
 cursor:pointer;
+background:#2980b9;
+color:white;
 }
 
+/* FOOTER */
 footer{
 text-align:center;
-margin:40px;
 color:#555;
+margin:50px 0 20px 0;
+font-size:0.9em;
 }
 </style>
 </head>
@@ -106,24 +150,49 @@ color:#555;
 
 <header>
 <h1>TechNova Academy</h1>
-<p>Communauté des érudits</p>
+<p>Communauté des érudits passionnés par l’informatique</p>
 </header>
 
 <section>
 <h2>À propos</h2>
-<p>TechNova Academy forme des esprits ambitieux.</p>
+<p>TechNova Academy forme des esprits ambitieux en informatique.</p>
 </section>
 
-<footer>© 2026 TechNova Academy</footer>
+<section>
+<h2>Formations</h2>
+<ul>
+<li>Excel</li>
+<li>Word</li>
+<li>Bases de données</li>
+<li>Informatique</li>
+</ul>
+</section>
+
+<section>
+<h2>Inscription</h2>
+<a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
+<button>S'inscrire</button>
+</a>
+</section>
+
+<footer>
+© 2026 TechNova Academy
+</footer>
 
 <!-- ================= FIREBASE ================= -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* 🔥 TA VRAIE CONFIG FIREBASE */
+import { getDatabase, ref, set, get } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+import { getMessaging, getToken, onMessage } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+/* 🔥 TA CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -136,13 +205,28 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getDatabase(app);
+const messaging = getMessaging(app);
+
+/* 👑 ADMIN */
+const adminEmail = "benikikwika38@gmail.com";
 
 /* 🔐 CODE SECRET */
 const SECRET_CODE = "TECH2026";
 
+/* 📱 DEVICE ID */
+function getDeviceId(){
+let id = localStorage.getItem("device_id");
+if(!id){
+id = crypto.randomUUID();
+localStorage.setItem("device_id", id);
+}
+return id;
+}
+
 /* ================= CODE GATE ================= */
 window.checkCode = function(){
-let code=document.getElementById("accessCode").value;
+let code = document.getElementById("accessCode").value;
 
 if(code === SECRET_CODE){
 document.getElementById("codeGate").style.display="none";
@@ -158,25 +242,64 @@ const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
 
 signInWithEmailAndPassword(auth,email,password)
-.then(()=>{
-alert("Connexion réussie ✅");
-document.getElementById("loginBox").style.display="none";
-})
-.catch(e=>{
-alert("Erreur : " + e.message);
+.then(async (userCred)=>{
+
+const user = userCred.user;
+const deviceId = getDeviceId();
+
+await set(ref(db,"devices/"+user.uid),{
+deviceId:deviceId
 });
+
+})
+.catch(e=>alert(e.message));
 };
 
-/* PROTECTION */
+/* ================= PROTECTION ================= */
 onAuthStateChanged(auth,user=>{
 if(user){
 document.getElementById("loginBox").style.display="none";
+
+const deviceId = getDeviceId();
+
+get(ref(db,"devices/"+user.uid)).then(snapshot=>{
+const data = snapshot.val();
+
+if(data && data.deviceId !== deviceId){
+document.body.innerHTML = "<h1>🚫 Accès refusé (appareil non autorisé)</h1>";
+}
+});
+
+if(user.email===adminEmail){
+let div=document.createElement("div");
+div.innerHTML=`
+<div style="position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:10px;border-radius:10px;">
+👑 ADMIN MODE
+<br>
+<button onclick="alert('Ajout cours bientôt')">Ajouter cours</button>
+</div>`;
+document.body.appendChild(div);
+}
+
 }else{
 document.getElementById("loginBox").style.display="flex";
 }
 });
 
+/* 🔔 NOTIFICATIONS */
+Notification.requestPermission();
+
+getToken(messaging,{
+vapidKey:"TON_VAPID_KEY"
+}).then(token=>{
+console.log("Device Token:",token);
+});
+
+onMessage(messaging,(payload)=>{
+alert("📢 "+payload.notification.title);
+});
+
 </script>
 
 </body>
-</html>
+  </html>
