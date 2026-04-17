@@ -6,37 +6,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#e9edf1;}
-header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight:bold;}
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0b141a;
+  color:white;
+}
 
-.box{background:white;margin:10px;padding:10px;border-radius:12px;}
+header{
+  background:#202c33;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
 
-.chatBox{
-  height:320px;
-  overflow:auto;
-  background:white;
+.box{
+  background:#111b21;
+  margin:10px;
   padding:10px;
   border-radius:12px;
 }
 
-.msg{padding:8px;margin:5px;border-radius:10px;max-width:70%;}
-.me{background:#cfe6ff;margin-left:auto;}
-.other{background:#eee;}
+/* STORIES */
+#stories{
+  display:flex;
+  overflow-x:auto;
+  gap:10px;
+}
 
-.small{font-size:12px;color:gray;}
-
-.avatar{
-  width:30px;
-  height:30px;
-  border-radius:50%;
+.story{
+  text-align:center;
   cursor:pointer;
 }
-.storyAvatar{
+
+.story img{
   width:60px;
   height:60px;
   border-radius:50%;
-  border:3px solid green;
-  cursor:pointer;
+  border:3px solid #00a884;
+}
+
+/* USERS */
+.user{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #222;
+}
+
+/* CHAT */
+.chatBox{
+  height:320px;
+  overflow:auto;
+  padding:10px;
+}
+
+.msg{
+  padding:10px;
+  margin:5px;
+  border-radius:10px;
+  max-width:70%;
+}
+
+.me{background:#005c4b;margin-left:auto;}
+.other{background:#202c33;}
+
+.small{font-size:11px;color:#aaa;}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+}
+
+#chatHeader{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid #222;
+  padding-bottom:10px;
+}
+
+input{
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  width:70%;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  background:#00a884;
+  color:white;
 }
 </style>
 </head>
@@ -63,22 +126,34 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
   <div id="myAvatar"></div>
 </div>
 
+<!-- STORIES -->
 <div class="box">
   <h3>📸 Stories</h3>
-  <input type="file" id="storyInput">
+  <input type="file" id="storyFile">
   <button onclick="addStory()">Publier</button>
   <div id="stories"></div>
 </div>
 
+<!-- USERS -->
 <div class="box">
   <h3>👥 Utilisateurs</h3>
   <div id="users"></div>
 </div>
 
+<!-- CHAT -->
 <div class="box">
-  <h3>💬 Chat privé</h3>
-  <div class="chatBox" id="chatBox"></div>
-  <div id="typing" class="small"></div>
+
+<div id="chatHeader">
+  <img id="chatAvatar" class="avatar">
+  <div>
+    <b id="chatName"></b><br>
+    <span id="chatStatus" class="small"></span>
+  </div>
+</div>
+
+<div class="chatBox" id="chatBox"></div>
+<div id="typing" class="small"></div>
+
 </div>
 
 <input id="msg" placeholder="Message..." oninput="typing()">
@@ -99,7 +174,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -111,10 +185,8 @@ function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
-
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("app").style.display="block";
-
+    loginBox.style.display="none";
+    app.style.display="block";
     loadUsers();
     loadProfile();
     loadStories();
@@ -128,13 +200,11 @@ function signup(){
   auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
-
     db.collection("users").doc(me).set({
-      email: me || "User",
+      email:me,
       avatar:"",
-      lastSeen: Date.now()
+      lastSeen:Date.now()
     });
-
     alert("Compte créé");
   })
   .catch(e=>alert(e.message));
@@ -142,16 +212,12 @@ function signup(){
 
 /* PROFILE */
 function saveAvatar(){
-  const file=avatarInput.files[0];
-  if(!file) return;
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    db.collection("users").doc(me).set({
-      avatar:reader.result
-    },{merge:true});
+  let file=avatarInput.files[0];
+  let r=new FileReader();
+  r.onload=()=>{
+    db.collection("users").doc(me).set({avatar:r.result},{merge:true});
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 
 function loadProfile(){
@@ -167,12 +233,15 @@ function loadUsers(){
     users.innerHTML="";
     snap.forEach(doc=>{
       let u=doc.data();
-      let online = Date.now() - (u.lastSeen || 0) < 5000;
+      let online=Date.now()-(u.lastSeen||0)<5000;
 
-      if(u.email !== me){
+      if(u.email!==me){
         users.innerHTML+=`
-          <div onclick="openChat('${u.email}')">
-            👤 ${u.email} ${online?"🟢":""}
+          <div class="user">
+            <div onclick="openChat('${u.email}')">
+              ${u.email} ${online?"🟢":""}
+            </div>
+            <button onclick="openUserStory('${doc.id}')">📸</button>
           </div>
         `;
       }
@@ -180,22 +249,34 @@ function loadUsers(){
   });
 }
 
-/* CHAT */
+/* CHAT HEADER */
+function loadChatHeader(){
+  db.collection("users").doc(currentChatUser)
+  .onSnapshot(doc=>{
+    let u=doc.data();
+    let online=Date.now()-(u.lastSeen||0)<5000;
+
+    chatAvatar.src = u.avatar || "";
+    chatName.innerText = u.email;
+    chatStatus.innerText = online ? "🟢 actif" : "⚫ non actif";
+  });
+}
+
+/* OPEN CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
+  loadChatHeader();
 }
 
+/* SEND */
 function sendMsg(){
-  if(!currentChatUser) return alert("Choisis un utilisateur");
-
-  let text=msg.value;
-  if(!text) return;
+  if(!currentChatUser)return alert("Choisis un utilisateur");
 
   let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
-    text,
+    text:msg.value,
     from:me,
     time:Date.now(),
     seen:false
@@ -204,6 +285,7 @@ function sendMsg(){
   msg.value="";
 }
 
+/* CHAT */
 function loadChat(){
   let id=[me,currentChatUser].sort().join("_");
 
@@ -221,10 +303,6 @@ function loadChat(){
         <div class="msg ${m.from===me?'me':'other'}">
           ${m.text}
           <div class="small">${status}</div>
-
-          ${m.from===me?`
-          <button onclick="deleteMsg('${doc.id}','${id}')" style="background:red;">🗑</button>
-          `:""}
         </div>
       `;
 
@@ -237,20 +315,84 @@ function loadChat(){
   });
 }
 
-function deleteMsg(msgId,chatId){
-  db.collection("chats").doc(chatId)
-  .collection("messages").doc(msgId).delete();
+/* STORIES */
+function addStory(){
+  let file=storyFile.files[0];
+  let r=new FileReader();
+  r.onload=()=>{
+    db.collection("stories").add({
+      user:me,
+      media:r.result,
+      type:file.type.startsWith("video")?"video":"image",
+      time:Date.now(),
+      views:[],
+      reactions:[]
+    });
+  };
+  r.readAsDataURL(file);
+}
+
+function loadStories(){
+  db.collection("stories").orderBy("time","desc")
+  .onSnapshot(snap=>{
+    stories.innerHTML="";
+    snap.forEach(doc=>{
+      let s=doc.data();
+
+      if(Date.now()-s.time<21600000){
+        stories.innerHTML+=`
+          <div class="story" onclick="openUserStory('${doc.id}')">
+            <img src="${s.media}">
+            <div style="font-size:12px">${s.user}</div>
+          </div>
+        `;
+      }
+    });
+  });
+}
+
+/* STORY GRAND */
+function openUserStory(id){
+  db.collection("stories").doc(id).get().then(doc=>{
+    let s=doc.data();
+
+    let modal=document.createElement("div");
+    modal.style="position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center";
+
+    let media = s.type==="video"
+      ? `<video src="${s.media}" controls autoplay style="width:100%;height:80%"></video>`
+      : `<img src="${s.media}" style="width:100%;height:80%;object-fit:contain">`;
+
+    modal.innerHTML=`
+      <div style="color:white;position:absolute;top:10px;">${s.user}</div>
+      ${media}
+      <div>
+        <button onclick="reactStory('${id}','🔥')">🔥</button>
+        <button onclick="reactStory('${id}','❤️')">❤️</button>
+        <button onclick="reactStory('${id}','😂')">😂</button>
+      </div>
+      <button onclick="this.parentElement.remove()">❌</button>
+    `;
+
+    document.body.appendChild(modal);
+  });
+}
+
+/* REACTION */
+function reactStory(id,emoji){
+  db.collection("stories").doc(id).update({
+    reactions:firebase.firestore.FieldValue.arrayUnion({
+      user:me,
+      emoji:emoji
+    })
+  });
 }
 
 /* TYPING */
 function typing(){
   let id=[me,currentChatUser].sort().join("_");
-
   db.collection("typing").doc(id).set({user:me});
-
-  setTimeout(()=>{
-    db.collection("typing").doc(id).delete();
-  },1000);
+  setTimeout(()=>db.collection("typing").doc(id).delete(),1000);
 }
 
 db.collection("typing").onSnapshot(snap=>{
@@ -265,81 +407,15 @@ db.collection("typing").onSnapshot(snap=>{
 /* ONLINE */
 function presence(){
   setInterval(()=>{
-    db.collection("users").doc(me).set({
-      lastSeen:Date.now()
-    },{merge:true});
+    if(me){
+      db.collection("users").doc(me).set({
+        lastSeen:Date.now()
+      },{merge:true});
+    }
   },3000);
-}
-
-/* STORIES */
-function addStory(){
-  const file=storyInput.files[0];
-  if(!file) return;
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    let type=file.type.includes("video")?"video":"image";
-
-    db.collection("stories").add({
-      user:me,
-      media:reader.result,
-      type:type,
-      time:Date.now(),
-      views:[]
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadStories(){
-  db.collection("stories").onSnapshot(snap=>{
-    stories.innerHTML="";
-    snap.forEach(doc=>{
-      let s=doc.data();
-
-      stories.innerHTML+=`
-        <img class="storyAvatar" src="${s.media}" onclick="openUserStory('${s.user}')">
-      `;
-    });
-  });
-}
-
-/* STORY FULL SCREEN */
-function openUserStory(user){
-  db.collection("stories")
-  .where("user","==",user)
-  .orderBy("time","desc")
-  .limit(1)
-  .get()
-  .then(snap=>{
-    let doc=snap.docs[0];
-    let s=doc.data();
-
-    let modal=document.createElement("div");
-    modal.style="position:fixed;top:0;left:0;width:100%;height:100%;background:black;z-index:9999";
-
-    modal.innerHTML=`
-      <div style="color:white;padding:10px;">${user}</div>
-
-      ${s.type==="video"
-        ? `<video src="${s.media}" controls autoplay style="width:100%;height:80%"></video>`
-        : `<img src="${s.media}" style="width:100%;height:80%">`
-      }
-
-      <button onclick="deleteStory('${doc.id}')">🗑 Supprimer</button>
-      <button onclick="this.parentElement.remove()">❌</button>
-    `;
-
-    document.body.appendChild(modal);
-  });
-}
-
-function deleteStory(id){
-  db.collection("stories").doc(id).delete();
-  alert("Story supprimée");
 }
 
 </script>
 
 </body>
-  </html>
+</html>
