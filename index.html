@@ -72,7 +72,6 @@ padding:50px 20px;
 position:relative;
 }
 
-/* ☰ MENU */
 .menu{
 position:absolute;
 top:20px;
@@ -81,7 +80,6 @@ font-size:28px;
 cursor:pointer;
 }
 
-/* NAV */
 nav{
 display:none;
 background:#2c3e50;
@@ -152,24 +150,16 @@ font-size:0.9em;
 </div>
 
 <header>
-<div class="menu" onclick="toggleMenu()">☰</div>
-
 <h1>TechNova Academy</h1>
 <p>Communauté des érudits passionnés par l’informatique</p>
-
-<nav id="navMenu">
-<a href="#about">À propos</a>
-<a href="#formations">Formations</a>
-<a href="#inscription">Inscription</a>
-</nav>
 </header>
 
-<section id="about">
+<section>
 <h2>À propos</h2>
 <p>TechNova Academy forme des esprits ambitieux en informatique.</p>
 </section>
 
-<section id="formations">
+<section>
 <h2>Formations</h2>
 <ul>
 <li>Excel</li>
@@ -179,7 +169,7 @@ font-size:0.9em;
 </ul>
 </section>
 
-<section id="inscription">
+<section>
 <h2>Inscription</h2>
 <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
 <button>S'inscrire</button>
@@ -193,7 +183,12 @@ font-size:0.9em;
 <!-- ================= FIREBASE ================= -->
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import { getAnalytics } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -203,7 +198,7 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getMessaging, getToken, onMessage } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
-/* FIREBASE CONFIG */
+/* 🔥 CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -214,7 +209,10 @@ const firebaseConfig = {
   measurementId: "G-9X1R7Q9S5G"
 };
 
+/* INIT */
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
 const auth = getAuth(app);
 const db = getDatabase(app);
 const messaging = getMessaging(app);
@@ -234,12 +232,6 @@ localStorage.setItem("device_id", id);
 }
 return id;
 }
-
-/* MENU TOGGLE */
-window.toggleMenu = function(){
-const nav = document.getElementById("navMenu");
-nav.style.display = (nav.style.display === "block") ? "none" : "block";
-};
 
 /* CODE GATE */
 window.checkCode = function(){
@@ -303,7 +295,7 @@ document.getElementById("loginBox").style.display="flex";
 }
 });
 
-/* NOTIFICATIONS */
+/* 🔔 NOTIFICATIONS */
 Notification.requestPermission();
 
 getToken(messaging,{
