@@ -5,9 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TechNova Academy – Communauté des Érudits</title>
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c3e50">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
 <style>
 
-/* Style général */
+/* ===== STYLE ===== */
 body{
 font-family:'Georgia',serif;
 background-color:#f4f4f9;
@@ -16,7 +21,52 @@ margin:0;
 padding:0;
 }
 
-/* Header */
+/* 🔐 CODE GATE */
+#codeGate{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:#111;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+z-index:99999;
+}
+
+#codeGate input{
+padding:10px;
+margin:10px;
+width:220px;
+text-align:center;
+border-radius:5px;
+border:none;
+}
+
+/* 🔐 LOGIN */
+#loginBox{
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:#2c3e50;
+display:none;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+color:white;
+z-index:9999;
+}
+
+#loginBox input{
+padding:10px;
+margin:5px;
+width:220px;
+border-radius:5px;
+border:none;
+}
+
+/* HEADER */
 header{
 background:#2c3e50;
 color:white;
@@ -25,7 +75,6 @@ padding:50px 20px;
 position:relative;
 }
 
-/* Bouton menu */
 .menu{
 position:absolute;
 top:20px;
@@ -34,7 +83,6 @@ font-size:28px;
 cursor:pointer;
 }
 
-/* Menu caché */
 nav{
 display:none;
 background:#2c3e50;
@@ -57,7 +105,7 @@ nav a:hover{
 background:#34495e;
 }
 
-/* Sections */
+/* SECTIONS */
 section{
 max-width:900px;
 margin:40px auto;
@@ -67,26 +115,8 @@ border-radius:10px;
 box-shadow:0 6px 15px rgba(0,0,0,0.1);
 }
 
-h2{
-color:#34495e;
-border-bottom:2px solid #2980b9;
-display:inline-block;
-padding-bottom:5px;
-}
-
-ul{
-padding-left:20px;
-}
-
-ul li{
-margin:10px 0;
-font-size:1.1em;
-}
-
-/* Boutons */
 button{
 padding:12px 25px;
-font-size:16px;
 border:none;
 border-radius:8px;
 cursor:pointer;
@@ -94,11 +124,6 @@ background:#2980b9;
 color:white;
 }
 
-button:hover{
-background:#1f618d;
-}
-
-/* Footer */
 footer{
 text-align:center;
 color:#555;
@@ -107,176 +132,205 @@ font-size:0.9em;
 }
 
 </style>
-
-<script>
-
-/* Menu 3 barres */
-
-function ouvrirMenu(){
-
-let menu = document.getElementById("menu");
-
-if(menu.style.display === "block"){
-menu.style.display="none";
-}else{
-menu.style.display="block";
-}
-
-}
-
-/* ADMIN SECRET */
-
-let compteur=0;
-
-function secretAdmin(){
-
-compteur++;
-
-if(compteur==3){
-
-let pass=prompt("Mot de passe Admin");
-
-if(pass==="kikwika12"){
-
-window.location="admin.html";
-
-}else{
-
-alert("Accès refusé");
-
-}
-
-}
-
-}
-
-</script>
-
 </head>
 
 <body>
+
+<!-- 🔐 CODE AVANT ACCÈS -->
+<div id="codeGate">
+<h2>🔐 Accès sécurisé TechNova</h2>
+
+<input id="accessCode" placeholder="Entrer le code">
+<button onclick="checkCode()">Valider</button>
+</div>
+
+<!-- 🔐 LOGIN -->
+<div id="loginBox">
+<h2>Connexion TechNova</h2>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Mot de passe">
+<button onclick="login()">Se connecter</button>
+</div>
 
 <header>
 
 <div class="menu" onclick="ouvrirMenu()">☰</div>
 
-<h1 onclick="secretAdmin()">TechNova Academy</h1>
+<h1>TechNova Academy</h1>
 
-<p>Communauté des érudits passionnés par l’informatique et les technologies</p>
+<p>Communauté des érudits passionnés par l’informatique</p>
 
 <nav id="menu">
-
 <a href="espace-etudiant.html">Espace étudiants</a>
-
 <a href="certificat.html">Certificat</a>
-
 <a href="acces-cours.html">Cours</a>
-<a href="ia.html">technova ia</a>
-<a href="post.html">📢 RS TECHNOVA ACADEMY</a>
+<a href="ia.html">Technova IA</a>
+<a href="post.html">📢 RS TECHNOVA</a>
 <a href="chat.html">💬 Contacter Admin</a>
-
 </nav>
 
 </header>
 
 <section>
-
 <h2>À propos</h2>
-
-<p>
-TechNova Academy a pour mission de former des esprits curieux et ambitieux aux bases et avancées de l’informatique.
-Chaque participant reçoit un accompagnement sérieux et rigoureux pour devenir un véritable érudit numérique.
-</p>
-
+<p>TechNova Academy forme des esprits ambitieux en informatique.</p>
 </section>
 
 <section>
-
-<h2>Formations disponibles</h2>
-
+<h2>Formations</h2>
 <ul>
 <li>Excel</li>
 <li>Word</li>
 <li>Bases de données</li>
-<li>Initiation à l’informatique</li>
+<li>Informatique</li>
 </ul>
-
 </section>
 
 <section>
-
 <h2>Inscription</h2>
-
-<p>
-Pour rejoindre notre communauté et accéder aux cours, cliquez sur le bouton ci-dessous.
-Votre dossier sera examiné et validé par TechNova Academy.
-</p>
-
-<br>
-<br><br>
 <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
-<button>S'inscrire maintenant</button>
+<button>S'inscrire</button>
 </a>
-            
-<br><br>
-  <p style="text-align:center; margin-top:15px; color:#555;">
-    📧 Email : <a href="mailto:contact@technova.com">contact@technova.com</a><br>
-    📞 Téléphone : <a href="tel:+ 243 973 571 493"> 0973571493 </a>
-  </p>
-       
-<footer style="background:#111; color:#ccc; text-align:center; padding:15px;">
-    
-    <p style="font-size:12px;">
-        © 2026 Technova - Tous droits réservés
-    </p>
+</section>
 
-    <!-- Bouton discret -->
-    <button onclick="toggleCreator()" 
-        style="font-size:10px; background:none; border:none; color:#888; cursor:pointer;">
-        À propos du créateur
-    </button>
-
-    <!-- Infos cachées -->
-    <div id="creatorInfo" style="display:none; margin-top:10px; font-size:12px; color:#ccc;">
-        Titre : Mes Espoirs en Tant que Développeur et pour Technova Academy
-
-**Introduction**  
-Je m'appelle Béni Kikwika, né le 20 mai 2000, et je suis Congolais, résidant à Kinshasa. Le 15 mars 2026, j'ai créé Technova Academy, une plateforme éducative dédiée à renforcer les compétences technologiques et personnelles des apprenants.
-
-**Mon Parcours en Développement**  
-Depuis mon jeune âge, j'ai toujours été passionné par la technologie. J'ai acquis des compétences en développement web qui me permettent de créer des solutions innovantes. Mon expérience m'a appris l'importance de l'apprentissage continu et de l'adaptation aux nouvelles tendances.
-
-**Vision pour Technova Academy**  
-Je souhaite faire de Technova Academy une référence en matière d'éducation technologique. Mon objectif est d'intégrer des outils modernes et interactifs pour rendre l'apprentissage plus engageant et accessible à tous.
-
-**Impact Souhaité**  
-J'espère que Technova Academy inspirera les apprenants à s'investir dans leur développement personnel et professionnel. Je veux que chaque utilisateur se sente soutenu et motivé à atteindre ses objectifs.
-
-**Conclusion**  
-Je vous invite à suivre notre aventure et à partager vos idées. Ensemble, nous pouvons transformer l'éducation et ouvrir de nouvelles portes pour l'avenir.
-
-    </div>
-
+<footer>
+© 2026 TechNova Academy
 </footer>
 
 <script>
-function toggleCreator() {
-    var info = document.getElementById("creatorInfo");
-    if (info.style.display === "none") {
-        info.style.display = "block";
-    } else {
-        info.style.display = "none";
-    }
+function ouvrirMenu(){
+let menu=document.getElementById("menu");
+menu.style.display=(menu.style.display==="block")?"none":"block";
 }
-</script></section>
-</section>
-    
-<footer>
+</script>
 
-© 2026 TechNova Academy – Tous droits réservés  
-Créé par Béni Kikwika
+<!-- ================= FIREBASE ================= -->
+<script type="module">
 
-</footer>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import { getDatabase, ref, set, get } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+import { getMessaging, getToken, onMessage } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+/* 🔥 CONFIG FIREBASE */
+const firebaseConfig = {
+apiKey: "TON_API_KEY",
+authDomain: "TON_PROJECT.firebaseapp.com",
+projectId: "TON_PROJECT",
+appId: "TON_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const messaging = getMessaging(app);
+
+/* 👑 ADMIN */
+const adminEmail = "benikikwika38@gmail.com";
+
+/* 🔐 CODE */
+const SECRET_CODE = "TECH2026";
+
+/* 📱 DEVICE ID */
+function getDeviceId(){
+let id = localStorage.getItem("device_id");
+if(!id){
+id = crypto.randomUUID();
+localStorage.setItem("device_id", id);
+}
+return id;
+}
+
+/* ================= CODE GATE ================= */
+window.checkCode = function(){
+let code = document.getElementById("accessCode").value;
+
+if(code === SECRET_CODE){
+document.getElementById("codeGate").style.display="none";
+document.getElementById("loginBox").style.display="flex";
+}else{
+alert("❌ Code incorrect");
+}
+};
+
+/* ================= LOGIN ================= */
+window.login = function(){
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
+
+signInWithEmailAndPassword(auth,email,password)
+.then(async (userCred)=>{
+
+const user = userCred.user;
+const deviceId = getDeviceId();
+
+/* 🔐 ENREGISTRE CE TÉLÉPHONE */
+await set(ref(db,"devices/"+user.uid),{
+deviceId:deviceId
+});
+
+})
+.catch(e=>alert(e.message));
+};
+
+/* 🚪 LOGOUT */
+window.logout = function(){
+signOut(auth);
+};
+
+/* ================= PROTECTION ================= */
+onAuthStateChanged(auth,user=>{
+if(user){
+
+document.getElementById("loginBox").style.display="none";
+
+/* 🔐 VERROUILLAGE APPAREIL */
+const deviceId = getDeviceId();
+
+get(ref(db,"devices/"+user.uid)).then(snapshot=>{
+const data = snapshot.val();
+
+if(data && data.deviceId !== deviceId){
+document.body.innerHTML = "<h1>🚫 Accès refusé (appareil non autorisé)</h1>";
+}
+});
+
+/* 👑 ADMIN PANEL */
+if(user.email===adminEmail){
+let div=document.createElement("div");
+div.innerHTML=`
+<div style="position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:10px;border-radius:10px;">
+👑 ADMIN MODE
+<br>
+<button onclick="alert('Ajout cours bientôt')">Ajouter cours</button>
+</div>`;
+document.body.appendChild(div);
+}
+
+}else{
+document.getElementById("loginBox").style.display="flex";
+}
+});
+
+/* 🔔 NOTIFICATIONS */
+Notification.requestPermission();
+
+getToken(messaging,{
+vapidKey:"TON_VAPID_KEY"
+}).then(token=>{
+console.log("Device Token:",token);
+});
+
+onMessage(messaging,(payload)=>{
+alert("📢 "+payload.notification.title);
+});
+
+</script>
 
 </body>
-    </html>
+            </html>
