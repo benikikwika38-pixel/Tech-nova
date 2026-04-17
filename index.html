@@ -72,6 +72,7 @@ padding:50px 20px;
 position:relative;
 }
 
+/* MENU ☰ */
 .menu{
 position:absolute;
 top:20px;
@@ -80,6 +81,7 @@ font-size:28px;
 cursor:pointer;
 }
 
+/* NAV */
 nav{
 display:none;
 background:#2c3e50;
@@ -150,16 +152,24 @@ font-size:0.9em;
 </div>
 
 <header>
+<div class="menu" onclick="toggleMenu()">☰</div>
+
 <h1>TechNova Academy</h1>
 <p>Communauté des érudits passionnés par l’informatique</p>
+
+<nav id="navMenu">
+<a href="#about">À propos</a>
+<a href="#formations">Formations</a>
+<a href="#inscription">Inscription</a>
+</nav>
 </header>
 
-<section>
+<section id="about">
 <h2>À propos</h2>
 <p>TechNova Academy forme des esprits ambitieux en informatique.</p>
 </section>
 
-<section>
+<section id="formations">
 <h2>Formations</h2>
 <ul>
 <li>Excel</li>
@@ -169,7 +179,7 @@ font-size:0.9em;
 </ul>
 </section>
 
-<section>
+<section id="inscription">
 <h2>Inscription</h2>
 <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
 <button>S'inscrire</button>
@@ -198,12 +208,12 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getMessaging, getToken, onMessage } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
-/* 🔥 CONFIG FIREBASE */
+/* CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
   projectId: "technova-academy",
-  storageBucket: "technova-academy.appspot.com",
+  storageBucket: "technova-academy.firebasestorage.app",
   messagingSenderId: "321716769948",
   appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959",
   measurementId: "G-9X1R7Q9S5G"
@@ -220,7 +230,7 @@ const messaging = getMessaging(app);
 /* ADMIN */
 const adminEmail = "benikikwika38@gmail.com";
 
-/* CODE SECRET */
+/* CODE */
 const SECRET_CODE = "TECH2026";
 
 /* DEVICE ID */
@@ -232,6 +242,12 @@ localStorage.setItem("device_id", id);
 }
 return id;
 }
+
+/* MENU */
+window.toggleMenu = function(){
+const nav = document.getElementById("navMenu");
+nav.style.display = (nav.style.display === "block") ? "none" : "block";
+};
 
 /* CODE GATE */
 window.checkCode = function(){
@@ -251,16 +267,6 @@ const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
 
 signInWithEmailAndPassword(auth,email,password)
-.then(async (userCred)=>{
-
-const user = userCred.user;
-const deviceId = getDeviceId();
-
-await set(ref(db,"devices/"+user.uid),{
-deviceId:deviceId
-});
-
-})
 .catch(e=>alert(e.message));
 };
 
@@ -275,7 +281,7 @@ get(ref(db,"devices/"+user.uid)).then(snapshot=>{
 const data = snapshot.val();
 
 if(data && data.deviceId !== deviceId){
-document.body.innerHTML = "<h1>🚫 Accès refusé (appareil non autorisé)</h1>";
+document.body.innerHTML="<h1>🚫 Accès refusé</h1>";
 }
 });
 
@@ -295,7 +301,7 @@ document.getElementById("loginBox").style.display="flex";
 }
 });
 
-/* 🔔 NOTIFICATIONS */
+/* NOTIFICATIONS */
 Notification.requestPermission();
 
 getToken(messaging,{
