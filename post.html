@@ -50,12 +50,20 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 <!-- APP -->
 <div id="app" style="display:none;">
 
-  <!-- 🔥 PROFIL -->
+  <!-- PROFIL -->
   <div class="box">
     <h3>👤 Profil</h3>
     <input id="avatarInput" type="file">
     <button onclick="saveAvatar()">Changer photo</button>
     <div id="myAvatar"></div>
+  </div>
+
+  <!-- STORIES -->
+  <div class="box">
+    <h3>📸 Statuts</h3>
+    <input type="file" id="storyFile">
+    <button onclick="addStory()">Publier statut</button>
+    <div id="stories"></div>
   </div>
 
   <div class="box">
@@ -94,6 +102,19 @@ const db = firebase.firestore();
 let me="";
 let currentChatUser="";
 
+/* 🔔 NOTIFICATIONS */
+function askNotification(){
+  if("Notification" in window){
+    Notification.requestPermission();
+  }
+}
+
+function notify(title, body){
+  if(Notification.permission==="granted"){
+    new Notification(title,{body});
+  }
+}
+
 /* LOGIN */
 function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
@@ -103,8 +124,10 @@ function login(){
     document.getElementById("loginBox").style.display="none";
     document.getElementById("app").style.display="block";
 
+    askNotification();
     loadUsers();
     loadProfile();
+    loadStories();
     presence();
   })
   .catch(e=>alert(e.message));
@@ -127,9 +150,9 @@ function signup(){
   .catch(e=>alert(e.message));
 }
 
-/* 🔥 PROFILE PHOTO */
+/* PROFILE */
 function saveAvatar(){
-  const file=document.getElementById("avatarInput").files[0];
+  const file=avatarInput.files[0];
   if(!file) return;
 
   const reader=new FileReader();
@@ -146,24 +169,56 @@ function loadProfile(){
     if(!doc.exists) return;
     let u=doc.data();
 
-    document.getElementById("myAvatar").innerHTML=`
-      <img class="avatar" src="${u.avatar||''}">
-    `;
+    myAvatar.innerHTML=`<img class="avatar" src="${u.avatar||''}">`;
   });
 }
 
-/* USERS LIST + 🟢 ONLINE */
+/* STORIES */
+function addStory(){
+  const file=storyFile.files[0];
+  if(!file) return;
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    db.collection("stories").add({
+      user:me,
+      image:reader.result,
+      time:Date.now()
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function loadStories(){
+  db.collection("stories").orderBy("time","desc")
+  .onSnapshot(snap=>{
+    stories.innerHTML="";
+    snap.forEach(doc=>{
+      let s=doc.data();
+
+      if(Date.now()-s.time<86400000){
+        stories.innerHTML+=`
+          <div>
+            <b>${s.user}</b><br>
+            <img src="${s.image}" style="width:100%;border-radius:10px;">
+          </div>
+        `;
+      }
+    });
+  });
+}
+
+/* USERS */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
-    let box=document.getElementById("users");
-    box.innerHTML="";
+    users.innerHTML="";
 
     snap.forEach(doc=>{
       let u=doc.data();
-      let online = Date.now()-u.lastSeen < 5000;
+      let online=Date.now()-u.lastSeen<5000;
 
-      if(u.email !== me){
-        box.innerHTML+=`
+      if(u.email!==me){
+        users.innerHTML+=`
           <div onclick="openChat('${u.email}')">
             👤 ${u.email} ${online?"🟢":"⚫"}
           </div>
@@ -173,13 +228,12 @@ function loadUsers(){
   });
 }
 
-/* OPEN CHAT */
+/* CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
 }
 
-/* SEND MESSAGE */
 function sendMsg(){
   if(!currentChatUser) return alert("Choisis un utilisateur");
 
@@ -198,7 +252,6 @@ function sendMsg(){
   msg.value="";
 }
 
-/* LOAD CHAT + PHOTO */
 function loadChat(){
 
   let id=[me,currentChatUser].sort().join("_");
@@ -208,18 +261,17 @@ function loadChat(){
   .orderBy("time")
   .onSnapshot(async snap=>{
 
-    let box=document.getElementById("chatBox");
-    box.innerHTML="";
+    chatBox.innerHTML="";
 
-    for(const docu of snap.docs){
-      let m=docu.data();
+    for(const d of snap.docs){
+      let m=d.data();
 
       let userDoc=await db.collection("users").doc(m.from).get();
       let avatar=userDoc.data()?.avatar||"";
 
       let status=m.seen?"✔✔":"✔";
 
-      box.innerHTML+=`
+      chatBox.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
           <img class="avatar" src="${avatar}">
           <div>
@@ -230,21 +282,20 @@ function loadChat(){
       `;
 
       if(m.from!==me){
+        notify("📩 Nouveau message", m.text);
         db.collection("chats").doc(id)
-        .collection("messages").doc(docu.id)
+        .collection("messages").doc(d.id)
         .update({seen:true});
       }
     }
   });
 }
 
-/* 🔥 TYPING */
+/* TYPING */
 function typing(){
   let id=[me,currentChatUser].sort().join("_");
 
-  db.collection("typing").doc(id).set({
-    user:me
-  });
+  db.collection("typing").doc(id).set({user:me});
 
   setTimeout(()=>{
     db.collection("typing").doc(id).delete();
@@ -255,7 +306,7 @@ db.collection("typing").onSnapshot(snap=>{
   snap.forEach(doc=>{
     let t=doc.data();
     if(t.user!==me){
-      document.getElementById("typing").innerText="✍️ écrit...";
+      typing.innerText="✍️ écrit...";
     }
   });
 });
