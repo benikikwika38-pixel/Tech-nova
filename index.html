@@ -3,18 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Academy – Communauté des Érudits</title>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2c3e50">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TechNova Academy</title>
 
 <style>
 body{
-font-family:'Georgia',serif;
-background:#f4f4f9;
+font-family:Georgia;
 margin:0;
+background:#f4f4f9;
 color:#222;
 }
 
@@ -29,16 +24,14 @@ display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-z-index:99999;
+z-index:9999;
 }
 
 #codeGate input{
 padding:10px;
-margin:10px;
 width:220px;
+margin:10px;
 text-align:center;
-border-radius:5px;
-border:none;
 }
 
 /* LOGIN */
@@ -52,71 +45,21 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 color:white;
-z-index:9999;
+z-index:9998;
 }
 
 #loginBox input{
 padding:10px;
-margin:5px;
 width:220px;
-border-radius:5px;
-border:none;
-}
-
-/* HEADER */
-header{
-background:#2c3e50;
-color:white;
-text-align:center;
-padding:50px 20px;
-position:relative;
-}
-
-.menu{
-position:absolute;
-top:20px;
-right:25px;
-font-size:28px;
-cursor:pointer;
-}
-
-nav{
-display:none;
-background:#2c3e50;
-position:absolute;
-top:80px;
-right:20px;
-border-radius:8px;
-}
-
-nav a{
-display:block;
-color:white;
-padding:12px;
-text-decoration:none;
-}
-
-section{
-max-width:900px;
-margin:40px auto;
-padding:20px;
-background:white;
-border-radius:10px;
+margin:5px;
 }
 
 button{
-padding:12px 25px;
+padding:10px 20px;
 background:#2980b9;
 color:white;
 border:none;
-border-radius:8px;
 cursor:pointer;
-}
-
-footer{
-text-align:center;
-margin:40px;
-color:#555;
 }
 </style>
 </head>
@@ -138,49 +81,33 @@ color:#555;
 <button onclick="login()">Se connecter</button>
 </div>
 
-<header>
-<div class="menu" onclick="toggleMenu()">☰</div>
-<h1>TechNova Academy</h1>
-<p>Communauté des érudits</p>
-</header>
-
-<section>
-<h2>À propos</h2>
-<p>TechNova Academy forme des esprits ambitieux.</p>
-</section>
-
-<footer>© 2026 TechNova Academy</footer>
-
-<script>
-function toggleMenu(){
-let m=document.getElementById("menu");
-if(m) m.style.display = m.style.display==="block"?"none":"block";
-}
-</script>
-
-<!-- ================= FIREBASE ================= -->
+<!-- ================= FIREBASE CDN ================= -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
+import { getAuth, signInWithEmailAndPassword } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* CONFIG */
+/* 🔥 TA CONFIG FIREBASE (CORRECTE) */
 const firebaseConfig = {
-apiKey: "TON_API_KEY",
-authDomain: "TON_PROJECT.firebaseapp.com",
-projectId: "TON_PROJECT"
+  apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy",
+  storageBucket: "technova-academy.appspot.com",
+  messagingSenderId: "321716769948",
+  appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959",
+  measurementId: "G-9X1R7Q9S5G"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-/* 🔐 CODE */
+/* 🔐 CODE SECRET */
 const SECRET_CODE = "TECH2026";
 
-/* IMPORTANT FIX */
+/* ================= CODE GATE ================= */
 window.checkCode = function(){
-let code=document.getElementById("accessCode").value;
+let code = document.getElementById("accessCode").value;
 
 if(code === SECRET_CODE){
 document.getElementById("codeGate").style.display="none";
@@ -190,21 +117,22 @@ alert("❌ Code incorrect");
 }
 };
 
+/* ================= LOGIN ================= */
 window.login = function(){
 const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
 
 signInWithEmailAndPassword(auth,email,password)
-.catch(e=>alert(e.message));
-};
-
-onAuthStateChanged(auth,user=>{
-if(user){
+.then(()=>{
+alert("Connexion réussie ✅");
 document.getElementById("loginBox").style.display="none";
-}
+})
+.catch(e=>{
+alert("Erreur : " + e.message);
 });
+};
 
 </script>
 
 </body>
-  </html>
+</html>
