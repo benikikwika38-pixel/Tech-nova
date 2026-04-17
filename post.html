@@ -6,19 +6,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#e9edf1;}
-header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight:bold;}
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0b141a;
+  color:white;
+}
 
-.box{background:white;margin:10px;padding:10px;border-radius:12px;}
+header{
+  background:#202c33;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+}
 
-.chatBox{height:320px;overflow:auto;background:white;padding:10px;border-radius:12px;}
+.box{
+  background:#111b21;
+  margin:10px;
+  padding:10px;
+  border-radius:12px;
+}
 
-.msg{padding:8px;margin:5px;border-radius:10px;max-width:70%;}
-.me{background:#cfe6ff;margin-left:auto;}
-.other{background:#eee;}
+/* STORIES */
+#stories{
+  display:flex;
+  overflow-x:auto;
+  gap:10px;
+}
 
-.small{font-size:12px;color:gray;}
-.avatar{width:30px;height:30px;border-radius:50%;}
+.story{
+  text-align:center;
+  cursor:pointer;
+}
+
+.story img{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:3px solid #00a884;
+}
+
+/* USERS */
+.user{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #222;
+}
+
+/* CHAT */
+.chatBox{
+  height:320px;
+  overflow:auto;
+  padding:10px;
+}
+
+.msg{
+  padding:10px;
+  margin:5px;
+  border-radius:10px;
+  max-width:70%;
+}
+
+.me{background:#005c4b;margin-left:auto;}
+.other{background:#202c33;}
+
+.small{font-size:11px;color:#aaa;}
+
+.avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+}
+
+#chatHeader{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid #222;
+  padding-bottom:10px;
+}
+
+input{
+  padding:10px;
+  border-radius:20px;
+  border:none;
+  width:70%;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:20px;
+  background:#00a884;
+  color:white;
+}
 </style>
 </head>
 
@@ -52,24 +134,26 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
   <div id="stories"></div>
 </div>
 
+<!-- USERS -->
 <div class="box">
   <h3>👥 Utilisateurs</h3>
   <div id="users"></div>
 </div>
 
+<!-- CHAT -->
 <div class="box">
-  
-  <!-- 🔥 HEADER CHAT -->
-  <div id="chatHeader" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
-    <img id="chatAvatar" class="avatar">
-    <div>
-      <b id="chatName"></b><br>
-      <span id="chatStatus" class="small"></span>
-    </div>
-  </div>
 
-  <div class="chatBox" id="chatBox"></div>
-  <div id="typing" class="small"></div>
+<div id="chatHeader">
+  <img id="chatAvatar" class="avatar">
+  <div>
+    <b id="chatName"></b><br>
+    <span id="chatStatus" class="small"></span>
+  </div>
+</div>
+
+<div class="chatBox" id="chatBox"></div>
+<div id="typing" class="small"></div>
+
 </div>
 
 <input id="msg" placeholder="Message..." oninput="typing()">
@@ -126,7 +210,6 @@ function signup(){
 /* PROFILE */
 function saveAvatar(){
   let file=avatarInput.files[0];
-  if(!file)return;
   let r=new FileReader();
   r.onload=()=>{
     db.collection("users").doc(me).set({avatar:r.result},{merge:true});
@@ -148,11 +231,16 @@ function loadUsers(){
     snap.forEach(doc=>{
       let u=doc.data();
       let online=Date.now()-u.lastSeen<5000;
+
       if(u.email!==me){
         users.innerHTML+=`
-          <div onclick="openChat('${u.email}')">
-            👤 ${u.email} ${online?"🟢":"⚫"}
-          </div>`;
+          <div class="user">
+            <div onclick="openChat('${u.email}')">
+              ${u.email} ${online?"🟢":""}
+            </div>
+            <button onclick="openUserStory('${u.email}')">📸</button>
+          </div>
+        `;
       }
     });
   });
@@ -167,7 +255,7 @@ function loadChatHeader(){
 
     chatAvatar.src = u.avatar || "";
     chatName.innerText = u.email;
-    chatStatus.innerText = online ? "🟢 en ligne" : "⚫ hors ligne";
+    chatStatus.innerText = online ? "🟢 en ligne" : "";
   });
 }
 
@@ -177,11 +265,6 @@ function openChat(user){
   loadChat();
   loadChatHeader();
 }
-
-/* CLICK PROFILE → STORY */
-chatHeader.onclick = function(){
-  openUserStory(currentChatUser);
-};
 
 /* SEND */
 function sendMsg(){
@@ -199,7 +282,7 @@ function sendMsg(){
   msg.value="";
 }
 
-/* FAST CHAT */
+/* CHAT */
 function loadChat(){
   let id=[me,currentChatUser].sort().join("_");
 
@@ -217,7 +300,6 @@ function loadChat(){
         <div class="msg ${m.from===me?'me':'other'}">
           ${m.text}
           <div class="small">${status}</div>
-          ${m.from===me?`<button onclick="deleteMsg('${id}','${doc.id}')">🗑</button>`:""}
         </div>
       `;
 
@@ -230,17 +312,9 @@ function loadChat(){
   });
 }
 
-function deleteMsg(chatId,msgId){
-  db.collection("chats").doc(chatId)
-  .collection("messages").doc(msgId)
-  .delete();
-}
-
 /* STORIES */
 function addStory(){
   let file=storyFile.files[0];
-  if(!file)return;
-
   let r=new FileReader();
   r.onload=()=>{
     db.collection("stories").add({
@@ -263,8 +337,9 @@ function loadStories(){
 
       if(Date.now()-s.time<21600000){
         stories.innerHTML+=`
-          <div onclick="openUserStory('${s.user}')">
-            👤 ${s.user} (${s.views?.length||0} vues)
+          <div class="story" onclick="openUserStory('${s.user}')">
+            <img src="${s.media}">
+            <div style="font-size:12px">${s.user}</div>
           </div>
         `;
       }
@@ -272,6 +347,7 @@ function loadStories(){
   });
 }
 
+/* VIEW STORY */
 function openUserStory(user){
   db.collection("stories")
   .where("user","==",user)
@@ -288,11 +364,15 @@ function openUserStory(user){
       views:firebase.firestore.FieldValue.arrayUnion(me)
     });
 
+    let content = `<h3>📸 Story de ${user}</h3>`;
+
     if(s.type==="video"){
-      chatBox.innerHTML=`<video src="${s.media}" controls autoplay width="100%"></video>`;
+      content += `<video src="${s.media}" controls autoplay width="100%"></video>`;
     }else{
-      chatBox.innerHTML=`<img src="${s.media}" style="width:100%">`;
+      content += `<img src="${s.media}" style="width:100%">`;
     }
+
+    chatBox.innerHTML = content;
   });
 }
 
@@ -322,7 +402,7 @@ function presence(){
     }
   },3000);
 }
-
 </script>
+
 </body>
-</html>
+  </html>
