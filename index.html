@@ -3,13 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TechNova Academy</title>
+<title>TechNova Academy – Communauté des Érudits</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2c3e50">
+<link rel="apple-touch-icon" href="icon-192.png">
 
 <style>
 body{
-font-family:Georgia;
-margin:0;
+font-family:'Georgia',serif;
 background:#f4f4f9;
+margin:0;
 color:#222;
 }
 
@@ -24,14 +28,16 @@ display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-z-index:9999;
+z-index:99999;
 }
 
 #codeGate input{
 padding:10px;
-width:220px;
 margin:10px;
+width:220px;
 text-align:center;
+border-radius:5px;
+border:none;
 }
 
 /* LOGIN */
@@ -45,21 +51,38 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 color:white;
-z-index:9998;
+z-index:9999;
 }
 
 #loginBox input{
 padding:10px;
-width:220px;
 margin:5px;
+width:220px;
+border-radius:5px;
+border:none;
+}
+
+/* HEADER */
+header{
+background:#2c3e50;
+color:white;
+text-align:center;
+padding:50px 20px;
 }
 
 button{
-padding:10px 20px;
+padding:12px 25px;
 background:#2980b9;
 color:white;
 border:none;
+border-radius:8px;
 cursor:pointer;
+}
+
+footer{
+text-align:center;
+margin:40px;
+color:#555;
 }
 </style>
 </head>
@@ -81,14 +104,26 @@ cursor:pointer;
 <button onclick="login()">Se connecter</button>
 </div>
 
-<!-- ================= FIREBASE CDN ================= -->
+<header>
+<h1>TechNova Academy</h1>
+<p>Communauté des érudits</p>
+</header>
+
+<section>
+<h2>À propos</h2>
+<p>TechNova Academy forme des esprits ambitieux.</p>
+</section>
+
+<footer>© 2026 TechNova Academy</footer>
+
+<!-- ================= FIREBASE ================= -->
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-/* 🔥 TA CONFIG FIREBASE (CORRECTE) */
+/* 🔥 TA VRAIE CONFIG FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -107,7 +142,7 @@ const SECRET_CODE = "TECH2026";
 
 /* ================= CODE GATE ================= */
 window.checkCode = function(){
-let code = document.getElementById("accessCode").value;
+let code=document.getElementById("accessCode").value;
 
 if(code === SECRET_CODE){
 document.getElementById("codeGate").style.display="none";
@@ -131,6 +166,15 @@ document.getElementById("loginBox").style.display="none";
 alert("Erreur : " + e.message);
 });
 };
+
+/* PROTECTION */
+onAuthStateChanged(auth,user=>{
+if(user){
+document.getElementById("loginBox").style.display="none";
+}else{
+document.getElementById("loginBox").style.display="flex";
+}
+});
 
 </script>
 
