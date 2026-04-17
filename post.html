@@ -11,25 +11,14 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 
 .box{background:white;margin:10px;padding:10px;border-radius:12px;}
 
-.chatBox{
-  height:320px;
-  overflow:auto;
-  background:white;
-  padding:10px;
-  border-radius:12px;
-}
+.chatBox{height:320px;overflow:auto;background:white;padding:10px;border-radius:12px;}
 
-.msg{padding:8px;margin:5px;border-radius:10px;max-width:70%;display:flex;gap:5px;}
+.msg{padding:8px;margin:5px;border-radius:10px;max-width:70%;}
 .me{background:#cfe6ff;margin-left:auto;}
 .other{background:#eee;}
 
 .small{font-size:12px;color:gray;}
-
-.avatar{
-  width:30px;
-  height:30px;
-  border-radius:50%;
-}
+.avatar{width:30px;height:30px;border-radius:50%;}
 </style>
 </head>
 
@@ -37,7 +26,6 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 
 <header>RS TECHNOVA ACADEMY🔥</header>
 
-<!-- LOGIN -->
 <div class="box" id="loginBox">
   <h3>Connexion</h3>
   <input id="email" placeholder="Email">
@@ -47,38 +35,36 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
   <button onclick="signup()">Créer compte</button>
 </div>
 
-<!-- APP -->
 <div id="app" style="display:none;">
 
-  <!-- PROFIL -->
-  <div class="box">
-    <h3>👤 Profil</h3>
-    <input id="avatarInput" type="file">
-    <button onclick="saveAvatar()">Changer photo</button>
-    <div id="myAvatar"></div>
-  </div>
+<div class="box">
+  <h3>👤 Profil</h3>
+  <input id="avatarInput" type="file">
+  <button onclick="saveAvatar()">Changer photo</button>
+  <div id="myAvatar"></div>
+</div>
 
-  <!-- 🔥 STORIES -->
-  <div class="box">
-    <h3>📸 Stories</h3>
-    <input type="file" id="storyFile">
-    <button onclick="addStory()">Publier</button>
-    <div id="stories"></div>
-  </div>
+<!-- STORIES -->
+<div class="box">
+  <h3>📸 Stories</h3>
+  <input type="file" id="storyFile">
+  <button onclick="addStory()">Publier</button>
+  <div id="stories"></div>
+</div>
 
-  <div class="box">
-    <h3>👥 Utilisateurs</h3>
-    <div id="users"></div>
-  </div>
+<div class="box">
+  <h3>👥 Utilisateurs</h3>
+  <div id="users"></div>
+</div>
 
-  <div class="box">
-    <h3>💬 Chat privé</h3>
-    <div class="chatBox" id="chatBox"></div>
-    <div id="typing" class="small"></div>
-  </div>
+<div class="box">
+  <h3>💬 Chat privé</h3>
+  <div class="chatBox" id="chatBox"></div>
+  <div id="typing" class="small"></div>
+</div>
 
-  <input id="msg" placeholder="Message..." oninput="typing()">
-  <button onclick="sendMsg()">Envoyer</button>
+<input id="msg" placeholder="Message..." oninput="typing()">
+<button onclick="sendMsg()">Envoyer</button>
 
 </div>
 
@@ -87,7 +73,6 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
-
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -95,7 +80,6 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -107,13 +91,11 @@ function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
-
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("app").style.display="block";
-
+    loginBox.style.display="none";
+    app.style.display="block";
     loadUsers();
     loadProfile();
-    loadStories(); // 🔥 ajouté
+    loadStories();
     presence();
   })
   .catch(e=>alert(e.message));
@@ -124,13 +106,9 @@ function signup(){
   auth.createUserWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
-
     db.collection("users").doc(me).set({
-      email: me,
-      avatar:"",
-      lastSeen: Date.now()
+      email:me,avatar:"",lastSeen:Date.now()
     });
-
     alert("Compte créé");
   })
   .catch(e=>alert(e.message));
@@ -138,87 +116,34 @@ function signup(){
 
 /* PROFILE */
 function saveAvatar(){
-  const file=document.getElementById("avatarInput").files[0];
-  if(!file) return;
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    db.collection("users").doc(me).set({
-      avatar:reader.result
-    },{merge:true});
+  let file=avatarInput.files[0];
+  if(!file)return;
+  let r=new FileReader();
+  r.onload=()=>{
+    db.collection("users").doc(me).set({avatar:r.result},{merge:true});
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 
 function loadProfile(){
   db.collection("users").doc(me).onSnapshot(doc=>{
-    if(!doc.exists) return;
     let u=doc.data();
-
-    document.getElementById("myAvatar").innerHTML=`
-      <img class="avatar" src="${u.avatar||''}">
-    `;
+    myAvatar.innerHTML=`<img class="avatar" src="${u.avatar||''}">`;
   });
-}
-
-/* 🔥 STORIES */
-function addStory(){
-  const file=document.getElementById("storyFile").files[0];
-  if(!file) return;
-
-  const reader=new FileReader();
-  reader.onload=()=>{
-    db.collection("stories").add({
-      user:me,
-      image:reader.result,
-      time:Date.now()
-    });
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadStories(){
-  db.collection("stories").orderBy("time","desc")
-  .onSnapshot(snap=>{
-    const box=document.getElementById("stories");
-    box.innerHTML="";
-
-    snap.forEach(doc=>{
-      const s=doc.data();
-
-      if(Date.now() - s.time < 21600000){ // 6h
-        box.innerHTML+=`
-          <div style="margin-top:10px;">
-            <b>${s.user}</b><br>
-            <img src="${s.image}" style="width:100%;border-radius:10px;">
-            ${s.user===me ? `<br><button onclick="deleteStory('${doc.id}')">🗑 Supprimer</button>` : ""}
-          </div>
-        `;
-      }
-    });
-  });
-}
-
-function deleteStory(id){
-  db.collection("stories").doc(id).delete();
 }
 
 /* USERS */
 function loadUsers(){
   db.collection("users").onSnapshot(snap=>{
-    let box=document.getElementById("users");
-    box.innerHTML="";
-
+    users.innerHTML="";
     snap.forEach(doc=>{
       let u=doc.data();
-      let online = Date.now()-u.lastSeen < 5000;
-
-      if(u.email !== me){
-        box.innerHTML+=`
+      let online=Date.now()-u.lastSeen<5000;
+      if(u.email!==me){
+        users.innerHTML+=`
           <div onclick="openChat('${u.email}')">
             👤 ${u.email} ${online?"🟢":"⚫"}
-          </div>
-        `;
+          </div>`;
       }
     });
   });
@@ -231,15 +156,11 @@ function openChat(user){
 }
 
 function sendMsg(){
-  if(!currentChatUser) return alert("Choisis un utilisateur");
-
-  let text=msg.value;
-  if(!text) return;
-
+  if(!currentChatUser)return alert("Choisis un utilisateur");
   let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
-    text,
+    text:msg.value,
     from:me,
     time:Date.now(),
     seen:false
@@ -248,69 +169,119 @@ function sendMsg(){
   msg.value="";
 }
 
+/* 🔥 FAST CHAT */
 function loadChat(){
-
   let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id)
   .collection("messages")
   .orderBy("time")
-  .onSnapshot(async snap=>{
+  .onSnapshot(snap=>{
+    chatBox.innerHTML="";
 
-    let box=document.getElementById("chatBox");
-    box.innerHTML="";
-
-    for(const docu of snap.docs){
-      let m=docu.data();
-
-      let userDoc=await db.collection("users").doc(m.from).get();
-      let avatar=userDoc.data()?.avatar||"";
-
+    snap.forEach(doc=>{
+      let m=doc.data();
       let status=m.seen?"✔✔":"✔";
 
-      box.innerHTML+=`
+      chatBox.innerHTML+=`
         <div class="msg ${m.from===me?'me':'other'}">
-          <img class="avatar" src="${avatar}">
-          <div>
-            ${m.text}
-            <div class="small">${status}</div>
-            ${m.from===me ? `<button onclick="deleteMsg('${id}','${docu.id}')">🗑</button>` : ""}
-          </div>
+          ${m.text}
+          <div class="small">${status}</div>
+          ${m.from===me?`<button onclick="deleteMsg('${id}','${doc.id}')">🗑</button>`:""}
         </div>
       `;
 
       if(m.from!==me){
         db.collection("chats").doc(id)
-        .collection("messages").doc(docu.id)
+        .collection("messages").doc(doc.id)
         .update({seen:true});
       }
-    }
+    });
   });
 }
 
-/* DELETE MESSAGE */
 function deleteMsg(chatId,msgId){
   db.collection("chats").doc(chatId)
   .collection("messages").doc(msgId)
   .delete();
 }
 
+/* STORIES */
+function addStory(){
+  let file=storyFile.files[0];
+  if(!file)return;
+
+  let r=new FileReader();
+  r.onload=()=>{
+    db.collection("stories").add({
+      user:me,
+      media:r.result,
+      type:file.type.startsWith("video")?"video":"image",
+      time:Date.now(),
+      views:[],
+      reactions:{}
+    });
+  };
+  r.readAsDataURL(file);
+}
+
+function loadStories(){
+  db.collection("stories").orderBy("time","desc")
+  .onSnapshot(snap=>{
+    stories.innerHTML="";
+
+    snap.forEach(doc=>{
+      let s=doc.data();
+
+      if(Date.now()-s.time<21600000){
+        stories.innerHTML+=`
+          <div onclick="openStory('${doc.id}')">
+            👤 ${s.user} (${s.views?.length||0} vues)
+          </div>
+        `;
+      }
+    });
+  });
+}
+
+function openStory(id){
+  db.collection("stories").doc(id).get().then(doc=>{
+    let s=doc.data();
+
+    db.collection("stories").doc(id).update({
+      views:firebase.firestore.FieldValue.arrayUnion(me)
+    });
+
+    if(s.type==="video"){
+      chatBox.innerHTML=`<video src="${s.media}" controls autoplay width="100%"></video>`;
+    }else{
+      chatBox.innerHTML=`<img src="${s.media}" style="width:100%">`;
+    }
+  });
+}
+
+function reactStory(id,emoji){
+  db.collection("stories").doc(id).update({
+    ["reactions."+me]:emoji
+  });
+}
+
+function deleteStory(id){
+  db.collection("stories").doc(id).delete();
+}
+
 /* TYPING */
 function typing(){
   let id=[me,currentChatUser].sort().join("_");
-
   db.collection("typing").doc(id).set({user:me});
-
-  setTimeout(()=>{
-    db.collection("typing").doc(id).delete();
-  },1000);
+  setTimeout(()=>db.collection("typing").doc(id).delete(),1000);
 }
 
 db.collection("typing").onSnapshot(snap=>{
   snap.forEach(doc=>{
     let t=doc.data();
     if(t.user!==me){
-      document.getElementById("typing").innerText="✍️ écrit...";
+      typing.innerText="✍️ écrit...";
     }
   });
 });
@@ -327,6 +298,5 @@ function presence(){
 }
 
 </script>
-
 </body>
 </html>
