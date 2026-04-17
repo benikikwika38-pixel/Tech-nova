@@ -63,14 +63,61 @@ border-radius:5px;
 border:none;
 }
 
-/* RESTE IDENTIQUE */
-header{background:#2c3e50;color:white;text-align:center;padding:50px 20px;position:relative;}
-.menu{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer;}
-nav{display:none;background:#2c3e50;position:absolute;top:80px;right:20px;border-radius:8px;}
-nav a{display:block;color:white;padding:12px;text-decoration:none;}
-section{max-width:900px;margin:40px auto;padding:20px;background:white;border-radius:10px;}
-button{padding:12px 25px;background:#2980b9;color:white;border:none;border-radius:8px;}
-footer{text-align:center;margin:40px;color:#555;}
+/* HEADER */
+header{
+background:#2c3e50;
+color:white;
+text-align:center;
+padding:50px 20px;
+position:relative;
+}
+
+.menu{
+position:absolute;
+top:20px;
+right:25px;
+font-size:28px;
+cursor:pointer;
+}
+
+nav{
+display:none;
+background:#2c3e50;
+position:absolute;
+top:80px;
+right:20px;
+border-radius:8px;
+}
+
+nav a{
+display:block;
+color:white;
+padding:12px;
+text-decoration:none;
+}
+
+section{
+max-width:900px;
+margin:40px auto;
+padding:20px;
+background:white;
+border-radius:10px;
+}
+
+button{
+padding:12px 25px;
+background:#2980b9;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+footer{
+text-align:center;
+margin:40px;
+color:#555;
+}
 </style>
 </head>
 
@@ -85,7 +132,7 @@ footer{text-align:center;margin:40px;color:#555;}
 
 <!-- 🔐 LOGIN -->
 <div id="loginBox">
-<h2>Connexion TechNova</h2>
+<h2>Bienvenue dans TechNova</h2>
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Mot de passe">
 <button onclick="login()">Se connecter</button>
@@ -95,12 +142,6 @@ footer{text-align:center;margin:40px;color:#555;}
 <div class="menu" onclick="toggleMenu()">☰</div>
 <h1>TechNova Academy</h1>
 <p>Communauté des érudits</p>
-
-<nav id="menu">
-<a href="#">Cours</a>
-<a href="#">IA</a>
-<a href="#">Chat</a>
-</nav>
 </header>
 
 <section>
@@ -113,7 +154,7 @@ footer{text-align:center;margin:40px;color:#555;}
 <script>
 function toggleMenu(){
 let m=document.getElementById("menu");
-m.style.display = m.style.display==="block"?"none":"block";
+if(m) m.style.display = m.style.display==="block"?"none":"block";
 }
 </script>
 
@@ -121,11 +162,8 @@ m.style.display = m.style.display==="block"?"none":"block";
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import { getDatabase, ref, set, get } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 /* CONFIG */
 const firebaseConfig = {
@@ -136,23 +174,11 @@ projectId: "TON_PROJECT"
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
 
 /* 🔐 CODE */
 const SECRET_CODE = "TECH2026";
 
-/* 📱 DEVICE ID */
-function getDeviceId(){
-let id = localStorage.getItem("device_id");
-if(!id){
-id = crypto.randomUUID();
-localStorage.setItem("device_id", id);
-}
-return id;
-}
-
-/* ================= IMPORTANT FIX ================= */
-/* 🔥 rendre fonction accessible bouton */
+/* IMPORTANT FIX */
 window.checkCode = function(){
 let code=document.getElementById("accessCode").value;
 
@@ -169,29 +195,16 @@ const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
 
 signInWithEmailAndPassword(auth,email,password)
-.then(async (userCred)=>{
-
-const user=userCred.user;
-const deviceId=getDeviceId();
-
-await set(ref(db,"devices/"+user.uid),{
-deviceId:deviceId
-});
-
-})
 .catch(e=>alert(e.message));
 };
 
-/* PROTECTION */
 onAuthStateChanged(auth,user=>{
 if(user){
 document.getElementById("loginBox").style.display="none";
-}else{
-document.getElementById("loginBox").style.display="flex";
 }
 });
 
 </script>
 
 </body>
-</html>
+  </html>
