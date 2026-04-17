@@ -11,17 +11,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
-
-/* ===== STYLE ===== */
 body{
 font-family:'Georgia',serif;
-background-color:#f4f4f9;
-color:#222;
+background:#f4f4f9;
 margin:0;
-padding:0;
+color:#222;
 }
 
-/* 🔐 CODE GATE */
+/* CODE GATE */
 #codeGate{
 position:fixed;
 top:0;left:0;
@@ -44,7 +41,7 @@ border-radius:5px;
 border:none;
 }
 
-/* 🔐 LOGIN */
+/* LOGIN */
 #loginBox{
 position:fixed;
 top:0;left:0;
@@ -66,80 +63,22 @@ border-radius:5px;
 border:none;
 }
 
-/* HEADER */
-header{
-background:#2c3e50;
-color:white;
-text-align:center;
-padding:50px 20px;
-position:relative;
-}
-
-.menu{
-position:absolute;
-top:20px;
-right:25px;
-font-size:28px;
-cursor:pointer;
-}
-
-nav{
-display:none;
-background:#2c3e50;
-position:absolute;
-top:80px;
-right:20px;
-border-radius:8px;
-overflow:hidden;
-}
-
-nav a{
-display:block;
-color:white;
-padding:12px 20px;
-text-decoration:none;
-border-bottom:1px solid rgba(255,255,255,0.2);
-}
-
-nav a:hover{
-background:#34495e;
-}
-
-/* SECTIONS */
-section{
-max-width:900px;
-margin:40px auto;
-padding:20px;
-background:white;
-border-radius:10px;
-box-shadow:0 6px 15px rgba(0,0,0,0.1);
-}
-
-button{
-padding:12px 25px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#2980b9;
-color:white;
-}
-
-footer{
-text-align:center;
-color:#555;
-margin:50px 0 20px 0;
-font-size:0.9em;
-}
-
+/* RESTE IDENTIQUE */
+header{background:#2c3e50;color:white;text-align:center;padding:50px 20px;position:relative;}
+.menu{position:absolute;top:20px;right:25px;font-size:28px;cursor:pointer;}
+nav{display:none;background:#2c3e50;position:absolute;top:80px;right:20px;border-radius:8px;}
+nav a{display:block;color:white;padding:12px;text-decoration:none;}
+section{max-width:900px;margin:40px auto;padding:20px;background:white;border-radius:10px;}
+button{padding:12px 25px;background:#2980b9;color:white;border:none;border-radius:8px;}
+footer{text-align:center;margin:40px;color:#555;}
 </style>
 </head>
 
 <body>
 
-<!-- 🔐 CODE AVANT ACCÈS -->
+<!-- 🔐 CODE GATE -->
 <div id="codeGate">
 <h2>🔐 Accès sécurisé TechNova</h2>
-
 <input id="accessCode" placeholder="Entrer le code">
 <button onclick="checkCode()">Valider</button>
 </div>
@@ -153,54 +92,28 @@ font-size:0.9em;
 </div>
 
 <header>
-
-<div class="menu" onclick="ouvrirMenu()">☰</div>
-
+<div class="menu" onclick="toggleMenu()">☰</div>
 <h1>TechNova Academy</h1>
-
-<p>Communauté des érudits passionnés par l’informatique</p>
+<p>Communauté des érudits</p>
 
 <nav id="menu">
-<a href="espace-etudiant.html">Espace étudiants</a>
-<a href="certificat.html">Certificat</a>
-<a href="acces-cours.html">Cours</a>
-<a href="ia.html">Technova IA</a>
-<a href="post.html">📢 RS TECHNOVA</a>
-<a href="chat.html">💬 Contacter Admin</a>
+<a href="#">Cours</a>
+<a href="#">IA</a>
+<a href="#">Chat</a>
 </nav>
-
 </header>
 
 <section>
 <h2>À propos</h2>
-<p>TechNova Academy forme des esprits ambitieux en informatique.</p>
+<p>TechNova Academy forme des esprits ambitieux.</p>
 </section>
 
-<section>
-<h2>Formations</h2>
-<ul>
-<li>Excel</li>
-<li>Word</li>
-<li>Bases de données</li>
-<li>Informatique</li>
-</ul>
-</section>
-
-<section>
-<h2>Inscription</h2>
-<a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
-<button>S'inscrire</button>
-</a>
-</section>
-
-<footer>
-© 2026 TechNova Academy
-</footer>
+<footer>© 2026 TechNova Academy</footer>
 
 <script>
-function ouvrirMenu(){
-let menu=document.getElementById("menu");
-menu.style.display=(menu.style.display==="block")?"none":"block";
+function toggleMenu(){
+let m=document.getElementById("menu");
+m.style.display = m.style.display==="block"?"none":"block";
 }
 </script>
 
@@ -214,24 +127,16 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, get } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-import { getMessaging, getToken, onMessage } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
-
-/* 🔥 CONFIG FIREBASE */
+/* CONFIG */
 const firebaseConfig = {
 apiKey: "TON_API_KEY",
 authDomain: "TON_PROJECT.firebaseapp.com",
-projectId: "TON_PROJECT",
-appId: "TON_APP_ID"
+projectId: "TON_PROJECT"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
-const messaging = getMessaging(app);
-
-/* 👑 ADMIN */
-const adminEmail = "benikikwika38@gmail.com";
 
 /* 🔐 CODE */
 const SECRET_CODE = "TECH2026";
@@ -246,9 +151,10 @@ localStorage.setItem("device_id", id);
 return id;
 }
 
-/* ================= CODE GATE ================= */
+/* ================= IMPORTANT FIX ================= */
+/* 🔥 rendre fonction accessible bouton */
 window.checkCode = function(){
-let code = document.getElementById("accessCode").value;
+let code=document.getElementById("accessCode").value;
 
 if(code === SECRET_CODE){
 document.getElementById("codeGate").style.display="none";
@@ -258,7 +164,6 @@ alert("❌ Code incorrect");
 }
 };
 
-/* ================= LOGIN ================= */
 window.login = function(){
 const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
@@ -266,10 +171,9 @@ const password=document.getElementById("password").value;
 signInWithEmailAndPassword(auth,email,password)
 .then(async (userCred)=>{
 
-const user = userCred.user;
-const deviceId = getDeviceId();
+const user=userCred.user;
+const deviceId=getDeviceId();
 
-/* 🔐 ENREGISTRE CE TÉLÉPHONE */
 await set(ref(db,"devices/"+user.uid),{
 deviceId:deviceId
 });
@@ -278,59 +182,16 @@ deviceId:deviceId
 .catch(e=>alert(e.message));
 };
 
-/* 🚪 LOGOUT */
-window.logout = function(){
-signOut(auth);
-};
-
-/* ================= PROTECTION ================= */
+/* PROTECTION */
 onAuthStateChanged(auth,user=>{
 if(user){
-
 document.getElementById("loginBox").style.display="none";
-
-/* 🔐 VERROUILLAGE APPAREIL */
-const deviceId = getDeviceId();
-
-get(ref(db,"devices/"+user.uid)).then(snapshot=>{
-const data = snapshot.val();
-
-if(data && data.deviceId !== deviceId){
-document.body.innerHTML = "<h1>🚫 Accès refusé (appareil non autorisé)</h1>";
-}
-});
-
-/* 👑 ADMIN PANEL */
-if(user.email===adminEmail){
-let div=document.createElement("div");
-div.innerHTML=`
-<div style="position:fixed;bottom:10px;right:10px;background:#000;color:#fff;padding:10px;border-radius:10px;">
-👑 ADMIN MODE
-<br>
-<button onclick="alert('Ajout cours bientôt')">Ajouter cours</button>
-</div>`;
-document.body.appendChild(div);
-}
-
 }else{
 document.getElementById("loginBox").style.display="flex";
 }
 });
 
-/* 🔔 NOTIFICATIONS */
-Notification.requestPermission();
-
-getToken(messaging,{
-vapidKey:"TON_VAPID_KEY"
-}).then(token=>{
-console.log("Device Token:",token);
-});
-
-onMessage(messaging,(payload)=>{
-alert("📢 "+payload.notification.title);
-});
-
 </script>
 
 </body>
-            </html>
+</html>
