@@ -58,7 +58,16 @@ header{background:#0a5bd3;color:white;padding:12px;text-align:center;font-weight
 </div>
 
 <div class="box">
-  <h3>💬 Chat privé</h3>
+  
+  <!-- 🔥 HEADER CHAT -->
+  <div id="chatHeader" style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+    <img id="chatAvatar" class="avatar">
+    <div>
+      <b id="chatName"></b><br>
+      <span id="chatStatus" class="small"></span>
+    </div>
+  </div>
+
   <div class="chatBox" id="chatBox"></div>
   <div id="typing" class="small"></div>
 </div>
@@ -149,14 +158,35 @@ function loadUsers(){
   });
 }
 
-/* CHAT */
+/* CHAT HEADER */
+function loadChatHeader(){
+  db.collection("users").doc(currentChatUser)
+  .onSnapshot(doc=>{
+    let u=doc.data();
+    let online=Date.now()-u.lastSeen<5000;
+
+    chatAvatar.src = u.avatar || "";
+    chatName.innerText = u.email;
+    chatStatus.innerText = online ? "🟢 en ligne" : "⚫ hors ligne";
+  });
+}
+
+/* OPEN CHAT */
 function openChat(user){
   currentChatUser=user;
   loadChat();
+  loadChatHeader();
 }
 
+/* CLICK PROFILE → STORY */
+chatHeader.onclick = function(){
+  openUserStory(currentChatUser);
+};
+
+/* SEND */
 function sendMsg(){
   if(!currentChatUser)return alert("Choisis un utilisateur");
+
   let id=[me,currentChatUser].sort().join("_");
 
   db.collection("chats").doc(id).collection("messages").add({
@@ -169,7 +199,7 @@ function sendMsg(){
   msg.value="";
 }
 
-/* 🔥 FAST CHAT */
+/* FAST CHAT */
 function loadChat(){
   let id=[me,currentChatUser].sort().join("_");
 
@@ -218,8 +248,7 @@ function addStory(){
       media:r.result,
       type:file.type.startsWith("video")?"video":"image",
       time:Date.now(),
-      views:[],
-      reactions:{}
+      views:[]
     });
   };
   r.readAsDataURL(file);
@@ -229,13 +258,12 @@ function loadStories(){
   db.collection("stories").orderBy("time","desc")
   .onSnapshot(snap=>{
     stories.innerHTML="";
-
     snap.forEach(doc=>{
       let s=doc.data();
 
       if(Date.now()-s.time<21600000){
         stories.innerHTML+=`
-          <div onclick="openStory('${doc.id}')">
+          <div onclick="openUserStory('${s.user}')">
             👤 ${s.user} (${s.views?.length||0} vues)
           </div>
         `;
@@ -244,11 +272,19 @@ function loadStories(){
   });
 }
 
-function openStory(id){
-  db.collection("stories").doc(id).get().then(doc=>{
+function openUserStory(user){
+  db.collection("stories")
+  .where("user","==",user)
+  .orderBy("time","desc")
+  .limit(1)
+  .get()
+  .then(snap=>{
+    if(snap.empty) return alert("Aucune story");
+
+    let doc=snap.docs[0];
     let s=doc.data();
 
-    db.collection("stories").doc(id).update({
+    db.collection("stories").doc(doc.id).update({
       views:firebase.firestore.FieldValue.arrayUnion(me)
     });
 
@@ -258,16 +294,6 @@ function openStory(id){
       chatBox.innerHTML=`<img src="${s.media}" style="width:100%">`;
     }
   });
-}
-
-function reactStory(id,emoji){
-  db.collection("stories").doc(id).update({
-    ["reactions."+me]:emoji
-  });
-}
-
-function deleteStory(id){
-  db.collection("stories").doc(id).delete();
 }
 
 /* TYPING */
