@@ -72,6 +72,7 @@ padding:50px 20px;
 position:relative;
 }
 
+/* ☰ MENU */
 .menu{
 position:absolute;
 top:20px;
@@ -80,6 +81,7 @@ font-size:28px;
 cursor:pointer;
 }
 
+/* NAV */
 nav{
 display:none;
 background:#2c3e50;
@@ -88,6 +90,7 @@ top:80px;
 right:20px;
 border-radius:8px;
 overflow:hidden;
+z-index:10000;
 }
 
 nav a{
@@ -149,16 +152,24 @@ font-size:0.9em;
 </div>
 
 <header>
+<div class="menu" onclick="toggleMenu()">☰</div>
+
 <h1>TechNova Academy</h1>
 <p>Communauté des érudits passionnés par l’informatique</p>
+
+<nav id="navMenu">
+<a href="#about">À propos</a>
+<a href="#formations">Formations</a>
+<a href="#inscription">Inscription</a>
+</nav>
 </header>
 
-<section>
+<section id="about">
 <h2>À propos</h2>
 <p>TechNova Academy forme des esprits ambitieux en informatique.</p>
 </section>
 
-<section>
+<section id="formations">
 <h2>Formations</h2>
 <ul>
 <li>Excel</li>
@@ -168,7 +179,7 @@ font-size:0.9em;
 </ul>
 </section>
 
-<section>
+<section id="inscription">
 <h2>Inscription</h2>
 <a href="https://forms.gle/8b2CHCozdcM33EMt5" target="_blank">
 <button>S'inscrire</button>
@@ -183,7 +194,7 @@ font-size:0.9em;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 import { getDatabase, ref, set, get } 
@@ -192,7 +203,7 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { getMessaging, getToken, onMessage } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
-/* 🔥 TA CONFIG FIREBASE */
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -208,13 +219,13 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const messaging = getMessaging(app);
 
-/* 👑 ADMIN */
+/* ADMIN */
 const adminEmail = "benikikwika38@gmail.com";
 
-/* 🔐 CODE SECRET */
+/* CODE SECRET */
 const SECRET_CODE = "TECH2026";
 
-/* 📱 DEVICE ID */
+/* DEVICE ID */
 function getDeviceId(){
 let id = localStorage.getItem("device_id");
 if(!id){
@@ -224,7 +235,13 @@ localStorage.setItem("device_id", id);
 return id;
 }
 
-/* ================= CODE GATE ================= */
+/* MENU TOGGLE */
+window.toggleMenu = function(){
+const nav = document.getElementById("navMenu");
+nav.style.display = (nav.style.display === "block") ? "none" : "block";
+};
+
+/* CODE GATE */
 window.checkCode = function(){
 let code = document.getElementById("accessCode").value;
 
@@ -236,7 +253,7 @@ alert("❌ Code incorrect");
 }
 };
 
-/* ================= LOGIN ================= */
+/* LOGIN */
 window.login = function(){
 const email=document.getElementById("email").value;
 const password=document.getElementById("password").value;
@@ -255,7 +272,7 @@ deviceId:deviceId
 .catch(e=>alert(e.message));
 };
 
-/* ================= PROTECTION ================= */
+/* PROTECTION */
 onAuthStateChanged(auth,user=>{
 if(user){
 document.getElementById("loginBox").style.display="none";
@@ -286,7 +303,7 @@ document.getElementById("loginBox").style.display="flex";
 }
 });
 
-/* 🔔 NOTIFICATIONS */
+/* NOTIFICATIONS */
 Notification.requestPermission();
 
 getToken(messaging,{
@@ -302,4 +319,4 @@ alert("📢 "+payload.notification.title);
 </script>
 
 </body>
-            </html>
+</html>
