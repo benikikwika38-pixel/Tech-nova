@@ -203,7 +203,7 @@ function signup(){
     db.collection("users").doc(me).set({
       email:me,
       avatar:"",
-      lastSeen:firebase.firestore.FieldValue.serverTimestamp()
+      lastSeen:Date.now()
     });
     alert("Compte créé");
   })
@@ -233,7 +233,7 @@ function loadUsers(){
     users.innerHTML="";
     snap.forEach(doc=>{
       let u=doc.data();
-      let online = u.lastSeen && (Date.now() - u.lastSeen.toMillis() < 5000);
+      let online=Date.now()-(u.lastSeen||0)<5000;
 
       if(u.email!==me){
         users.innerHTML+=`
@@ -254,7 +254,7 @@ function loadChatHeader(){
   db.collection("users").doc(currentChatUser)
   .onSnapshot(doc=>{
     let u=doc.data();
-    let online = u.lastSeen && (Date.now() - u.lastSeen.toMillis() < 5000);
+    let online=Date.now()-(u.lastSeen||0)<5000;
 
     chatAvatar.src = u.avatar || "";
     chatName.innerText = u.email;
@@ -278,7 +278,7 @@ function sendMsg(){
   db.collection("chats").doc(id).collection("messages").add({
     text:msg.value,
     from:me,
-    time:firebase.firestore.FieldValue.serverTimestamp(),
+    time:Date.now(),
     seen:false
   });
 
@@ -315,7 +315,7 @@ function loadChat(){
   });
 }
 
-/* STORIES (FIX ICI 🔥) */
+/* STORIES */
 function addStory(){
   let file=storyFile.files[0];
   let r=new FileReader();
@@ -324,7 +324,7 @@ function addStory(){
       user:me,
       media:r.result,
       type:file.type.startsWith("video")?"video":"image",
-      time:firebase.firestore.FieldValue.serverTimestamp(),
+      time:Date.now(),
       views:[],
       reactions:[]
     });
@@ -332,7 +332,6 @@ function addStory(){
   r.readAsDataURL(file);
 }
 
-/* LOAD STORIES FIX */
 function loadStories(){
   db.collection("stories").orderBy("time","desc")
   .onSnapshot(snap=>{
@@ -340,11 +339,7 @@ function loadStories(){
     snap.forEach(doc=>{
       let s=doc.data();
 
-      if(!s.time) return;
-
-      let time = s.time.toMillis();
-
-      if(Date.now()-time < 21600000){
+      if(Date.now()-s.time<21600000){
         stories.innerHTML+=`
           <div class="story" onclick="openUserStory('${doc.id}')">
             <img src="${s.media}">
@@ -371,10 +366,25 @@ function openUserStory(id){
     modal.innerHTML=`
       <div style="color:white;position:absolute;top:10px;">${s.user}</div>
       ${media}
+      <div>
+        <button onclick="reactStory('${id}','🔥')">🔥</button>
+        <button onclick="reactStory('${id}','❤️')">❤️</button>
+        <button onclick="reactStory('${id}','😂')">😂</button>
+      </div>
       <button onclick="this.parentElement.remove()">❌</button>
     `;
 
     document.body.appendChild(modal);
+  });
+}
+
+/* REACTION */
+function reactStory(id,emoji){
+  db.collection("stories").doc(id).update({
+    reactions:firebase.firestore.FieldValue.arrayUnion({
+      user:me,
+      emoji:emoji
+    })
   });
 }
 
@@ -399,7 +409,7 @@ function presence(){
   setInterval(()=>{
     if(me){
       db.collection("users").doc(me).set({
-        lastSeen:firebase.firestore.FieldValue.serverTimestamp()
+        lastSeen:Date.now()
       },{merge:true});
     }
   },3000);
@@ -408,4 +418,4 @@ function presence(){
 </script>
 
 </body>
-      </html>
+  </html>
