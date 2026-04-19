@@ -145,7 +145,6 @@ button{
 
 <div id="app" style="display:none;">
 
-<!-- 🔥 DISCUSSIONS -->
 <div class="box">
   <h3>💬 Discussions</h3>
   <div id="conversations"></div>
@@ -158,7 +157,6 @@ button{
   <div id="myAvatar"></div>
 </div>
 
-<!-- STORIES -->
 <div class="box">
   <h3>📸 Stories</h3>
   <input type="file" id="storyFile">
@@ -166,13 +164,11 @@ button{
   <div id="stories"></div>
 </div>
 
-<!-- USERS -->
 <div class="box">
   <h3>👥 Utilisateurs</h3>
   <div id="users"></div>
 </div>
 
-<!-- CHAT -->
 <div class="box">
 
 <div id="chatHeader">
@@ -209,8 +205,19 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let me="";
-let currentChatUser="";
+let me = "";
+let currentChatUser = "";
+
+/* DOM FIX */
+const msg = document.getElementById("msg");
+const conversations = document.getElementById("conversations");
+const stories = document.getElementById("stories");
+const chatBox = document.getElementById("chatBox");
+const chatAvatar = document.getElementById("chatAvatar");
+const chatName = document.getElementById("chatName");
+const chatStatus = document.getElementById("chatStatus");
+const typingBox = document.getElementById("typing");
+const users = document.getElementById("users");
 
 /* LOGIN */
 function login(){
@@ -222,7 +229,7 @@ function login(){
     loadUsers();
     loadProfile();
     loadStories();
-    loadConversations(); // 🔥
+    loadConversations();
     presence();
   })
   .catch(e=>alert(e.message));
@@ -243,15 +250,30 @@ function signup(){
   .catch(e=>alert(e.message));
 }
 
-/* 🔥 CONVERSATIONS */
+/* USERS */
+function loadUsers(){
+  db.collection("users").onSnapshot(snap=>{
+    users.innerHTML="";
+    snap.forEach(doc=>{
+      let u=doc.data();
+      if(u.email!==me){
+        users.innerHTML+=`
+          <div class="user">
+            <span>${u.email}</span>
+          </div>
+        `;
+      }
+    });
+  });
+}
+
+/* CONVERSATIONS */
 function loadConversations(){
   db.collection("conversations")
   .where("users","array-contains",me)
   .orderBy("lastTime","desc")
   .onSnapshot(async snap=>{
-
     conversations.innerHTML="";
-
     for(const doc of snap.docs){
       let c=doc.data();
       let other=c.users.find(u=>u!==me);
@@ -305,7 +327,7 @@ function openChat(user){
   loadChatHeader();
 }
 
-/* SEND */
+/* SEND MESSAGE */
 function sendMsg(){
   if(!currentChatUser)return alert("Choisis un utilisateur");
 
@@ -318,7 +340,6 @@ function sendMsg(){
     seen:false
   });
 
-  // 🔥 update conversation
   db.collection("conversations").doc(id).set({
     users:[me,currentChatUser],
     lastMessage:msg.value,
@@ -359,7 +380,7 @@ function loadChat(){
   });
 }
 
-/* STORIES (inchangé) */
+/* STORIES */
 function addStory(){
   let file=storyFile.files[0];
   let r=new FileReader();
@@ -368,9 +389,7 @@ function addStory(){
       user:me,
       media:r.result,
       type:file.type.startsWith("video")?"video":"image",
-      time:Date.now(),
-      views:[],
-      reactions:[]
+      time:Date.now()
     });
   };
   r.readAsDataURL(file);
@@ -394,7 +413,12 @@ function loadStories(){
   });
 }
 
-/* TYPING + ONLINE inchangé */
+/* STORY CLICK */
+function openUserStory(id){
+  alert("Story ouverte : " + id);
+}
+
+/* TYPING */
 function typing(){
   let id=[me,currentChatUser].sort().join("_");
   db.collection("typing").doc(id).set({user:me});
@@ -405,11 +429,12 @@ db.collection("typing").onSnapshot(snap=>{
   snap.forEach(doc=>{
     let t=doc.data();
     if(t.user!==me){
-      typing.innerText="✍️ écrit...";
+      typingBox.innerText="✍️ écrit...";
     }
   });
 });
 
+/* PRESENCE */
 function presence(){
   setInterval(()=>{
     if(me){
