@@ -6,41 +6,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{margin:0;font-family:Arial;background:#18191a;color:white;}
-header{background:#242526;padding:15px;text-align:center;}
+body{
+  margin:0;
+  font-family: Arial;
+  background:#0f1115;
+  color:white;
+}
 
-.box{background:#242526;margin:10px;padding:10px;border-radius:10px;}
+header{
+  background:#1c1e21;
+  padding:15px;
+  text-align:center;
+  font-weight:bold;
+}
 
-input{width:100%;padding:10px;border:none;border-radius:8px;}
-button{padding:10px;border:none;border-radius:8px;background:#2374e1;color:white;margin-top:5px;}
+.box{
+  background:#1c1e21;
+  margin:10px;
+  padding:10px;
+  border-radius:12px;
+}
+
+input, button{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border:none;
+  border-radius:8px;
+}
+
+button{
+  background:#2374e1;
+  color:white;
+}
+
+/* PROFIL */
+.profile{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  background:#333;
+}
+
+/* AMIS */
+.friend{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #333;
+}
+
+/* NOTIF */
+.notif{
+  background:#2d88ff;
+  padding:8px;
+  border-radius:8px;
+  margin:5px 0;
+  font-size:13px;
+}
 </style>
 </head>
 
 <body>
 
-<header>
-🌐 Tech Réseau  
-<br>
-<button onclick="goChat()">💬 Nova Réseau</button>
-</header>
+<header>🌐 Tech Réseau</header>
 
+<!-- LOGIN -->
 <div class="box" id="loginBox">
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Mot de passe">
-<button onclick="login()">Entrer</button>
+  <h3>Connexion</h3>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Mot de passe">
+  <button onclick="login()">Entrer</button>
 </div>
 
+<!-- APP -->
 <div id="app" style="display:none;">
+
+  <!-- PROFIL -->
   <div class="box">
-    <h3>Bienvenue sur Tech Réseau</h3>
-    <p>Accède à Nova Réseau pour discuter.</p>
+    <h3>👤 Profil</h3>
+    <div class="profile">
+      <div class="avatar" id="avatar"></div>
+      <div>
+        <b id="name"></b><br>
+        <small id="mail"></small>
+      </div>
+    </div>
   </div>
+
+  <!-- AMIS -->
+  <div class="box">
+    <h3>👥 Amis</h3>
+    <input id="friendEmail" placeholder="Email utilisateur">
+    <button onclick="sendRequest()">Ajouter ami</button>
+
+    <h4>Demandes</h4>
+    <div id="requests"></div>
+
+    <h4>Mes amis</h4>
+    <div id="friends"></div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="box">
+    <h3>🔔 Notifications</h3>
+    <div id="notifs"></div>
+  </div>
+
+  <button onclick="goChat()">💬 Aller à Nova Réseau</button>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 <script>
+
 const firebaseConfig = {
   apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
   authDomain: "technova-academy.firebaseapp.com",
@@ -49,29 +137,129 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 let me="";
 
+/* LOGIN */
 function login(){
   auth.signInWithEmailAndPassword(email.value,password.value)
   .then(u=>{
     me=u.user.email;
+
     loginBox.style.display="none";
     app.style.display="block";
-  })
-  .catch(e=>alert(e.message));
+
+    loadProfile();
+    loadRequests();
+    loadFriends();
+    loadNotifs();
+  });
 }
 
-function goChat(){
-  if(!me){
-    alert("Connecte-toi d'abord !");
-    return;
-  }
+/* PROFIL */
+function loadProfile(){
+  db.collection("users").doc(me).onSnapshot(doc=>{
+    let u=doc.data()||{};
 
-  localStorage.setItem("fromTech", "true");
+    name.innerText = u.name || me;
+    mail.innerText = me;
+  });
+}
+
+/* AMIS - DEMANDE */
+function sendRequest(){
+  db.collection("friendRequests").add({
+    from:me,
+    to:friendEmail.value,
+    status:"pending"
+  });
+
+  addNotif(friendEmail.value, me+" t'a envoyé une demande d'ami");
+}
+
+/* CHARGER DEMANDES */
+function loadRequests(){
+  db.collection("friendRequests")
+  .where("to","==",me)
+  .where("status","==","pending")
+  .onSnapshot(snap=>{
+    requests.innerHTML="";
+
+    snap.forEach(doc=>{
+      let r=doc.data();
+
+      requests.innerHTML+=`
+      <div class="friend">
+        ${r.from}
+        <button onclick="accept('${doc.id}', '${r.from}')">✔</button>
+      </div>`;
+    });
+  });
+}
+
+/* ACCEPTER AMI */
+function accept(id,from){
+  db.collection("friendRequests").doc(id).update({
+    status:"accepted"
+  });
+
+  db.collection("friends").add({
+    users:[me,from]
+  });
+
+  addNotif(from, me+" a accepté ta demande");
+}
+
+/* AMIS */
+function loadFriends(){
+  db.collection("friends")
+  .where("users","array-contains",me)
+  .onSnapshot(snap=>{
+    friends.innerHTML="";
+
+    snap.forEach(doc=>{
+      let f=doc.data();
+      let other=f.users.find(u=>u!==me);
+
+      friends.innerHTML+=`
+      <div class="friend">${other}</div>`;
+    });
+  });
+}
+
+/* NOTIFICATIONS */
+function addNotif(to,text){
+  db.collection("notifications").add({
+    to:to,
+    text:text,
+    time:Date.now()
+  });
+}
+
+/* LOAD NOTIF */
+function loadNotifs(){
+  db.collection("notifications")
+  .where("to","==",me)
+  .onSnapshot(snap=>{
+    notifs.innerHTML="";
+
+    snap.forEach(doc=>{
+      let n=doc.data();
+
+      notifs.innerHTML+=`
+      <div class="notif">${n.text}</div>`;
+    });
+  });
+}
+
+/* NAVIGATION */
+function goChat(){
+  localStorage.setItem("fromTech","true");
   window.location.href="nova.html";
 }
+
 </script>
 
 </body>
-</html>
+  </html>
