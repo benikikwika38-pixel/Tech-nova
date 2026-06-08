@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technova Academy - Forum Étudiants</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f7fb;
+    margin:0;
+}
+
+header{
+    background:#0f172a;
+    color:white;
+    padding:20px;
+    text-align:center;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+    margin-bottom:20px;
+}
+
+input, textarea{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    height:120px;
+}
+
+button{
+    margin-top:10px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.message{
+    background:white;
+    padding:15px;
+    margin-top:15px;
+    border-radius:10px;
+    border-left:5px solid #2563eb;
+}
+
+.nom{
+    font-weight:bold;
+    color:#2563eb;
+}
+
+.date{
+    font-size:12px;
+    color:gray;
+    margin-top:5px;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Technova Academy</h1>
+    <p>Forum Officiel des Étudiants</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Créer une publication</h2>
+
+        <input
+            type="text"
+            id="nom"
+            placeholder="Votre nom">
+
+        <textarea
+            id="message"
+            placeholder="Partagez une idée, une question ou une annonce..."></textarea>
+
+        <button onclick="publierMessage()">
+            Publier
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Publications</h2>
+
+        <div id="listeMessages"></div>
+
+    </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: apiKey: "AIzaSyAFPw3pHfHBrd2SaNuSdkqdLonID_Sr2hQ",
+  authDomain: "technova-academy.firebaseapp.com",
+  projectId: "technova-academy",
+  storageBucket: "technova-academy.firebasestorage.app",
+  messagingSenderId: "321716769948",
+  appId: "1:321716769948:web:c8e2d7a4d3e6be795e0959",
+  measurementId: "G-9X1R7Q9S5G"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+window.publierMessage = async function(){
+
+    const nom =
+        document.getElementById("nom").value;
+
+    const message =
+        document.getElementById("message").value;
+
+    if(!nom || !message){
+        alert("Complète tous les champs");
+        return;
+    }
+
+    try{
+
+        await addDoc(
+            collection(db,"forum"),
+            {
+                nom: nom,
+                message: message,
+                date: new Date().toISOString()
+            }
+        );
+
+        document.getElementById("message").value="";
+
+        chargerMessages();
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Erreur lors de la publication");
+
+    }
+
+}
+
+async function chargerMessages(){
+
+    const liste =
+        document.getElementById("listeMessages");
+
+    liste.innerHTML = "";
+
+    const q = query(
+        collection(db,"forum"),
+        orderBy("date","desc")
+    );
+
+    const snapshot =
+        await getDocs(q);
+
+    snapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+        liste.innerHTML += `
+        <div class="message">
+
+            <div class="nom">
+                ${data.nom}
+            </div>
+
+            <p>
+                ${data.message}
+            </p>
+
+            <div class="date">
+                ${new Date(data.date)
+                    .toLocaleString()}
+            </div>
+
+        </div>
+        `;
+
+    });
+
+}
+
+chargerMessages();
+
+</script>
+
+</body>
+</html>
